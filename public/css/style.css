@@ -1,0 +1,795 @@
+/*
+ * Karang Taruna Teluknaga - Company Profile Styles
+ * Inspired by Shine CSS, Bootstrap 5, Astroship & Glint
+ */
+
+/* =============================================
+   CSS Variables & Root Styles
+============================================= */
+:root {
+    --primary-color: #00A67E;
+    --primary-dark: #008F6B;
+    --primary-light: #E8F8F3;
+    --secondary-color: #1B1B18;
+    --accent-color: #FFB800;
+    --text-dark: #1B1B18;
+    --text-muted: #6B7280;
+    --text-light: #9CA3AF;
+    --bg-light: #F8F9FA;
+    --bg-white: #FFFFFF;
+    --border-color: #E5E7EB;
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    --transition-base: all 0.3s ease;
+    --font-primary: 'Plus Jakarta Sans', sans-serif;
+    --font-secondary: 'Inter', sans-serif;
+}
+
+/* =============================================
+   Base Styles
+============================================= */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    font-family: var(--font-secondary);
+    font-size: 16px;
+    line-height: 1.6;
+    color: var(--text-dark);
+    background-color: var(--bg-white);
+    overflow-x: hidden;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-primary);
+    font-weight: 700;
+    line-height: 1.2;
+    color: var(--text-dark);
+}
+
+a {
+    text-decoration: none;
+    transition: var(--transition-base);
+}
+
+img {
+    max-width: 100%;
+    height: auto;
+}
+
+/* =============================================
+   Bootstrap Overrides
+============================================= */
+.btn-primary {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+    font-weight: 600;
+    padding: 12px 28px;
+    transition: var(--transition-base);
+}
+
+.btn-primary:hover {
+    background-color: var(--primary-dark);
+    border-color: var(--primary-dark);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+.btn-outline-dark {
+    border-width: 2px;
+    font-weight: 600;
+    padding: 11px 27px;
+}
+
+.btn-outline-dark:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+.text-primary {
+    color: var(--primary-color) !important;
+}
+
+.bg-primary {
+    background-color: var(--primary-color) !important;
+}
+
+/* =============================================
+   Navbar Styles
+============================================= */
+.navbar {
+    transition: var(--transition-base);
+    background: rgba(255, 255, 255, 0.95) !important;
+    backdrop-filter: blur(10px);
+}
+
+.navbar.scrolled {
+    box-shadow: var(--shadow-md);
+}
+
+.brand-icon {
+    width: 40px;
+    height: 40px;
+    background: var(--secondary-color);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 700;
+    font-size: 14px;
+}
+
+.nav-link {
+    font-weight: 500;
+    color: var(--text-dark) !important;
+    position: relative;
+    padding: 8px 16px !important;
+}
+
+.nav-link::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 2px;
+    background: var(--primary-color);
+    transition: var(--transition-base);
+}
+
+.nav-link:hover::after,
+.nav-link.active::after {
+    width: 30px;
+}
+
+.nav-link.active {
+    color: var(--primary-color) !important;
+}
+
+/* =============================================
+   Hero Section
+============================================= */
+.hero-section {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding-top: 100px;
+    padding-bottom: 100px;
+    background: linear-gradient(180deg, #ffffff 0%, #f8f9fa 100%);
+    position: relative;
+    overflow: hidden;
+}
+
+.hero-badge {
+    display: inline-block;
+    padding: 8px 20px;
+    background: var(--primary-light);
+    border: 1px solid var(--primary-color);
+    border-radius: 100px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--primary-color);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
+.hero-title {
+    font-size: clamp(3rem, 8vw, 6rem);
+    font-weight: 800;
+    line-height: 1.1;
+    margin-bottom: 24px;
+    color: var(--text-dark);
+}
+
+.hero-title .text-primary {
+    color: var(--primary-color) !important;
+}
+
+.hero-subtitle {
+    font-size: 1.25rem;
+    color: var(--text-muted);
+    font-style: italic;
+    max-width: 600px;
+    margin: 0 auto 40px;
+}
+
+.hero-buttons .btn {
+    padding: 14px 36px;
+    font-size: 16px;
+}
+
+.hero-wave {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    line-height: 0;
+}
+
+.hero-wave svg {
+    width: 100%;
+    height: auto;
+}
+
+/* =============================================
+   Section Styles
+============================================= */
+section {
+    padding: 100px 0;
+}
+
+.section-badge {
+    display: inline-block;
+    padding: 6px 16px;
+    background: var(--primary-light);
+    border-radius: 100px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--primary-color);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 16px;
+}
+
+.section-title {
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 0;
+}
+
+.section-title-lg {
+    font-size: clamp(2rem, 4vw, 3rem);
+    font-weight: 800;
+    margin-bottom: 16px;
+}
+
+.section-link {
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    color: var(--primary-color);
+}
+
+.section-link:hover {
+    color: var(--primary-dark);
+}
+
+/* =============================================
+   Product Cards
+============================================= */
+.section-products {
+    padding: 100px 0;
+}
+
+.product-card {
+    background: var(--bg-white);
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: var(--shadow-sm);
+    transition: var(--transition-base);
+    height: 100%;
+}
+
+.product-card:hover {
+    transform: translateY(-8px);
+    box-shadow: var(--shadow-xl);
+}
+
+.product-image {
+    position: relative;
+    height: 200px;
+    overflow: hidden;
+}
+
+.product-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: var(--transition-base);
+}
+
+.product-card:hover .product-image img {
+    transform: scale(1.05);
+}
+
+.product-badge {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    padding: 4px 12px;
+    background: var(--primary-color);
+    color: white;
+    font-size: 11px;
+    font-weight: 600;
+    border-radius: 100px;
+    text-transform: uppercase;
+}
+
+.product-body {
+    padding: 20px;
+}
+
+.product-category {
+    font-size: 12px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-weight: 500;
+}
+
+.product-title {
+    font-size: 16px;
+    font-weight: 700;
+    margin: 8px 0;
+    color: var(--text-dark);
+}
+
+.product-seller {
+    font-size: 13px;
+    color: var(--text-muted);
+    margin-bottom: 16px;
+}
+
+.product-price {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--primary-color);
+}
+
+/* =============================================
+   About Section
+============================================= */
+.section-about {
+    padding: 100px 0;
+    background: var(--bg-white);
+}
+
+.about-image-wrapper {
+    position: relative;
+}
+
+.about-image-wrapper img {
+    border-radius: 24px;
+}
+
+.about-stats {
+    position: absolute;
+    bottom: -30px;
+    right: -30px;
+    background: var(--primary-color);
+    color: white;
+    padding: 24px 32px;
+    border-radius: 16px;
+    box-shadow: var(--shadow-lg);
+}
+
+.about-stats h3 {
+    font-size: 2.5rem;
+    font-weight: 800;
+    color: white;
+    margin-bottom: 4px;
+}
+
+.about-stats p {
+    margin: 0;
+    font-size: 14px;
+    opacity: 0.9;
+}
+
+.about-features .feature-icon {
+    font-size: 20px;
+}
+
+/* =============================================
+   Statistics Section
+============================================= */
+.section-stats {
+    padding: 60px 0;
+}
+
+.stats-wrapper {
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+    padding: 60px 40px;
+}
+
+.stat-box {
+    padding: 20px;
+}
+
+.stat-number {
+    font-size: clamp(2.5rem, 5vw, 3.5rem);
+    font-weight: 800;
+    color: white;
+    margin-bottom: 8px;
+}
+
+.stat-label {
+    color: rgba(255, 255, 255, 0.85);
+    font-size: 14px;
+    font-weight: 500;
+    margin: 0;
+}
+
+/* =============================================
+   Categories Section
+============================================= */
+.section-categories {
+    padding: 100px 0;
+    background: var(--bg-white);
+}
+
+.category-card {
+    display: block;
+    background: var(--bg-light);
+    border-radius: 16px;
+    padding: 40px 30px;
+    text-align: center;
+    transition: var(--transition-base);
+    border: 2px solid transparent;
+    height: 100%;
+}
+
+.category-card:hover {
+    background: var(--bg-white);
+    border-color: var(--primary-color);
+    transform: translateY(-8px);
+    box-shadow: var(--shadow-lg);
+}
+
+.category-icon {
+    width: 70px;
+    height: 70px;
+    background: var(--primary-light);
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 20px;
+    font-size: 28px;
+    color: var(--primary-color);
+    transition: var(--transition-base);
+}
+
+.category-card:hover .category-icon {
+    background: var(--primary-color);
+    color: white;
+}
+
+.category-card h5 {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--text-dark);
+    margin-bottom: 8px;
+}
+
+.category-card p {
+    color: var(--text-muted);
+    margin: 0;
+    font-size: 14px;
+}
+
+/* =============================================
+   Partners Section
+============================================= */
+.section-partners {
+    padding: 80px 0;
+}
+
+.partner-logo {
+    background: var(--bg-white);
+    padding: 30px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100px;
+    box-shadow: var(--shadow-sm);
+    transition: var(--transition-base);
+}
+
+.partner-logo:hover {
+    box-shadow: var(--shadow-md);
+}
+
+.partner-logo img {
+    max-height: 40px;
+    filter: grayscale(100%);
+    opacity: 0.6;
+    transition: var(--transition-base);
+}
+
+.partner-logo:hover img {
+    filter: grayscale(0);
+    opacity: 1;
+}
+
+/* =============================================
+   CTA Section
+============================================= */
+.section-cta {
+    padding: 60px 0;
+}
+
+.cta-wrapper {
+    background: linear-gradient(135deg, var(--secondary-color) 0%, #2d2d2a 100%);
+    padding: 60px;
+}
+
+/* =============================================
+   Testimonials Section
+============================================= */
+.section-testimonials {
+    padding: 100px 0;
+    background: var(--bg-white);
+}
+
+.testimonial-card {
+    background: var(--bg-light);
+    border-radius: 16px;
+    padding: 32px;
+    height: 100%;
+    transition: var(--transition-base);
+}
+
+.testimonial-card:hover {
+    background: var(--bg-white);
+    box-shadow: var(--shadow-lg);
+}
+
+.testimonial-text {
+    font-size: 15px;
+    line-height: 1.7;
+    color: var(--text-dark);
+    margin: 0;
+}
+
+.testimonial-author img {
+    width: 50px;
+    height: 50px;
+    object-fit: cover;
+}
+
+/* =============================================
+   Contact Section
+============================================= */
+.section-contact {
+    padding: 100px 0;
+}
+
+.contact-icon {
+    width: 50px;
+    height: 50px;
+    background: var(--primary-light);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    color: var(--primary-color);
+    flex-shrink: 0;
+}
+
+.contact-form-wrapper {
+    background: var(--bg-white);
+    padding: 40px;
+    border-radius: 24px;
+    box-shadow: var(--shadow-lg);
+}
+
+.contact-form .form-control {
+    border-radius: 12px;
+    padding: 14px 18px;
+    border: 1px solid var(--border-color);
+    font-size: 15px;
+}
+
+.contact-form .form-control:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(0, 166, 126, 0.1);
+}
+
+.contact-form .form-label {
+    font-weight: 500;
+    color: var(--text-dark);
+    margin-bottom: 8px;
+}
+
+/* =============================================
+   Footer Styles
+============================================= */
+.footer {
+    background: var(--secondary-color);
+}
+
+.brand-icon-footer {
+    width: 45px;
+    height: 45px;
+    background: white;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--secondary-color);
+    font-weight: 700;
+    font-size: 15px;
+}
+
+.footer-links li {
+    margin-bottom: 12px;
+}
+
+.footer-links a {
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 14px;
+    transition: var(--transition-base);
+}
+
+.footer-links a:hover {
+    color: white;
+    padding-left: 5px;
+}
+
+.social-icon {
+    width: 40px;
+    height: 40px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 16px;
+    transition: var(--transition-base);
+}
+
+.social-icon:hover {
+    background: var(--primary-color);
+    color: white;
+    transform: translateY(-3px);
+}
+
+/* =============================================
+   Responsive Styles
+============================================= */
+@media (max-width: 991.98px) {
+    .navbar-collapse {
+        background: white;
+        padding: 20px;
+        margin-top: 15px;
+        border-radius: 12px;
+        box-shadow: var(--shadow-lg);
+    }
+    
+    .navbar-nav {
+        gap: 8px;
+    }
+    
+    .nav-link::after {
+        display: none;
+    }
+    
+    .hero-section {
+        padding-top: 120px;
+        padding-bottom: 80px;
+    }
+    
+    .hero-title {
+        font-size: 3rem;
+    }
+    
+    .about-stats {
+        position: relative;
+        bottom: 0;
+        right: 0;
+        margin-top: 20px;
+        display: inline-block;
+    }
+    
+    section {
+        padding: 60px 0;
+    }
+    
+    .cta-wrapper {
+        padding: 40px 30px;
+    }
+}
+
+@media (max-width: 767.98px) {
+    .hero-title {
+        font-size: 2.5rem;
+    }
+    
+    .hero-buttons {
+        flex-direction: column;
+        width: 100%;
+        max-width: 300px;
+        margin: 0 auto;
+    }
+    
+    .hero-buttons .btn {
+        width: 100%;
+    }
+    
+    .section-header {
+        flex-direction: column;
+        align-items: flex-start !important;
+        gap: 16px;
+    }
+    
+    .stats-wrapper {
+        padding: 40px 20px;
+    }
+    
+    .contact-form-wrapper {
+        padding: 30px 20px;
+    }
+}
+
+/* =============================================
+   Animation & Effects
+============================================= */
+.fade-in {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.6s ease, transform 0.6s ease;
+}
+
+.fade-in.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Smooth scroll offset for fixed navbar */
+[id] {
+    scroll-margin-top: 100px;
+}
+
+/* Loading animation */
+.loading-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    transition: opacity 0.5s ease, visibility 0.5s ease;
+}
+
+.loading-overlay.hidden {
+    opacity: 0;
+    visibility: hidden;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+    width: 10px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--bg-light);
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--primary-color);
+    border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--primary-dark);
+}
