@@ -117,7 +117,7 @@ class UmkmController extends Controller
     public function verifikasi()
     {
         $umkms = Umkm::where('status', 'pending')->paginate(15);
-        return view('admin.umkm-verifikasi-new', compact('umkms'));
+        return view('admin.umkm.verifikasi', compact('umkms'));
     }
 
     /**

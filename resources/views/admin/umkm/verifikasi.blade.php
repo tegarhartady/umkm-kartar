@@ -1,13 +1,13 @@
 @extends('layouts.dashboard')
 
-@section('title', 'Verifikasi UMKM')
+@section('title', 'Daftar UMKM')
 
 @section('breadcrumb')
     <nav aria-label="breadcrumb">
         <ol class="breadcrumb mb-0">
-            <li class="breadcrumb-item"><a href="{{ route('dashboard.admin') }}"><i class="bi bi-house me-1"></i>Dashboard</a></li>
+            <li class="breadcrumb-item"><i class="bi bi-house me-1"></i>Dashboard</li>
             <li class="breadcrumb-item">Kelola UMKM</li>
-            <li class="breadcrumb-item active">Verifikasi</li>
+            <li class="breadcrumb-item active">Daftar UMKM</li>
         </ol>
     </nav>
 @endsection
@@ -18,20 +18,27 @@
 <div class="page-header">
     <div class="row align-items-center">
         <div class="col">
-            <h1 class="page-title"><i class="bi bi-check-circle me-2"></i>Verifikasi UMKM</h1>
+            <h1 class="page-title">Daftar UMKM</h1>
             <p class="page-subtitle">
-                Review dan verifikasi pendaftaran UMKM baru yang menunggu persetujuan
+                Kelola semua UMKM yang terdaftar di platform
             </p>
         </div>
         <div class="col-auto">
-            <span class="badge-count">{{ $umkms->total() }}</span>
+            <div class="page-actions">
+                <a href="{{ route('admin.umkm.create') }}" class="btn btn-primary">
+                    <i class="bi bi-plus-lg me-2"></i>Tambah UMKM
+                </a>
+            </div>
         </div>
     </div>
 </div>
 
 @if(session('success'))
-    <div class="alert alert-success alert-dismissible fade show" role="alert">
-        <i class="bi bi-check-circle me-2"></i>{{ session('success') }}
+    <div class="alert alert-success alert-dismissible fade show mb-4" role="alert">
+        <div class="d-flex align-items-center">
+            <i class="bi bi-check-circle me-2"></i>
+            <div>{{ session('success') }}</div>
+        </div>
         <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
     </div>
 @endif
@@ -40,126 +47,129 @@
 <div class="filter-section mb-4">
     <div class="row g-3">
         <div class="col-md-6">
-            <div class="input-group" style="border-radius: 12px; overflow: hidden;">
-                <span class="input-group-text border-0" style="background: linear-gradient(135deg, #667eea, #764ba2); color: white;">
+            <div class="input-group input-group-lg search-box">
+                <span class="input-group-text">
                     <i class="bi bi-search"></i>
                 </span>
-                <input type="text" class="form-control border-0" id="searchInput" placeholder="Cari UMKM atau pemilik..." 
-                       style="border-radius: 0; padding: 12px;">
+                <input type="text" class="form-control" id="searchBox" placeholder="Cari nama toko atau pemilik...">
             </div>
         </div>
         <div class="col-md-6">
-            <select class="form-select" id="filterDesa" style="border-radius: 12px; border: 2px solid #e2e8f0; height: 48px;">
-                <option value="">Semua Desa</option>
-                <option value="Teluknaga">Teluknaga</option>
-                <option value="Tanjung Pasir">Tanjung Pasir</option>
-                <option value="Muara">Muara</option>
-                <option value="Lemo">Lemo</option>
-                <option value="Pangkalan">Pangkalan</option>
+            <select class="form-select form-select-lg" id="statusFilter">
+                <option value="">Semua Status</option>
+                <option value="approved">Disetujui</option>
+                <option value="pending">Menunggu</option>
+                <option value="rejected">Ditolak</option>
             </select>
         </div>
     </div>
 </div>
 
-<!-- Verifikasi Grid -->
-<div class="verifikasi-grid">
+<!-- UMKM Grid View -->
+<div class="umkm-grid">
     @forelse($umkms as $umkm)
-    <div class="verifikasi-card" data-desa="{{ $umkm->desa }}">
+    <div class="umkm-card" data-aos="fade-up">
         <div class="card-header-custom">
-            <div class="shop-icon">
-                <i class="bi bi-shop"></i>
+            <div class="d-flex justify-content-between align-items-start">
+                <div class="shop-icon">
+                    <i class="bi bi-shop"></i>
+                </div>
+                <span class="badge-status 
+                    @if($umkm->status == 'approved') bg-success 
+                    @elseif($umkm->status == 'pending') bg-warning 
+                    @else bg-danger @endif">
+                    {{ ucfirst($umkm->status) }}
+                </span>
             </div>
-            <div class="header-content">
-                <h5 class="shop-name">{{ $umkm->nama_toko }}</h5>
-                <p class="owner-name">{{ $umkm->pemilik }}</p>
-            </div>
-            <span class="badge-pending">Pending</span>
         </div>
-
+        
         <div class="card-body-custom">
-            <div class="info-section">
-                <div class="info-row">
-                    <span class="label"><i class="bi bi-envelope me-1"></i>Email</span>
-                    <span class="value">{{ $umkm->email }}</span>
+            <h5 class="shop-name">{{ $umkm->nama_toko }}</h5>
+            <p class="shop-owner"><i class="bi bi-person-fill me-1"></i>{{ $umkm->pemilik }}</p>
+            
+            <div class="info-group">
+                <div class="info-item">
+                    <span class="label">Desa</span>
+                    <span class="value">{{ $umkm->desa ?? '-' }}</span>
                 </div>
-                <div class="info-row">
-                    <span class="label"><i class="bi bi-telephone me-1"></i>Telepon</span>
-                    <span class="value">{{ $umkm->phone }}</span>
-                </div>
-                <div class="info-row">
-                    <span class="label"><i class="bi bi-geo-alt me-1"></i>Lokasi</span>
-                    <span class="value">{{ $umkm->desa }}</span>
-                </div>
-            </div>
-
-            <div class="detail-row">
-                <div class="detail-item">
-                    <span class="detail-label">Kategori</span>
-                    <span class="badge-kategori">{{ $umkm->kategori }}</span>
-                </div>
-                <div class="detail-item">
-                    <span class="detail-label">Omzet Bulanan</span>
-                    <span class="detail-value">
-                        @if($umkm->omzet_bulanan)
-                            Rp {{ number_format($umkm->omzet_bulanan, 0, ',', '.') }}
-                        @else
-                            <span class="text-muted">-</span>
-                        @endif
-                    </span>
+                <div class="info-item">
+                    <span class="label">Kategori</span>
+                    <span class="value">{{ $umkm->kategori ?? '-' }}</span>
                 </div>
             </div>
-
-            @if($umkm->deskripsi)
-            <div class="description-box">
-                <small class="text-muted">Deskripsi:</small>
-                <p class="mb-0">{{ Str::limit($umkm->deskripsi, 120) }}</p>
-            </div>
-            @endif
-
-            <div class="meta-info">
-                <small><i class="bi bi-calendar me-1"></i>{{ $umkm->created_at->format('d M Y H:i') }}</small>
+            
+            <div class="stats-row">
+                <div class="stat">
+                    <div class="stat-value">{{ $umkm->products_count ?? 0 }}</div>
+                    <div class="stat-label">Produk</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-value">{{ $umkm->email }}</div>
+                    <div class="stat-label">Email</div>
+                </div>
             </div>
         </div>
-
+        
         <div class="card-footer-custom">
             <a href="{{ route('admin.umkm.show', $umkm) }}" class="btn-action" title="Lihat Detail">
                 <i class="bi bi-eye"></i>
             </a>
-            <form method="POST" action="{{ route('admin.umkm.approve', $umkm) }}" class="d-inline" style="flex: 1;">
+            <a href="{{ route('admin.umkm.edit', $umkm) }}" class="btn-action" title="Edit">
+                <i class="bi bi-pencil-square"></i>
+            </a>
+            <form method="POST" action="{{ route('admin.umkm.destroy', $umkm) }}" class="d-inline" 
+                  onsubmit="return confirm('Yakin ingin menghapus UMKM ini?')">
                 @csrf
-                @method('PATCH')
-                <button type="submit" class="btn-approve w-100" onclick="return confirm('Setujui pendaftaran UMKM ini?')">
-                    <i class="bi bi-check me-1"></i>Setujui
-                </button>
-            </form>
-            <form method="POST" action="{{ route('admin.umkm.reject', $umkm) }}" class="d-inline" style="flex: 1;">
-                @csrf
-                @method('PATCH')
-                <button type="submit" class="btn-reject w-100" onclick="return confirm('Tolak pendaftaran UMKM ini?')">
-                    <i class="bi bi-x me-1"></i>Tolak
+                @method('DELETE')
+                <button type="submit" class="btn-action delete" title="Hapus">
+                    <i class="bi bi-trash"></i>
                 </button>
             </form>
         </div>
+
+        <!-- Approve/Reject Buttons (for pending UMKM) -->
+        @if($umkm->status == 'pending')
+        <div class="btn-group" role="group" style="margin: 1rem;">
+            <form action="{{ route('admin.umkm.approve', $umkm) }}" method="POST" style="display:inline;">
+                @csrf
+                @method('PATCH')
+                <button type="submit" class="btn btn-sm btn-success" onclick="return confirm('Setujui UMKM {{ $umkm->nama_toko }}?')">
+                    <i class="bi bi-check-circle"></i> Setujui
+                </button>
+            </form>
+            <form action="{{ route('admin.umkm.reject', $umkm) }}" method="POST" style="display:inline;">
+                @csrf
+                @method('PATCH')
+                <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Tolak UMKM {{ $umkm->nama_toko }}?')">
+                    <i class="bi bi-x-circle"></i> Tolak
+                </button>
+            </form>
+        </div>
+        @endif
     </div>
     @empty
-    <div style="grid-column: 1 / -1;">
-        <div class="empty-state">
-            <div class="empty-icon">
-                <i class="bi bi-check-circle-fill"></i>
-            </div>
-            <h4>Tidak ada UMKM yang menunggu verifikasi</h4>
-            <p class="text-muted">Semua pendaftaran UMKM sudah diverifikasi.</p>
-            <a href="{{ route('admin.umkm.index') }}" class="btn btn-primary">
-                <i class="bi bi-arrow-left me-1"></i>Kembali ke Daftar UMKM
-            </a>
+    <div class="empty-state col-12">
+        <div class="empty-icon">
+            <i class="bi bi-inbox"></i>
         </div>
+        <h4>Belum ada UMKM terdaftar</h4>
+        <p class="text-muted">Mulai tambahkan UMKM pertama Anda</p>
+        <a href="{{ route('admin.umkm.create') }}" class="btn btn-primary mt-3">
+            <i class="bi bi-plus-lg me-2"></i>Tambah UMKM
+        </a>
     </div>
     @endforelse
 </div>
 
+<!-- Pagination -->
 @if($umkms->hasPages())
-<div class="pagination-wrapper">
-    {{ $umkms->links() }}
+<div class="pagination-wrapper mt-5">
+    <div class="pagination-info">
+        Menampilkan {{ $umkms->firstItem() }}-{{ $umkms->lastItem() }} dari {{ $umkms->total() }} data
+    </div>
+    <nav>
+        {{ $umkms->links('pagination::bootstrap-5') }}
+    </nav>
 </div>
 @endif
 
@@ -167,120 +177,70 @@
 
 @push('styles')
 <style>
-/* ========== Page Header ========== */
-.page-header {
-    margin-bottom: 32px;
-    animation: slideDown 0.6s ease;
-}
-
-@keyframes slideDown {
-    from {
-        opacity: 0;
-        transform: translateY(-20px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-.page-title {
-    font-size: 28px;
-    font-weight: 700;
-    background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    margin-bottom: 8px;
-    display: flex;
-    align-items: center;
-}
-
-.page-subtitle {
-    color: var(--text-muted);
-    font-size: 15px;
-    margin-bottom: 0;
-}
-
-.badge-count {
-    background: linear-gradient(135deg, #ffd700, #ffa500);
-    color: white;
-    padding: 8px 16px;
-    border-radius: 50px;
-    font-weight: 600;
-    font-size: 16px;
-    box-shadow: 0 4px 12px rgba(255, 215, 0, 0.3);
-}
-
-/* ========== Filter Section ========== */
+/* Filter Section */
 .filter-section {
     background: white;
-    padding: 20px;
-    border-radius: 16px;
-    box-shadow: 0 2px 20px rgba(0, 0, 0, 0.06);
-    border: 1px solid #f0f0f0;
+    padding: 1.5rem;
+    border-radius: 15px;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
 }
 
-.input-group-text {
-    background: linear-gradient(135deg, #667eea, #764ba2) !important;
-    border: none !important;
-    color: white !important;
+.search-box .input-group-text {
+    background: #f8f9fa;
+    border: 2px solid #e9ecef;
+    color: #667eea;
 }
 
-.form-control {
-    border: none !important;
-    background: transparent !important;
-    font-size: 0.95rem;
+.search-box .form-control {
+    border: 2px solid #e9ecef;
+    font-size: 1rem;
+    transition: all 0.3s ease;
 }
 
-.form-control::placeholder {
-    color: var(--text-muted);
+.search-box .form-control:focus {
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
 }
 
-.form-select {
-    border: 2px solid #e2e8f0 !important;
-    background: white !important;
+.form-select-lg {
+    border: 2px solid #e9ecef;
+    transition: all 0.3s ease;
 }
 
-.form-select:focus {
-    border-color: #667eea !important;
-    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1) !important;
+.form-select-lg:focus {
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
 }
 
-/* ========== Verifikasi Grid ========== */
-.verifikasi-grid {
+/* UMKM Grid */
+.umkm-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
     gap: 2rem;
     margin-bottom: 2rem;
 }
 
-.verifikasi-card {
+.umkm-card {
     background: white;
     border-radius: 16px;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+    overflow: hidden;
     transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
     border: 1px solid #f0f0f0;
-    overflow: hidden;
     display: flex;
     flex-direction: column;
 }
 
-.verifikasi-card:hover {
+.umkm-card:hover {
     transform: translateY(-8px);
     box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
     border-color: #e2e8f0;
 }
 
-/* Card Header */
 .card-header-custom {
     background: linear-gradient(135deg, rgba(102, 126, 234, 0.05), rgba(118, 75, 162, 0.05));
-    padding: 20px;
+    padding: 1.5rem;
     border-bottom: 1px solid #f0f0f0;
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    position: relative;
 }
 
 .shop-icon {
@@ -294,144 +254,105 @@
     color: white;
     font-size: 24px;
     box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
-    flex-shrink: 0;
 }
 
-.header-content {
-    flex: 1;
-    min-width: 0;
+.badge-status {
+    font-size: 0.75rem;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-weight: 600;
+    text-transform: capitalize;
+}
+
+.card-body-custom {
+    padding: 1.5rem;
+    flex-grow: 1;
 }
 
 .shop-name {
+    font-size: 1.2rem;
     font-weight: 700;
-    color: var(--text-dark);
-    margin-bottom: 4px;
-    font-size: 16px;
+    color: #2d3748;
+    margin-bottom: 0.5rem;
 }
 
-.owner-name {
-    color: var(--text-muted);
-    font-size: 13px;
-    margin-bottom: 0;
+.shop-owner {
+    font-size: 0.9rem;
+    color: #718096;
+    margin-bottom: 1rem;
 }
 
-.badge-pending {
-    background: linear-gradient(135deg, #ffd700, #ffa500);
-    color: #7d5d0f;
-    padding: 6px 12px;
-    border-radius: 50px;
-    font-size: 12px;
-    font-weight: 600;
-    white-space: nowrap;
-}
-
-/* Card Body */
-.card-body-custom {
-    padding: 20px;
-    flex: 1;
-}
-
-.info-section {
-    margin-bottom: 16px;
-}
-
-.info-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 10px;
-    padding: 8px 12px;
-    background: #f7fafc;
-    border-radius: 8px;
-}
-
-.info-row .label {
-    font-weight: 500;
-    color: var(--text-muted);
-    font-size: 13px;
-    display: flex;
-    align-items: center;
-}
-
-.info-row .value {
-    color: var(--text-dark);
-    font-size: 13px;
-    font-weight: 500;
-}
-
-.detail-row {
+.info-group {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 12px;
-    margin-bottom: 16px;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid #f0f0f0;
 }
 
-.detail-item {
-    background: linear-gradient(135deg, rgba(102, 126, 234, 0.05), rgba(118, 75, 162, 0.05));
-    padding: 12px;
-    border-radius: 10px;
-    border: 1px solid rgba(102, 126, 234, 0.2);
-}
-
-.detail-label {
+.info-item .label {
     display: block;
-    color: var(--text-muted);
-    font-size: 12px;
+    font-size: 0.8rem;
+    color: #a0aec0;
     font-weight: 600;
-    margin-bottom: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 0.25rem;
 }
 
-.badge-kategori {
-    display: inline-block;
-    background: linear-gradient(135deg, rgba(72, 187, 120, 0.1), rgba(56, 161, 105, 0.1));
-    color: #22543d;
-    padding: 4px 10px;
-    border-radius: 6px;
-    font-size: 12px;
+.info-item .value {
+    display: block;
+    font-size: 0.95rem;
+    color: #2d3748;
     font-weight: 600;
-    border: 1px solid rgba(72, 187, 120, 0.3);
 }
 
-.detail-value {
-    color: var(--text-dark);
-    font-weight: 600;
-    font-size: 13px;
+.stats-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
 }
 
-.description-box {
-    background: #f8f9fa;
-    padding: 12px;
+.stat {
+    text-align: center;
+    padding: 1rem;
+    background: #f7fafc;
     border-radius: 10px;
-    margin-bottom: 12px;
-    border-left: 3px solid #667eea;
+    transition: all 0.3s ease;
 }
 
-.description-box p {
-    color: var(--text-dark);
-    font-size: 13px;
-    line-height: 1.4;
+.stat:hover {
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
 }
 
-.meta-info {
-    color: var(--text-muted);
-    font-size: 12px;
-    padding-top: 12px;
-    border-top: 1px solid #f0f0f0;
+.stat-value {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #667eea;
+    line-height: 1;
+    margin-bottom: 0.5rem;
 }
 
-/* Card Footer */
+.stat-label {
+    font-size: 0.8rem;
+    color: #718096;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
 .card-footer-custom {
-    padding: 16px 20px;
+    padding: 1rem 1.5rem;
     background: #f7fafc;
     border-top: 1px solid #f0f0f0;
     display: flex;
-    gap: 10px;
-    align-items: center;
+    gap: 0.5rem;
+    justify-content: flex-end;
 }
 
 .btn-action {
-    width: 44px;
-    height: 44px;
+    width: 40px;
+    height: 40px;
     border-radius: 10px;
     display: flex;
     align-items: center;
@@ -440,119 +361,90 @@
     color: #667eea;
     border: 1px solid #e9ecef;
     transition: all 0.3s ease;
+    cursor: pointer;
     text-decoration: none;
-    font-size: 18px;
 }
 
 .btn-action:hover {
     background: #667eea;
     color: white;
+    border-color: #667eea;
     transform: translateY(-2px);
 }
 
-.btn-approve {
-    background: linear-gradient(135deg, #48bb78, #38a169);
+.btn-action.delete {
+    color: #f56565;
+}
+
+.btn-action.delete:hover {
+    background: #f56565;
     color: white;
-    border: none;
-    border-radius: 10px;
-    padding: 10px 16px;
-    font-weight: 600;
-    font-size: 13px;
-    transition: all 0.3s ease;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.btn-approve:hover {
-    background: linear-gradient(135deg, #38a169, #2f855a);
-    transform: translateY(-2px);
-}
-
-.btn-reject {
-    background: linear-gradient(135deg, #f56565, #e53e3e);
-    color: white;
-    border: none;
-    border-radius: 10px;
-    padding: 10px 16px;
-    font-weight: 600;
-    font-size: 13px;
-    transition: all 0.3s ease;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.btn-reject:hover {
-    background: linear-gradient(135deg, #e53e3e, #c53030);
-    transform: translateY(-2px);
+    border-color: #f56565;
 }
 
 /* Empty State */
 .empty-state {
-    text-align: center;
-    padding: 60px 40px;
     background: white;
     border-radius: 16px;
-    box-shadow: 0 2px 20px rgba(0, 0, 0, 0.06);
-    border: 1px solid #f0f0f0;
+    padding: 3rem 2rem;
+    text-align: center;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
 }
 
 .empty-icon {
-    font-size: 72px;
-    color: #48bb78;
-    margin-bottom: 20px;
+    font-size: 4rem;
+    color: #cbd5e0;
+    margin-bottom: 1rem;
 }
 
 .empty-state h4 {
-    color: var(--text-dark);
+    color: #2d3748;
     font-weight: 700;
-    margin-bottom: 8px;
+    margin-bottom: 0.5rem;
 }
 
 .empty-state p {
-    color: var(--text-muted);
-    margin-bottom: 24px;
+    margin-bottom: 0;
 }
 
-/* Pagination Wrapper */
+/* Pagination */
 .pagination-wrapper {
     display: flex;
-    justify-content: center;
-    margin-top: 2rem;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.5rem;
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
 }
 
-@media (max-width: 991.98px) {
-    .verifikasi-grid {
-        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    }
+.pagination-info {
+    font-size: 0.9rem;
+    color: #718096;
 }
 
-@media (max-width: 767.98px) {
-    .page-title {
-        font-size: 22px;
-    }
+.pagination-wrapper nav {
+    margin: 0;
+}
 
-    .verifikasi-grid {
+/* Responsive */
+@media (max-width: 768px) {
+    .umkm-grid {
         grid-template-columns: 1fr;
         gap: 1.5rem;
     }
-
-    .detail-row {
-        grid-template-columns: 1fr;
+    
+    .filter-section {
+        padding: 1rem;
     }
-
-    .card-footer-custom {
+    
+    .pagination-wrapper {
         flex-direction: column;
+        gap: 1rem;
     }
-
-    .btn-action {
-        width: 100%;
-    }
-
-    .btn-approve,
-    .btn-reject {
-        width: 100%;
+    
+    .info-group {
+        grid-template-columns: 1fr;
     }
 }
 </style>
@@ -560,29 +452,24 @@
 
 @push('scripts')
 <script>
+// Simple search filter
 document.addEventListener('DOMContentLoaded', function() {
-    const searchInput = document.getElementById('searchInput');
-    const filterDesa = document.getElementById('filterDesa');
-    const cards = document.querySelectorAll('.verifikasi-card');
-
-    function filterCards() {
-        const searchTerm = searchInput ? searchInput.value.toLowerCase() : '';
-        const desaTerm = filterDesa ? filterDesa.value : '';
-
-        cards.forEach(card => {
-            const shopName = card.querySelector('.shop-name')?.textContent.toLowerCase() || '';
-            const ownerName = card.querySelector('.owner-name')?.textContent.toLowerCase() || '';
-            const desa = card.dataset.desa;
-
-            const matchesSearch = shopName.includes(searchTerm) || ownerName.includes(searchTerm);
-            const matchesDesa = !desaTerm || desa === desaTerm;
-
-            card.style.display = matchesSearch && matchesDesa ? 'flex' : 'none';
+    const searchBox = document.getElementById('searchBox');
+    const statusFilter = document.getElementById('statusFilter');
+    
+    if(searchBox) {
+        searchBox.addEventListener('input', function() {
+            // In production, this should use proper filtering via API or form submit
+            console.log('Search:', this.value);
         });
     }
-
-    if (searchInput) searchInput.addEventListener('keyup', filterCards);
-    if (filterDesa) filterDesa.addEventListener('change', filterCards);
+    
+    if(statusFilter) {
+        statusFilter.addEventListener('change', function() {
+            // In production, this should use proper filtering via API or form submit
+            console.log('Status:', this.value);
+        });
+    }
 });
 </script>
 @endpush

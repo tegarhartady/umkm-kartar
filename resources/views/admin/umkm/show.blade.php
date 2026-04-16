@@ -121,7 +121,8 @@
                 </div>
             </div>
 
-            @if($umkm->status == 'pending')
+            <!-- Tombol Approve/Reject untuk UMKM Pending -->
+            @if($umkm->status === 'pending')
                 <div class="card border-0 shadow-sm mb-4">
                     <div class="card-header bg-white border-bottom">
                         <h5 class="mb-0">Verifikasi</h5>
@@ -130,13 +131,13 @@
                         <p class="small text-muted mb-3">UMKM ini menunggu persetujuan Anda.</p>
                         <form action="{{ route('admin.umkm.approve', $umkm->id) }}" method="POST" class="mb-2">
                             @csrf
-                            <button type="submit" class="btn btn-success w-100">
+                            <button type="submit" class="btn btn-success w-100" onclick="return confirm('Setujui UMKM {{ $umkm->nama_toko }}?')">
                                 <i class="bi bi-check-circle me-2"></i>Setujui UMKM
                             </button>
                         </form>
                         <form action="{{ route('admin.umkm.reject', $umkm->id) }}" method="POST">
                             @csrf
-                            <button type="submit" class="btn btn-outline-danger w-100">
+                            <button type="submit" class="btn btn-danger w-100" onclick="return confirm('Tolak UMKM {{ $umkm->nama_toko }}?')">
                                 <i class="bi bi-x-circle me-2"></i>Tolak UMKM
                             </button>
                         </form>
@@ -166,6 +167,39 @@
                         @endif
                     @else
                         <p class="small text-muted mb-0">Belum ada produk</p>
+                    @endif
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Foto KTP dan Foto Tempat Usaha -->
+    <div class="row mt-4">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h6 class="mb-0">📷 Foto KTP</h6>
+                </div>
+                <div class="card-body">
+                    @if($umkm->foto_ktp)
+                        <img src="{{ asset('storage/' . $umkm->foto_ktp) }}" alt="Foto KTP" class="img-fluid rounded" style="max-height: 400px;">
+                    @else
+                        <p class="text-muted">Belum ada foto KTP</p>
+                    @endif
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h6 class="mb-0">📷 Foto Tempat Usaha</h6>
+                </div>
+                <div class="card-body">
+                    @if($umkm->foto_tempat)
+                        <img src="{{ asset('storage/' . $umkm->foto_tempat) }}" alt="Foto Tempat Usaha" class="img-fluid rounded" style="max-height: 400px;">
+                    @else
+                        <p class="text-muted">Belum ada foto tempat usaha</p>
                     @endif
                 </div>
             </div>
