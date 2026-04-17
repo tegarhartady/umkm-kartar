@@ -12,15 +12,20 @@ return new class extends Migration
             $table->id();
             $table->string('nama_toko');
             $table->string('pemilik');
+            $table->string('no_ktp')->nullable();
             $table->string('email')->unique();
             $table->string('phone');
             $table->string('desa');
             $table->string('alamat');
             $table->string('kategori');
+            $table->string('lama_usaha')->nullable();
             $table->text('deskripsi')->nullable();
+            $table->string('produk_utama')->nullable();
+            $table->string('foto_ktp')->nullable();
+            $table->string('foto_tempat')->nullable();
             $table->string('password')->nullable();
             $table->rememberToken()->nullable();
-            $table->string('status')->default('pending'); // pending, approved, rejected
+            $table->string('status')->default('pending'); // pending, disetujui, ditolak
             $table->decimal('omzet_bulanan', 15, 2)->nullable();
             $table->string('foto_toko')->nullable();
             $table->timestamps();
