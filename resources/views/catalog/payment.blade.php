@@ -121,6 +121,13 @@
                         @csrf
                         
                         <div class="payment-methods">
+                            <div class="payment-method" onclick="selectPaymentMethod('qris')">
+                                <input type="radio" name="payment_method" value="qris" id="qris" style="display: none;">
+                                <i class="bi bi-qr-code"></i>
+                                <h6 class="fw-bold">QRIS</h6>
+                                <p class="text-muted mb-0 small">Scan & Bayar</p>
+                            </div>
+                            
                             <div class="payment-method" onclick="selectPaymentMethod('bank_transfer')">
                                 <input type="radio" name="payment_method" value="bank_transfer" id="bank_transfer" style="display: none;" checked>
                                 <i class="bi bi-bank"></i>
@@ -165,6 +172,42 @@
             </div>
         </div>
     </div>
+</div>
+
+<!-- QRIS Modal -->
+<div class="modal fade" id="qrisModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg" style="border-radius: 20px;">
+            <div class="modal-header border-0" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); color: white;">
+                <h5 class="modal-title fw-bold"><i class="bi bi-qr-code me-2"></i>Pembayaran QRIS</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body text-center py-4" style="animation: slideUp 0.4s ease-in-out;">
+                <p class="text-muted mb-4">Scan QR Code di bawah dengan aplikasi e-wallet atau mobile banking Anda</p>
+                <div style="animation: fadeInScale 0.6s ease-in-out;">
+                    <div style="width: 220px; height: 220px; margin: 0 auto; background: white; border: 3px solid #4facfe; border-radius: 15px; display: flex; align-items: center; justify-content: center; box-shadow: 0 10px 30px rgba(79, 172, 254, 0.2);">
+                        <svg viewBox="0 0 200 200" width="190" height="190">
+                            <rect width="200" height="200" fill="white"/>
+                            <rect x="10" y="10" width="40" height="40" fill="black"/><rect x="15" y="15" width="30" height="30" fill="white"/><rect x="20" y="20" width="20" height="20" fill="black"/>
+                            <rect x="150" y="10" width="40" height="40" fill="black"/><rect x="155" y="15" width="30" height="30" fill="white"/><rect x="160" y="20" width="20" height="20" fill="black"/>
+                            <rect x="10" y="150" width="40" height="40" fill="black"/><rect x="15" y="155" width="30" height="30" fill="white"/><rect x="20" y="160" width="20" height="20" fill="black"/>
+                            <rect x="60" y="60" width="10" height="10" fill="black"/><rect x="80" y="70" width="10" height="10" fill="black"/><rect x="70" y="90" width="10" height="10" fill="black"/><rect x="100" y="80" width="10" height="10" fill="black"/><rect x="90" y="110" width="10" height="10" fill="black"/><rect x="110" y="100" width="10" height="10" fill="black"/><rect x="120" y="120" width="10" height="10" fill="black"/><rect x="60" y="130" width="10" height="10" fill="black"/>
+                        </svg>
+                    </div>
+                </div>
+                <p class="text-muted small mt-4">Nominal: <strong class="text-success">Rp {{ number_format($order->total_amount, 0, ',', '.') }}</strong></p>
+            </div>
+            <div class="modal-footer border-0">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    @keyframes fadeInScale { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: scale(1); } }
+    @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+</style>
 @endsection
 
 @push('styles')
@@ -278,6 +321,12 @@
         
         event.currentTarget.classList.add('selected');
         document.getElementById(method).checked = true;
+        
+        // Trigger QRIS modal jika metode QRIS dipilih
+        if (method === 'qris') {
+            const qrisModal = new bootstrap.Modal(document.getElementById('qrisModal'));
+            qrisModal.show();
+        }
     }
     
     document.addEventListener('DOMContentLoaded', function() {

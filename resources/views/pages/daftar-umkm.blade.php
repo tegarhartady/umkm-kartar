@@ -161,15 +161,26 @@
                                     @enderror
                                 </div>
                                 <div class="col-md-6">
+                                    
                                     <label class="form-label">Desa/Kelurahan <span class="text-danger">*</span></label>
-                                    <select name="desa" class="form-select @error('desa') is-invalid @enderror" required>
+                                     <select name="desa" class="form-select @error('desa') is-invalid @enderror" required>
+                                        <option value="">-- Pilih Desa --</option>
+                                        @forelse($desas as $desa)
+                                            <option value="{{ $desa->nama_desa }}" {{ old('desa') == $desa->nama_desa ? 'selected' : '' }}>
+                                                {{ $desa->nama_desa }}
+                                            </option>
+                                        @empty
+                                            <option value="" disabled>Tidak ada desa tersedia</option>
+                                        @endforelse
+                                    </select>
+                                    {{-- <select name="desa" class="form-select @error('desa') is-invalid @enderror" required>
                                         <option value="">Pilih desa</option>
                                         <option value="Teluknaga" {{ old('desa') == 'Teluknaga' ? 'selected' : '' }}>Desa Teluknaga</option>
                                         <option value="Tanjung Pasir" {{ old('desa') == 'Tanjung Pasir' ? 'selected' : '' }}>Desa Tanjung Pasir</option>
                                         <option value="Muara" {{ old('desa') == 'Muara' ? 'selected' : '' }}>Desa Muara</option>
                                         <option value="Lemo" {{ old('desa') == 'Lemo' ? 'selected' : '' }}>Desa Lemo</option>
                                         <option value="Pangkalan" {{ old('desa') == 'Pangkalan' ? 'selected' : '' }}>Desa Pangkalan</option>
-                                    </select>
+                                    </select> --}}
                                     @error('desa')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
@@ -204,6 +215,30 @@
                                     @error('foto_tempat')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Latitude & Longitude untuk Lokasi Penjualan -->
+                        <div class="row mt-3">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Latitude (Titik Lokasi) <span class="text-danger">*</span></label>
+                                    <input type="number" name="latitude" step="0.000001" class="form-control @error('latitude') is-invalid @enderror" placeholder="-6.123456" value="{{ old('latitude') }}" required>
+                                    @error('latitude')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                    <small class="text-muted">📍 Cari di Google Maps</small>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Longitude (Titik Lokasi) <span class="text-danger">*</span></label>
+                                    <input type="number" name="longitude" step="0.000001" class="form-control @error('longitude') is-invalid @enderror" placeholder="106.123456" value="{{ old('longitude') }}" required>
+                                    @error('longitude')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                    <small class="text-muted">📍 Cari di Google Maps</small>
                                 </div>
                             </div>
                         </div>
@@ -324,14 +359,45 @@
 }
 
 .form-control:focus, .form-select:focus {
-    border-color: var(--primary-color);
-    box-shadow: 0 0 0 3px rgba(0, 166, 126, 0.1);
+    border-color: #001f5c;
+    box-shadow: 0 0 0 0.2rem rgba(0, 31, 92, 0.15);
 }
 
 .form-label {
     font-weight: 500;
     color: var(--text-dark);
     margin-bottom: 6px;
+}
+
+.daftar-umkm-btn {
+    background: linear-gradient(135deg, #001f5c 0%, #000f3d 100%);
+    border: none;
+    color: white;
+    box-shadow: 0 4px 15px rgba(0, 31, 92, 0.2);
+}
+
+.daftar-umkm-btn:hover {
+    background: linear-gradient(135deg, #000f3d 0%, #001f5c 100%);
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 31, 92, 0.3);
+}
+
+.step-indicator .step-active {
+    background: #001f5c;
+    color: white;
+}
+
+.progress-bar {
+    background: linear-gradient(135deg, #001f5c 0%, #000f3d 100%);
+}
+
+a {
+    color: #001f5c;
+}
+
+a:hover {
+    color: #000f3d;
 }
 
 @media (max-width: 767px) {

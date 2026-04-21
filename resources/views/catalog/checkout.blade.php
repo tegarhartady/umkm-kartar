@@ -4,7 +4,7 @@
 
 @section('content')
     <!-- Navigation -->
-    <nav class="navbar navbar-expand-lg navbar-dark" style="background: #333;">
+    {{-- <nav class="navbar navbar-expand-lg navbar-dark" style="background: #333;">
         <div class="container">
             <a class="navbar-brand fw-bold" href="{{ url('/') }}">
                 <i class="bi bi-shop me-2"></i>Kartar UMKM
@@ -26,7 +26,7 @@
                 </ul>
             </div>
         </div>
-    </nav>
+    </nav> --}}
 
     <div class="checkout-container">
         <div class="container">
@@ -88,7 +88,7 @@
                     </div>
 
                     <!-- Customer Form -->
-                    <form action="{{ route('catalog.order', $product) }}" method="POST" id="checkoutForm">
+                    <form action="/order/{{ $product->id }}" method="POST" id="checkoutForm">
                         @csrf
                         <input type="hidden" name="quantity" id="quantityInput" value="1">
                         
@@ -100,7 +100,7 @@
                             <div class="col-md-6">
                                 <div class="form-floating">
                                     <input type="text" name="customer_name" class="form-control @error('customer_name') is-invalid @enderror" 
-                                           id="customer_name" value="{{ old('customer_name') }}" placeholder="Nama Lengkap" required>
+                                           id="customer_name" value="{{ old('customer_name', $formData['customer_name'] ?? '') }}" placeholder="Nama Lengkap" required>
                                     <label for="customer_name">Nama Lengkap *</label>
                                     @error('customer_name')
                                         <div class="invalid-feedback">{{ $message }}</div>
@@ -110,7 +110,7 @@
                             <div class="col-md-6">
                                 <div class="form-floating">
                                     <input type="email" name="customer_email" class="form-control @error('customer_email') is-invalid @enderror" 
-                                           id="customer_email" value="{{ old('customer_email') }}" placeholder="Email" required>
+                                           id="customer_email" value="{{ old('customer_email', $formData['customer_email'] ?? '') }}" placeholder="Email" required>
                                     <label for="customer_email">Email *</label>
                                     @error('customer_email')
                                         <div class="invalid-feedback">{{ $message }}</div>
@@ -121,7 +121,7 @@
 
                         <div class="form-floating">
                             <input type="text" name="customer_phone" class="form-control @error('customer_phone') is-invalid @enderror" 
-                                   id="customer_phone" value="{{ old('customer_phone') }}" placeholder="Nomor WhatsApp" required>
+                                   id="customer_phone" value="{{ old('customer_phone', $formData['customer_phone'] ?? '') }}" placeholder="Nomor WhatsApp" required>
                             <label for="customer_phone">Nomor WhatsApp Aktif *</label>
                             @error('customer_phone')
                                 <div class="invalid-feedback">{{ $message }}</div>
@@ -130,7 +130,7 @@
 
                         <div class="form-floating">
                             <textarea name="customer_address" class="form-control @error('customer_address') is-invalid @enderror" 
-                                      id="customer_address" placeholder="Alamat Lengkap" required>{{ old('customer_address') }}</textarea>
+                                      id="customer_address" placeholder="Alamat Lengkap" required>{{ old('customer_address', $formData['customer_address'] ?? '') }}</textarea>
                             <label for="customer_address">Alamat Lengkap *</label>
                             @error('customer_address')
                                 <div class="invalid-feedback">{{ $message }}</div>
@@ -149,7 +149,7 @@
 
                         <!-- Action Buttons -->
                         <div class="d-flex justify-content-between mt-4">
-                            <a href="{{ route('catalog.show', $product) }}" class="btn btn-outline-secondary btn-lg">
+                            <a href="/beli/{{ $product->id }}" class="btn btn-outline-secondary btn-lg">
                                 <i class="bi bi-arrow-left me-2"></i>Kembali
                             </a>
                             <button type="submit" class="btn btn-checkout btn-lg">

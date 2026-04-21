@@ -26,13 +26,31 @@
                         <h3 class="login-title text-center">Selamat Datang</h3>
                         <p class="login-subtitle text-center text-muted mb-4">Masuk ke akun Anda untuk melanjutkan</p>
                         
-                        <form class="login-form" method="POST" action="{{ route('login.post') }}">
+                        <form class="login-form" method="POST" action="{{ route('login.authenticate') }}" id="loginForm">
                             @csrf
                             @if ($errors->any())
                                 <div class="alert alert-danger">
                                     {{ $errors->first() }}
                                 </div>
                             @endif
+                            
+                            <div class="mb-3">
+                                <label class="form-label">Login Sebagai</label>
+                                <div class="role-selector">
+                                    <input type="radio" id="role-umkm" name="role" value="umkm" checked onchange="updateFormAction()">
+                                    <label for="role-umkm" class="role-option">
+                                        <i class="bi bi-shop"></i>
+                                        <span>UMKM</span>
+                                    </label>
+                                    
+                                    <input type="radio" id="role-admin" name="role" value="admin" onchange="updateFormAction()">
+                                    <label for="role-admin" class="role-option">
+                                        <i class="bi bi-person-badge"></i>
+                                        <span>Admin</span>
+                                    </label>
+                                </div>
+                            </div>
+                            
                             <div class="mb-3">
                                 <label class="form-label">Email</label>
                                 <input type="email" name="email" class="form-control" placeholder="Masukkan email Anda" value="{{ old('email') }}" required>
@@ -53,7 +71,7 @@
                                 </div>
                                 <a href="#" class="small text-primary">Lupa password?</a>
                             </div>
-                            <button type="submit" class="btn btn-primary w-100 rounded-pill py-3">
+                            <button type="submit" class="btn btn-primary w-100 rounded-pill py-3 btn-login">
                                 Masuk
                             </button>
                         </form>
@@ -126,8 +144,8 @@
 }
 
 .form-control:focus {
-    border-color: var(--primary-color);
-    box-shadow: 0 0 0 3px rgba(0, 166, 126, 0.1);
+    border-color: #001f5c;
+    box-shadow: 0 0 0 0.2rem rgba(0, 31, 92, 0.15);
 }
 
 .input-group .btn {
@@ -140,11 +158,87 @@
     color: var(--text-dark);
     margin-bottom: 8px;
 }
+
+/* Role Selector */
+.role-selector {
+    display: flex;
+    gap: 1rem;
+}
+
+.role-selector input[type="radio"] {
+    display: none;
+}
+
+.role-option {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 1rem;
+    border: 2px solid #e9ecef;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    background: #f8f9fa;
+    font-weight: 500;
+    color: #6c757d;
+}
+
+.role-selector input[type="radio"]:checked + .role-option {
+    border-color: var(--primary-color);
+    background: rgba(0, 166, 126, 0.1);
+    color: var(--primary-color);
+}
+
+.role-option i {
+    font-size: 1.5rem;
+}
+
+.login-container {
+    background: linear-gradient(135deg, #001f5c 0%, #000f3d 100%);
+}
+
+.btn-login {
+    background: #001f5c;
+    border-color: #001f5c;
+    color: white;
+}
+
+.btn-login:hover {
+    background: #000f3d;
+    border-color: #000f3d;
+    color: white;
+    box-shadow: 0 4px 15px rgba(0, 31, 92, 0.3);
+}
+
+a {
+    color: #001f5c;
+}
+
+a:hover {
+    color: #000f3d;
+}
+
+.text-primary {
+    color: #001f5c !important;
+}
 </style>
 @endpush
 
 @push('scripts')
 <script>
+function updateFormAction() {
+    const form = document.getElementById('loginForm');
+    const role = document.querySelector('input[name="role"]:checked').value;
+    
+    if (role === 'umkm') {
+        form.action = "{{ route('umkm.authenticate') }}";
+    } else {
+        form.action = "{{ route('login.authenticate') }}";
+    }
+}
+
 document.getElementById('togglePassword').addEventListener('click', function() {
     const password = document.querySelector('input[type="password"], input[type="text"]');
     const icon = this.querySelector('i');
@@ -159,5 +253,8 @@ document.getElementById('togglePassword').addEventListener('click', function() {
         icon.classList.add('bi-eye');
     }
 });
+
+// Set initial form action
+updateFormAction();
 </script>
 @endpush

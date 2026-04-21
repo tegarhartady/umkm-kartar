@@ -18,13 +18,10 @@
                     <a class="nav-link {{ Request::is('/') ? 'active' : '' }} px-4" href="{{ url('/') }}">Beranda</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link {{ Request::is('katalog') ? 'active' : '' }} px-4" href="{{ url('/katalog') }}">Katalog</a>
+                    <a class="nav-link {{ Request::is('katalog') ? 'active' : '' }} px-4" href="{{ url('/katalog') }}">Katalog & Desa Mitra</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link {{ Request::is('desa-mitra') ? 'active' : '' }} px-4" href="{{ url('/desa-mitra') }}">Desa Mitra</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link {{ Request::is('csr-pik2') ? 'active' : '' }} px-4" href="{{ url('/csr-pik2') }}">CSR PIK2</a>
+                    <a class="nav-link {{ Request::is('csr-pik2') ? 'active' : '' }} px-4" href="{{ url('/csr-pik2') }}">DUKUNGAN CSR PIK2</a>
                 </li>
             </ul>
             

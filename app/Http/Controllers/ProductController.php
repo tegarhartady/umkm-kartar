@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Product;
+use App\Models\Umkm;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -10,22 +11,25 @@ use Illuminate\Support\Facades\Storage;
 class ProductController extends Controller
 {
     /**
-     * Middleware untuk protect routes
-     */
-    public function __construct()
-    {
-        $this->middleware('auth:umkm');
-    }
-
-    /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        $umkm = Auth::guard('umkm')->user();
-        $products = $umkm->products()->latest()->paginate(10);
-
-        return view('umkm.products.index', compact('products', 'umkm'));
+        $user = auth()->user();
+        
+        // Admin bisa lihat semua produk
+        if ($user && ($user->role === 'admin' || $user->role === 'super_admin')) {
+            $products = Product::latest()->paginate(10);
+            return view('admin.products.index', compact('products'));
+        }
+        
+        // UMKM lihat produk miliknya saja
+        if ($user && method_exists($user, 'products')) {
+            $products = $user->products()->latest()->paginate(10);
+            return view('umkm.products.index', compact('products'));
+        }
+        
+        abort(403, 'Unauthorized');
     }
 
     /**
@@ -33,7 +37,8 @@ class ProductController extends Controller
      */
     public function create()
     {
-        return view('umkm.products.create');
+        $umkms = Umkm::all();
+        return view('admin.products.create', compact('umkms'));
     }
 
     /**
@@ -42,27 +47,27 @@ class ProductController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
+            'umkm_id' => 'required|exists:umkms,id',
             'nama_produk' => 'required|string|max:255',
+            'kategori' => 'required|string',
+            'satuan' => 'required|string',
+            'metode_pemesanan' => 'required|in:siap_jadi,po,keduanya',
             'deskripsi' => 'required|string',
+            'image' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
             'harga' => 'required|numeric|min:0',
             'stok' => 'required|integer|min:0',
-            'satuan' => 'required|string|max:50',
-            'kategori' => 'nullable|string|max:100',
-            'foto' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
-        $umkm = Auth::guard('umkm')->user();
-
-        // Handle foto upload
-        if ($request->hasFile('foto')) {
-            $validated['foto'] = $request->file('foto')->store('products', 'public');
+        if ($request->hasFile('image')) {
+            $validated['image'] = $request->file('image')->store('products', 'public');
         }
 
-        $umkm->products()->create($validated);
+        $validated['status'] = 'aktif';
+        
+        Product::create($validated);
 
-        return redirect()
-            ->route('umkm.products.index')
-            ->with('success', '✅ Produk berhasil ditambahkan!');
+        return redirect()->route('admin.products.index')
+            ->with('success', 'Produk berhasil ditambahkan');
     }
 
     /**

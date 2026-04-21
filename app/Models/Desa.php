@@ -21,6 +21,18 @@ class Desa extends Model
     {
         return $this->hasMany(Umkm::class, 'desa', 'nama_desa');
     }
+
+    public function products()
+    {
+        return $this->hasManyThrough(
+            Product::class,
+            Umkm::class,
+            'desa',
+            'umkm_id',
+            'nama_desa',
+            'id'
+        );
+    }
 }
 
 class Category extends Model

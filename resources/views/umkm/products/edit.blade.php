@@ -1,171 +1,147 @@
-@extends('layouts.app')
+@extends('layouts.dashboard-umkm')
 
-@section('title', 'Edit Produk - ' . $product->nama_produk)
+@section('title', 'Edit Produk - ' . Auth::guard('umkm')->user()->nama_toko)
+
+@section('breadcrumb')
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{{ route('umkm.umkm.dashboard') }}">Dashboard</a></li>
+            <li class="breadcrumb-item"><a href="{{ route('umkm.products.index') }}">Produk</a></li>
+            <li class="breadcrumb-item active">Edit Produk</li>
+        </ol>
+    </nav>
+@endsection
 
 @section('content')
-
-<div class="container-fluid py-4">
-    <!-- Header -->
+<div class="container-fluid">
     <div class="row mb-4">
         <div class="col-12">
-            <h1 class="h3 mb-0">
-                <i class="bi bi-pencil me-2"></i>Edit Produk
-            </h1>
-            <p class="text-muted small">
-                <a href="{{ route('umkm.dashboard') }}">Dashboard</a> /
-                <a href="{{ route('umkm.products.index') }}">Produk</a> / Edit
-            </p>
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h1 class="h3 mb-1 fw-bold">Edit Produk</h1>
+                    <p class="text-muted mb-0">Ubah informasi produk Anda</p>
+                </div>
+            </div>
         </div>
     </div>
 
     <div class="row">
         <div class="col-lg-8">
             <div class="card border-0 shadow-sm">
-                <div class="card-header bg-light border-bottom">
-                    <h6 class="mb-0">
-                        <i class="bi bi-box-seam me-2"></i>Form Edit Produk
-                    </h6>
+                <div class="card-header bg-white border-bottom">
+                    <h5 class="mb-0"><i class="bi bi-pencil me-2"></i>Form Edit Produk</h5>
                 </div>
-                <div class="card-body p-4">
-                    <form method="POST" action="{{ route('umkm.products.update', $product) }}" enctype="multipart/form-data">
-                        @csrf @method('PUT')
+                <div class="card-body">
+                    <form action="{{ route('umkm.products.update', $product->id) }}" method="POST" enctype="multipart/form-data">
+                        @csrf
+                        @method('PUT')
 
-                        <!-- Nama Produk -->
-                        <div class="mb-4">
-                            <label class="form-label fw-semibold">Nama Produk <span class="text-danger">*</span></label>
-                            <input type="text" name="nama_produk" class="form-control @error('nama_produk') is-invalid @enderror"
-                                   value="{{ old('nama_produk', $product->nama_produk) }}" required>
-                            @error('nama_produk')
-                                <div class="invalid-feedback d-block">{{ $message }}</div>
-                            @enderror
+                        @if ($errors->any())
+                            <div class="alert alert-danger">
+                                <ul class="mb-0">
+                                    @foreach ($errors->all() as $error)
+                                        <li>{{ $error }}</li>
+                                    @endforeach
+                                </ul>
+                            </div>
+                        @endif
+
+                        <div class="mb-3">
+                            <label class="form-label">Nama Produk *</label>
+                            <input type="text" name="nama_produk" class="form-control @error('nama_produk') is-invalid @enderror" 
+                                   value="{{ old('nama_produk', $product->nama_produk) }}" placeholder="Masukkan nama produk" required>
+                            @error('nama_produk') <div class="invalid-feedback d-block">{{ $message }}</div> @enderror
                         </div>
 
-                        <!-- Deskripsi -->
-                        <div class="mb-4">
-                            <label class="form-label fw-semibold">Deskripsi <span class="text-danger">*</span></label>
-                            <textarea name="deskripsi" class="form-control @error('deskripsi') is-invalid @enderror"
-                                      rows="4" required>{{ old('deskripsi', $product->deskripsi) }}</textarea>
-                            @error('deskripsi')
-                                <div class="invalid-feedback d-block">{{ $message }}</div>
-                            @enderror
-                        </div>
-
-                        <!-- Harga & Satuan Row -->
                         <div class="row">
-                            <div class="col-md-6 mb-4">
-                                <label class="form-label fw-semibold">Harga (Rp) <span class="text-danger">*</span></label>
-                                <input type="number" name="harga" class="form-control @error('harga') is-invalid @enderror"
-                                       min="0" step="1"
-                                       value="{{ old('harga', $product->harga) }}" required>
-                                @error('harga')
-                                    <div class="invalid-feedback d-block">{{ $message }}</div>
-                                @enderror
-                            </div>
-                            <div class="col-md-6 mb-4">
-                                <label class="form-label fw-semibold">Satuan <span class="text-danger">*</span></label>
-                                <select name="satuan" class="form-select @error('satuan') is-invalid @enderror" required>
-                                    <option value="">-- Pilih Satuan --</option>
-                                    <option value="pcs" {{ old('satuan', $product->satuan) == 'pcs' ? 'selected' : '' }}>Pcs</option>
-                                    <option value="kg" {{ old('satuan', $product->satuan) == 'kg' ? 'selected' : '' }}>Kg</option>
-                                    <option value="liter" {{ old('satuan', $product->satuan) == 'liter' ? 'selected' : '' }}>Liter</option>
-                                    <option value="box" {{ old('satuan', $product->satuan) == 'box' ? 'selected' : '' }}>Box</option>
-                                    <option value="pack" {{ old('satuan', $product->satuan) == 'pack' ? 'selected' : '' }}>Pack</option>
-                                </select>
-                                @error('satuan')
-                                    <div class="invalid-feedback d-block">{{ $message }}</div>
-                                @enderror
-                            </div>
-                        </div>
-
-                        <!-- Stok & Kategori Row -->
-                        <div class="row">
-                            <div class="col-md-6 mb-4">
-                                <label class="form-label fw-semibold">Stok <span class="text-danger">*</span></label>
-                                <input type="number" name="stok" class="form-control @error('stok') is-invalid @enderror"
-                                       min="0"
-                                       value="{{ old('stok', $product->stok) }}" required>
-                                @error('stok')
-                                    <div class="invalid-feedback d-block">{{ $message }}</div>
-                                @enderror
-                            </div>
-                            <div class="col-md-6 mb-4">
-                                <label class="form-label fw-semibold">Kategori</label>
-                                <input type="text" name="kategori" class="form-control @error('kategori') is-invalid @enderror"
-                                       value="{{ old('kategori', $product->kategori) }}">
-                                @error('kategori')
-                                    <div class="invalid-feedback d-block">{{ $message }}</div>
-                                @enderror
-                            </div>
-                        </div>
-
-                        <!-- Foto -->
-                        <div class="mb-4">
-                            <label class="form-label fw-semibold">Foto Produk</label>
-
-                            @if ($product->foto)
+                            <div class="col-md-6">
                                 <div class="mb-3">
-                                    <img src="{{ asset('storage/' . $product->foto) }}" alt="{{ $product->nama_produk }}"
-                                         class="img-thumbnail" style="max-width: 200px;">
-                                    <p class="small text-muted mt-2 mb-0">Foto saat ini</p>
+                                    <label class="form-label">Kategori *</label>
+                                    <select name="kategori" class="form-select @error('kategori') is-invalid @enderror" required>
+                                        <option value="">Pilih Kategori</option>
+                                        <option value="Hasil Laut" {{ old('kategori', $product->kategori) == 'Hasil Laut' ? 'selected' : '' }}>Hasil Laut</option>
+                                        <option value="Makanan Olahan" {{ old('kategori', $product->kategori) == 'Makanan Olahan' ? 'selected' : '' }}>Makanan Olahan</option>
+                                        <option value="Bumbu Dapur" {{ old('kategori', $product->kategori) == 'Bumbu Dapur' ? 'selected' : '' }}>Bumbu Dapur</option>
+                                        <option value="Kerajinan" {{ old('kategori', $product->kategori) == 'Kerajinan' ? 'selected' : '' }}>Kerajinan</option>
+                                        <option value="Kuliner" {{ old('kategori', $product->kategori) == 'Kuliner' ? 'selected' : '' }}>Kuliner</option>
+                                    </select>
+                                    @error('kategori') <div class="invalid-feedback d-block">{{ $message }}</div> @enderror
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Satuan *</label>
+                                    <select name="satuan" class="form-select @error('satuan') is-invalid @enderror" required>
+                                        <option value="">Pilih Satuan</option>
+                                        <option value="kg" {{ old('satuan', $product->satuan) == 'kg' ? 'selected' : '' }}>Kilogram (kg)</option>
+                                        <option value="gram" {{ old('satuan', $product->satuan) == 'gram' ? 'selected' : '' }}>Gram (gr)</option>
+                                        <option value="pcs" {{ old('satuan', $product->satuan) == 'pcs' ? 'selected' : '' }}>Pieces (pcs)</option>
+                                        <option value="pack" {{ old('satuan', $product->satuan) == 'pack' ? 'selected' : '' }}>Pack</option>
+                                        <option value="porsi" {{ old('satuan', $product->satuan) == 'porsi' ? 'selected' : '' }}>Porsi</option>
+                                    </select>
+                                    @error('satuan') <div class="invalid-feedback d-block">{{ $message }}</div> @enderror
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Deskripsi Produk *</label>
+                            <textarea name="deskripsi" class="form-control @error('deskripsi') is-invalid @enderror" 
+                                      placeholder="Deskripsi produk Anda" rows="4" required>{{ old('deskripsi', $product->deskripsi) }}</textarea>
+                            @error('deskripsi') <div class="invalid-feedback d-block">{{ $message }}</div> @enderror
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Harga (Rp) *</label>
+                                    <input type="number" name="harga" class="form-control @error('harga') is-invalid @enderror" 
+                                           value="{{ old('harga', $product->harga) }}" min="0" step="100" placeholder="Masukkan harga" required>
+                                    @error('harga') <div class="invalid-feedback d-block">{{ $message }}</div> @enderror
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Stok *</label>
+                                    <input type="number" name="stok" class="form-control @error('stok') is-invalid @enderror" 
+                                           value="{{ old('stok', $product->stok) }}" min="0" placeholder="Masukkan stok" required>
+                                    @error('stok') <div class="invalid-feedback d-block">{{ $message }}</div> @enderror
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="form-label">Foto Produk</label>
+                            @if($product->image)
+                                <div class="mb-2">
+                                    <img src="{{ Storage::url($product->image) }}" alt="Produk" style="max-width: 150px; max-height: 150px; border-radius: 8px;">
+                                    <p class="text-muted small mt-1">Foto saat ini</p>
                                 </div>
                             @endif
-
-                            <input type="file" name="foto" class="form-control @error('foto') is-invalid @enderror"
-                                   accept="image/*">
-                            <small class="text-muted d-block mt-2">
-                                <i class="bi bi-info-circle me-1"></i>
-                                Biarkan kosong jika tidak ingin mengubah foto. Format: JPG, PNG, GIF | Ukuran max: 2MB
-                            </small>
-                            @error('foto')
-                                <div class="invalid-feedback d-block">{{ $message }}</div>
-                            @enderror
+                            <div class="border border-2 border-dashed rounded p-4 text-center" style="cursor: pointer;" onclick="document.getElementById('image').click()">
+                                <input type="file" name="image" id="image" accept="image/*" style="display: none;" onchange="previewImage()">
+                                <div id="upload-content">
+                                    <i class="bi bi-cloud-upload" style="font-size: 2rem; color: #667eea;"></i>
+                                    <h5 class="mt-2">Klik atau drag foto di sini</h5>
+                                    <p class="text-muted mb-0">JPG, PNG, GIF hingga 2MB</p>
+                                </div>
+                                <div id="image-preview-container" style="display: none; text-align: center;">
+                                    <img id="image-preview" src="" alt="Preview" style="max-width: 150px; max-height: 150px; border-radius: 8px;">
+                                    <p class="mt-2 mb-0 text-success"><i class="bi bi-check-circle"></i> Foto siap diupload</p>
+                                </div>
+                            </div>
+                            @error('image') <div class="text-danger small mt-2">{{ $message }}</div> @enderror
                         </div>
 
-                        <!-- Submit Buttons -->
                         <div class="d-flex gap-2">
-                            <button type="submit" class="btn btn-primary">
-                                <i class="bi bi-check-circle me-1"></i>Simpan Perubahan
-                            </button>
                             <a href="{{ route('umkm.products.index') }}" class="btn btn-outline-secondary">
-                                <i class="bi bi-x-circle me-1"></i>Batal
+                                <i class="bi bi-arrow-left"></i> Batal
                             </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-check"></i> Simpan Perubahan
+                            </button>
                         </div>
                     </form>
                 </div>
             </div>
-        </div>
-
-        <!-- Sidebar Info -->
-        <div class="col-lg-4">
-            <div class="card border-0 shadow-sm mb-3">
-                <div class="card-header bg-light border-bottom">
-                    <h6 class="mb-0">
-                        <i class="bi bi-info-circle me-2"></i>Info Produk
-                    </h6>
-                </div>
-                <div class="card-body small">
-                    <div class="mb-3">
-                        <strong>Status</strong>
-                        <p class="mb-0">
-                            @if ($product->status === 'aktif')
-                                <span class="badge bg-success">Aktif</span>
-                            @else
-                                <span class="badge bg-warning">Pending Review</span>
-                            @endif
-                        </p>
-                    </div>
-                    <div class="mb-3">
-                        <strong>Dibuat</strong>
-                        <p class="text-muted mb-0">{{ $product->created_at->format('d M Y H:i') }}</p>
-                    </div>
-                    <div>
-                        <strong>Diubah</strong>
-                        <p class="text-muted mb-0">{{ $product->updated_at->format('d M Y H:i') }}</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-@endsection
+        </div

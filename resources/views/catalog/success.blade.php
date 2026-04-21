@@ -94,46 +94,30 @@
                                 <p class="text-muted mb-0 small">Produk diterima dan transaksi selesai.</p>
                             </div>
                         </div>
-                    </div>
 
-                    <!-- Contact Info -->
-                    <div class="alert alert-info">
-                        <h6 class="fw-bold">
-                            <i class="bi bi-telephone me-2"></i>Informasi Kontak
-                        </h6>
-                        <p class="mb-2">UMKM akan menghubungi Anda melalui WhatsApp untuk konfirmasi pesanan dan detail pengiriman.</p>
-                        <p class="mb-0"><strong>Nomor WhatsApp Anda:</strong> {{ $order->customer_phone }}</p>
-                    </div>
-
-                    <!-- Action Buttons -->
-                    <div class="row g-3 mt-3">
-                        <div class="col-md-6">
-                            <a href="https://wa.me/{{ $order->product->umkm->phone }}?text=Halo, saya ingin bertanya tentang pesanan #{{ $order->order_number }}" 
-                               class="whatsapp-btn d-block text-center" target="_blank">
-                                <i class="bi bi-whatsapp me-2"></i>Hubungi UMKM
+                        <!-- Action Buttons -->
+                        <div class="d-flex flex-column gap-2">
+                            <a href="/katalog" class="btn btn-success btn-lg">
+                                <i class="bi bi-bag-check me-2"></i>Lanjut Belanja
+                            </a>
+                            <a href="/" class="btn btn-outline-secondary btn-lg">
+                                <i class="bi bi-house me-2"></i>Kembali ke Beranda
                             </a>
                         </div>
-                        <div class="col-md-6">
-                            <a href="{{ route('katalog') }}" class="btn-success-action d-block text-center">
-                                <i class="bi bi-arrow-left me-2"></i>Kembali ke Katalog
-                            </a>
-                        </div>
-                    </div>
 
-                    <!-- Additional Info -->
-                    <div class="mt-4 text-center">
-                        <p class="text-muted">
-                            <i class="bi bi-clock me-2"></i>
-                            Pesanan dibuat pada {{ $order->created_at->format('d M Y, H:i') }}
-                        </p>
-                        <small class="text-muted">
-                            Jika ada pertanyaan, jangan ragu untuk menghubungi UMKM terkait atau admin sistem.
-                        </small>
+                        <!-- Contact Info -->
+                        <div class="mt-4 pt-4 border-top">
+                            <p class="text-muted small text-center mb-0">
+                                Ada pertanyaan? Hubungi kami di WhatsApp <strong>+62 812-3456-7890</strong>
+                            </p>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+</div>
+
 @endsection
 
 @push('styles')

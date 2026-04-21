@@ -35,24 +35,25 @@ class DesaController extends Controller
         return redirect()->route('admin.desa.index')->with('success', 'Desa berhasil ditambahkan!');
     }
 
-    public function edit(Desa $desa)
+    public function edit($id)
     {
+        $desa = Desa::findOrFail($id);
         return view('admin.desa.edit', compact('desa'));
     }
 
-    public function update(Request $request, Desa $desa)
+    public function update(Request $request, $id)
     {
+        $desa = Desa::findOrFail($id);
+        
         $validated = $request->validate([
-            'nama_desa' => 'required|string|max:255',
-            'kecamatan' => 'required|string|max:255',
-            'kabupaten' => 'required|string|max:255',
+            'nama_desa' => 'required|string|unique:desas,nama_desa,' . $id,
             'deskripsi' => 'nullable|string',
-            'jumlah_umkm' => 'required|integer|min:0',
         ]);
 
         $desa->update($validated);
 
-        return redirect()->route('admin.desa.index')->with('success', 'Desa berhasil diperbarui!');
+        return redirect()->route('admin.desa.index')
+            ->with('success', 'Desa berhasil diupdate');
     }
 
     public function destroy(Desa $desa)

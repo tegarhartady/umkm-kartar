@@ -28,6 +28,103 @@
     <link href="{{ asset('css/style.css') }}" rel="stylesheet">
     
     @stack('styles')
+
+    <style>
+        .navbar {
+            background: white;
+            box-shadow: 0 2px 8px rgba(0, 31, 92, 0.1);
+        }
+
+        .navbar-brand {
+            color: #001f5c !important;
+            font-weight: 700;
+        }
+
+        .nav-link {
+            color: #333 !important;
+        }
+
+        .nav-link:hover {
+            color: #001f5c !important;
+        }
+
+        .nav-link.active {
+            color: #001f5c !important;
+            border-bottom: 2px solid #001f5c;
+        }
+
+        .sidebar {
+            background: #001f5c;
+            color: white;
+        }
+
+        .sidebar .nav-link {
+            color: rgba(255, 255, 255, 0.8) !important;
+        }
+
+        .sidebar .nav-link:hover {
+            color: white !important;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .sidebar .nav-link.active {
+            background: #000f3d;
+            color: white !important;
+            border-left: 3px solid white;
+        }
+
+        .section-badge {
+            background: #e8eef7 !important;
+            color: #001f5c !important;
+            border-color: #001f5c !important;
+        }
+
+        .text-primary {
+            color: #001f5c !important;
+        }
+
+        .bg-primary {
+            background-color: #001f5c !important;
+        }
+
+        .border-primary {
+            border-color: #001f5c !important;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #001f5c 0%, #000f3d 100%);
+            border: none;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #000f3d 0%, #001f5c 100%);
+            color: white;
+        }
+
+        .btn-outline-primary {
+            color: #001f5c;
+            border-color: #001f5c;
+        }
+
+        .btn-outline-primary:hover {
+            background: #001f5c;
+            border-color: #001f5c;
+            color: white;
+        }
+
+        .feature-icon {
+            color: #001f5c;
+        }
+
+        .contact-icon {
+            color: #001f5c;
+        }
+
+        .stat-number {
+            color: #001f5c;
+        }
+    </style>
 </head>
 <body>
     <!-- Navbar -->

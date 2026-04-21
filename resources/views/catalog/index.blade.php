@@ -518,7 +518,7 @@
                         <div class="card product-card h-100">
                             <div class="product-image">
                                 @if($product->image)
-                                    <img src="{{ asset($product->image) }}" alt="{{ $product->nama_produk }}">
+                                    <img src="{{ asset('storage/' . $product->image) }}" alt="{{ $product->nama_produk }}">
                                 @else
                                     <div class="no-image">
                                         <i class="bi bi-image"></i>
@@ -526,11 +526,11 @@
                                     </div>
                                 @endif
                                 <div class="category-badge">{{ $product->kategori }}</div>
-                                <div class="product-overlay">
+                                {{-- <div class="product-overlay">
                                     <a href="{{ route('catalog.show', $product) }}" class="btn btn-view-detail">
                                         <i class="bi bi-eye me-2"></i>Lihat Detail
                                     </a>
-                                </div>
+                                </div> --}}
                             </div>
                             <div class="card-body">
                                 <h6 class="card-title fw-bold">{{ $product->nama_produk }}</h6>

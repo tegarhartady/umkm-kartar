@@ -25,15 +25,6 @@
 
             <!-- Product Info -->
             <div class="col-lg-7">
-                <!-- Breadcrumb -->
-                {{-- <nav aria-label="breadcrumb" class="mb-4">
-                    <ol class="breadcrumb">
-                        <li class="breadcrumb-item"><a href="{{ route('home') }}" class="text-primary text-decoration-none">Beranda</a></li>
-                        <li class="breadcrumb-item"><a href="{{ route('katalog') }}" class="text-primary text-decoration-none">Katalog</a></li>
-                        <li class="breadcrumb-item active">{{ $product->nama_produk }}</li>
-                    </ol>
-                </nav> --}}
-
                 <!-- Category Badge -->
                 <span class="badge bg-success mb-3">{{ $product->kategori }}</span>
 
@@ -44,8 +35,8 @@
                 <div class="d-flex align-items-center mb-4 pb-4 border-bottom">
                     <i class="bi bi-shop text-success me-3" style="font-size: 1.5rem;"></i>
                     <div>
-                        <h6 class="mb-0">{{ $product->umkm->nama_toko ?? 'UMKM' }}</h6>
-                        <small class="text-muted">{{ $product->umkm->desa ?? '' }}</small>
+                        <h6 class="mb-0">{{ $umkm->nama_toko }}</h6>
+                        <small class="text-muted">{{ $umkm->desa }}</small>
                     </div>
                 </div>
 
@@ -77,12 +68,12 @@
 
                 <!-- CTA Buttons -->
                 <div class="d-flex gap-3">
-                    <a href="{{ route('checkout', $product->id) }}" class="btn btn-success btn-lg grow">
+                    <a href="/checkout/{{ $product->id }}" class="btn btn-success btn-lg grow">
                         <i class="bi bi-cart me-2"></i>Beli Sekarang
                     </a>
-                    {{-- <a href="{{ route('katalog') }}" class="btn btn-outline-secondary btn-lg">
+                    <a href="/katalog" class="btn btn-outline-secondary btn-lg">
                         <i class="bi bi-arrow-left me-2"></i>Kembali
-                    </a> --}}
+                    </a>
                 </div>
             </div>
         </div>

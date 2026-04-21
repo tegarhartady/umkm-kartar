@@ -1,9 +1,17 @@
-@extends('layouts.app')
+@extends('layouts.dashboard-umkm')
 
 @section('title', 'Dashboard UMKM - ' . Auth::guard('umkm')->user()->nama_toko)
 
+@section('breadcrumb')
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item active"><i class="bi bi-house me-1"></i>Dashboard</li>
+        </ol>
+    </nav>
+@endsection
+
 @section('content')
-<div class="container-fluid py-4">
+    <div class="container-fluid">
     <!-- Header -->
     <div class="row mb-4">
         <div class="col-12">
@@ -12,12 +20,6 @@
                     <h1 class="h3 mb-1 fw-bold">Dashboard UMKM</h1>
                     <p class="text-muted mb-0">Kelola informasi dan produk UMKM Anda</p>
                 </div>
-                <form action="{{ route('umkm.logout') }}" method="POST" style="display:inline;">
-                    @csrf
-                    <button type="submit" class="btn btn-outline-danger">
-                        <i class="bi bi-box-arrow-right"></i> Logout
-                    </button>
-                </form>
             </div>
         </div>
     </div>
@@ -30,7 +32,7 @@
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
                             <p class="text-muted mb-1">Total Produk</p>
-                            <h3 class="mb-0 text-primary fw-bold">{{ $totalProducts }}</h3>
+                            <h3 class="mb-0 text-primary fw-bold">{{ $totalProducts ?? 0 }}</h3>
                         </div>
                         <i class="bi bi-box-seam text-primary" style="font-size: 2rem; opacity: 0.5;"></i>
                     </div>
@@ -43,7 +45,7 @@
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
                             <p class="text-muted mb-1">Produk Aktif</p>
-                            <h3 class="mb-0 text-success fw-bold">{{ $activeProducts }}</h3>
+                            <h3 class="mb-0 text-success fw-bold">{{ $activeProducts ?? 0 }}</h3>
                         </div>
                         <i class="bi bi-check-circle text-success" style="font-size: 2rem; opacity: 0.5;"></i>
                     </div>
@@ -77,7 +79,7 @@
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
                             <p class="text-muted mb-1">Kategori</p>
-                            <h5 class="mb-0">{{ $umkm->kategori }}</h5>
+                            <h5 class="mb-0">{{ $umkm->kategori ?? '-' }}</h5>
                         </div>
                         <i class="bi bi-tag text-warning" style="font-size: 2rem; opacity: 0.5;"></i>
                     </div>
@@ -92,7 +94,10 @@
             <div class="card border-0 shadow-sm">
                 <div class="card-header bg-white border-bottom">
                     <div class="d-flex justify-content-between align-items-center">
-                        <h5 class="mb-0">Informasi UMKM</h5>
+                        <h5 class="mb-0"><i class="bi bi-info-circle me-2"></i>Informasi UMKM</h5>
+                        <a href="#" class="btn btn-sm btn-primary">
+                            <i class="bi bi-pencil"></i> Edit
+                        </a>
                     </div>
                 </div>
                 <div class="card-body">
@@ -101,19 +106,19 @@
                             <table class="table table-borderless">
                                 <tr>
                                     <td class="fw-bold" width="150">Nama Toko:</td>
-                                    <td>{{ $umkm->nama_toko }}</td>
+                                    <td>{{ $umkm->nama_toko ?? '-' }}</td>
                                 </tr>
                                 <tr>
                                     <td class="fw-bold">Pemilik:</td>
-                                    <td>{{ $umkm->pemilik }}</td>
+                                    <td>{{ $umkm->pemilik ?? '-' }}</td>
                                 </tr>
                                 <tr>
                                     <td class="fw-bold">Email:</td>
-                                    <td>{{ $umkm->email }}</td>
+                                    <td>{{ $umkm->email ?? '-' }}</td>
                                 </tr>
                                 <tr>
                                     <td class="fw-bold">No. Telepon:</td>
-                                    <td>{{ $umkm->phone }}</td>
+                                    <td>{{ $umkm->phone ?? '-' }}</td>
                                 </tr>
                             </table>
                         </div>
@@ -121,11 +126,11 @@
                             <table class="table table-borderless">
                                 <tr>
                                     <td class="fw-bold" width="150">Desa:</td>
-                                    <td>{{ $umkm->desa }}</td>
+                                    <td>{{ $umkm->desa ?? '-' }}</td>
                                 </tr>
                                 <tr>
                                     <td class="fw-bold">Alamat:</td>
-                                    <td>{{ $umkm->alamat }}</td>
+                                    <td>{{ $umkm->alamat ?? '-' }}</td>
                                 </tr>
                                 <tr>
                                     <td class="fw-bold">Lama Usaha:</td>
@@ -133,7 +138,7 @@
                                 </tr>
                                 <tr>
                                     <td class="fw-bold">Produk Utama:</td>
-                                    <td>{{ $umkm->produk_utama }}</td>
+                                    <td>{{ $umkm->produk_utama ?? '-' }}</td>
                                 </tr>
                             </table>
                         </div>
@@ -149,7 +154,7 @@
             <div class="card border-0 shadow-sm">
                 <div class="card-header bg-white border-bottom">
                     <div class="d-flex justify-content-between align-items-center">
-                        <h5 class="mb-0">Daftar Produk</h5>
+                        <h5 class="mb-0"><i class="bi bi-box me-2"></i>Daftar Produk</h5>
                         @if($umkm->status === 'disetujui')
                             <a href="{{ route('umkm.products.create') }}" class="btn btn-sm btn-primary">
                                 <i class="bi bi-plus-circle"></i> Tambah Produk
@@ -230,23 +235,4 @@
                 </div>
             </div>
         </div>
-    </div>
-</div>
 @endsection
-
-@push('styles')
-<style>
-    .card {
-        transition: transform 0.2s, box-shadow 0.2s;
-    }
-
-    .card:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
-    }
-
-    .table-hover tbody tr:hover {
-        background-color: #f8f9fa;
-    }
-</style>
-@endpush

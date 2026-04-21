@@ -129,10 +129,11 @@
                     </div>
                     <div class="card-body">
                         <p class="small text-muted mb-3">UMKM ini menunggu persetujuan Anda.</p>
-                        <form action="{{ route('admin.umkm.approve', $umkm->id) }}" method="POST" class="mb-2">
+                        <form action="{{ route('admin.umkm.approve', $umkm->id) }}" method="POST" class="d-inline">
                             @csrf
-                            <button type="submit" class="btn btn-success w-100" onclick="return confirm('Setujui UMKM {{ $umkm->nama_toko }}?')">
-                                <i class="bi bi-check-circle me-2"></i>Setujui UMKM
+                            @method('PATCH')
+                            <button type="submit" class="btn btn-sm btn-success w-100">
+                                <i class="bi bi-check-circle me-1"></i>Setujui
                             </button>
                         </form>
                         <form action="{{ route('admin.umkm.reject', $umkm->id) }}" method="POST">
@@ -149,7 +150,7 @@
             @if($umkm->status === 'disetujui')
                 <div class="alert alert-info" role="alert">
                     <strong>Password UMKM</strong>
-                    <p class="mb-2">Jika UMKM lupa password, klik tombol di bawah untuk generate password baru:</p>
+                    <p class="mb-2">Jika UMKM lupa password, klik tombol di bawah untuk generate password baru: password123</p>
                     <form action="{{ route('admin.umkm.resetPassword', $umkm->id) }}" method="POST" style="display:inline;">
                         @csrf
                         <button type="submit" class="btn btn-warning" onclick="return confirm('Generate password baru untuk UMKM ini?')">

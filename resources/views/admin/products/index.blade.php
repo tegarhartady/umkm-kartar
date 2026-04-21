@@ -168,8 +168,8 @@
             <div class="card-body">
                 <!-- Product Image -->
                 <div class="mb-3">
-                    @if($product->image && file_exists(public_path($product->image)))
-                        <img src="{{ asset($product->image) }}" alt="{{ $product->nama_produk }}" class="img-fluid rounded" style="max-height: 200px; object-fit: cover; width: 100%;">
+                    @if($product->image)
+                        <img src="{{ asset('storage/' . $product->image) }}" alt="{{ $product->nama_produk }}" class="img-fluid rounded" style="max-height: 200px; object-fit: cover; width: 100%;">
                     @else
                         <div class="bg-light rounded d-flex align-items-center justify-content-center" style="height: 200px;">
                             <div class="text-center">
@@ -239,7 +239,47 @@
 
 @if($products->hasPages())
 <div class="d-flex justify-content-center mt-4">
-    {{ $products->links() }}
+    <nav aria-label="Page navigation">
+        <ul class="pagination">
+            {{-- Previous Page Link --}}
+            @if ($products->onFirstPage())
+                <li class="page-item disabled">
+                    <span class="page-link">&laquo;</span>
+                </li>
+            @else
+                <li class="page-item">
+                    <a class="page-link" href="{{ $products->previousPageUrl() }}" rel="prev">&laquo;</a>
+                </li>
+            @endif
+
+            {{-- Pagination Elements --}}
+            @foreach ($products->getUrlRange(1, $products->lastPage()) as $page => $url)
+                @if ($page == $products->currentPage())
+                    <li class="page-item active">
+                        <span class="page-link">
+                            {{ $page }}
+                            <span class="visually-hidden">(current)</span>
+                        </span>
+                    </li>
+                @else
+                    <li class="page-item">
+                        <a class="page-link" href="{{ $url }}">{{ $page }}</a>
+                    </li>
+                @endif
+            @endforeach
+
+            {{-- Next Page Link --}}
+            @if ($products->hasMorePages())
+                <li class="page-item">
+                    <a class="page-link" href="{{ $products->nextPageUrl() }}" rel="next">&raquo;</a>
+                </li>
+            @else
+                <li class="page-item disabled">
+                    <span class="page-link">&raquo;</span>
+                </li>
+            @endif
+        </ul>
+    </nav>
 </div>
 @endif
 
@@ -254,6 +294,34 @@
 .product-card:hover {
     transform: translateY(-2px);
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+.pagination {
+    gap: 0.25rem;
+}
+
+.page-link {
+    color: #001f5c;
+    border-color: #dee2e6;
+    padding: 0.5rem 0.75rem;
+    font-size: 0.9rem;
+}
+
+.page-link:hover {
+    color: white;
+    background-color: #001f5c;
+    border-color: #001f5c;
+}
+
+.page-item.active .page-link {
+    background-color: #001f5c;
+    border-color: #001f5c;
+    color: white;
+}
+
+.page-item.disabled .page-link {
+    color: #6c757d;
+    cursor: not-allowed;
 }
 </style>
 @endpush

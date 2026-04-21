@@ -32,13 +32,81 @@
             --shadow-lg: 0 8px 16px rgba(0, 0, 0, 0.15);
             --shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.15);
         }
+        
+        .sidebar {
+            background: #001f5c;
+        }
+
+        .sidebar .nav-link {
+            color: #000f3d !important;
+        }
+
+        .sidebar .nav-link:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: #000f3d !important;
+        }
+
+        .sidebar .nav-link.active {
+            background: #000f3d;
+            border-left: 3px solid 000f3d;
+        }
+
+        .navbar {
+            background: white;
+            box-shadow: 0 2px 8px rgba(0, 31, 92, 0.1);
+        }
+
+        .navbar-brand {
+            color: #001f5c !important;
+            font-weight: 700;
+        }
+
+        .nav-link {
+            color: #333 !important;
+        }
+
+        .nav-link:hover {
+            color: #001f5c !important;
+        }
+
+        .nav-link.active {
+            color: #ffffff !important;
+            border-bottom: 2px solid #001f5c;
+        }
+
+        .card {
+            border: 1px solid #e0e0e0;
+            border-radius: 12px;
+        }
+
+        .card-header {
+            background: white;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .badge-primary {
+            background: #001f5c;
+        }
+
+        .badge-success {
+            background: #28a745;
+        }
+
+        .badge-warning {
+            background: #ffc107;
+            color: #333;
+        }
+
+        .badge-danger {
+            background: #dc3545;
+        }
     </style>
     
     @stack('styles')
 </head>
 <body class="dashboard-layout">
     
-    <!-- Sidebar -->
+    @include('components.sidebar')
     <div class="sidebar" id="sidebar">
         <div class="sidebar-header">
             <div class="brand-logo">

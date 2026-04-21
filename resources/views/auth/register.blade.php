@@ -65,4 +65,42 @@
         <p class="text-center mt-4">Sudah punya akun? <a href="{{ route('auth.login') }}" class="text-blue-600 hover:underline font-bold">Masuk di sini</a></p>
     </div>
 </div>
+
+<style>
+.register-container {
+    background: linear-gradient(135deg, #001f5c 0%, #000f3d 100%);
+}
+
+.btn-register {
+    background: linear-gradient(135deg, #001f5c 0%, #000f3d 100%);
+    border: none;
+    color: white;
+    box-shadow: 0 4px 15px rgba(0, 31, 92, 0.2);
+}
+
+.btn-register:hover {
+    background: linear-gradient(135deg, #000f3d 0%, #001f5c 100%);
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 31, 92, 0.3);
+}
+
+.form-control:focus, .form-select:focus {
+    border-color: #001f5c;
+    box-shadow: 0 0 0 0.2rem rgba(0, 31, 92, 0.15);
+}
+
+.step-active {
+    background: #001f5c;
+    color: white;
+}
+
+a {
+    color: #001f5c;
+}
+
+a:hover {
+    color: #000f3d;
+}
+</style>
 @endsection

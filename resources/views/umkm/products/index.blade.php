@@ -1,101 +1,117 @@
-@extends('layouts.app')
+@extends('layouts.dashboard-umkm')
 
-@section('title', 'Kelola Produk - UMKM')
+@section('title', 'Daftar Produk - ' . Auth::guard('umkm')->user()->nama_toko)
+
+@section('breadcrumb')
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{{ route('umkm.umkm.dashboard') }}">Dashboard</a></li>
+            <li class="breadcrumb-item active">Daftar Produk</li>
+        </ol>
+    </nav>
+@endsection
 
 @section('content')
-
-<div class="container-fluid py-4">
-    <!-- Header -->
+<div class="container-fluid">
     <div class="row mb-4">
-        <div class="col-md-8">
-            <h1 class="h3 mb-0">
-                <i class="bi bi-box-seam me-2"></i>Kelola Produk
-            </h1>
-            <p class="text-muted small"><a href="{{ route('umkm.dashboard') }}">Dashboard</a> / Produk</p>
-        </div>
-        <div class="col-md-4 text-end">
-            <a href="{{ route('umkm.products.create') }}" class="btn btn-primary">
-                <i class="bi bi-plus-circle me-1"></i>Tambah Produk Baru
-            </a>
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h1 class="h3 mb-1 fw-bold">Daftar Produk</h1>
+                    <p class="text-muted mb-0">Kelola semua produk Anda</p>
+                </div>
+                @if(Auth::guard('umkm')->user()->status === 'disetujui')
+                    <a href="{{ route('umkm.products.create') }}" class="btn btn-primary">
+                        <i class="bi bi-plus-circle me-2"></i>Tambah Produk
+                    </a>
+                @endif
+            </div>
         </div>
     </div>
 
-    @if (session('success'))
-        <div class="alert alert-success alert-dismissible fade show" role="alert">
-            {!! session('success') !!}
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        </div>
-    @endif
-
-    @if ($products->count() > 0)
-        <div class="row">
-            @foreach ($products as $product)
-            <div class="col-md-6 col-lg-4 mb-4">
-                <div class="card border-0 shadow-sm h-100">
-                    @if ($product->foto)
-                        <img src="{{ asset('storage/' . $product->foto) }}" class="card-img-top" alt="{{ $product->nama_produk }}"
-                             style="height: 200px; object-fit: cover;">
-                    @else
-                        <div class="bg-light d-flex align-items-center justify-content-center" style="height: 200px;">
-                            <i class="bi bi-image text-muted" style="font-size: 2rem;"></i>
+    <div class="row">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white border-bottom">
+                    <h5 class="mb-0"><i class="bi bi-box me-2"></i>Produk Anda</h5>
+                </div>
+                <div class="card-body p-0">
+                    @if($products->count() > 0)
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th style="width: 50px;">No</th>
+                                        <th>Nama Produk</th>
+                                        <th>Kategori</th>
+                                        <th>Harga</th>
+                                        <th>Stok</th>
+                                        <th>Status</th>
+                                        <th style="width: 150px;">Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach($products as $product)
+                                        <tr>
+                                            <td><span class="badge bg-light text-dark">{{ $loop->iteration }}</span></td>
+                                            <td>
+                                                <div class="fw-bold">{{ $product->nama_produk }}</div>
+                                                <small class="text-muted">{{ Str::limit($product->deskripsi, 50) }}</small>
+                                            </td>
+                                            <td>{{ $product->kategori }}</td>
+                                            <td>Rp {{ number_format($product->harga, 0, ',', '.') }}</td>
+                                            <td>
+                                                <span class="badge bg-{{ $product->stok > 0 ? 'success' : 'danger' }}">
+                                                    {{ $product->stok }} {{ $product->satuan }}
+                                                </span>
+                                            </td>
+                                            <td>
+                                                @if($product->status === 'aktif')
+                                                    <span class="badge bg-success">Aktif</span>
+                                                @else
+                                                    <span class="badge bg-secondary">Nonaktif</span>
+                                                @endif
+                                            </td>
+                                            <td>
+                                                <a href="{{ route('umkm.products.edit', $product->id) }}" class="btn btn-sm btn-warning">
+                                                    <i class="bi bi-pencil"></i>
+                                                </a>
+                                                <form action="{{ route('umkm.products.destroy', $product->id) }}" method="POST" style="display:inline;">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Hapus produk ini?')">
+                                                        <i class="bi bi-trash"></i>
+                                                    </button>
+                                                </form>
+                                            </td>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
                         </div>
-                    @endif
 
-                    <div class="card-body">
-                        <h6 class="card-title mb-1">{{ $product->nama_produk }}</h6>
-                        <p class="text-muted small mb-2">{{ Str::limit($product->deskripsi, 60) }}</p>
-
-                        <div class="d-flex justify-content-between align-items-center mb-3">
-                            <span class="h6 mb-0">Rp {{ number_format($product->harga, 0, ',', '.') }}</span>
-                            @if ($product->status === 'aktif')
-                                <span class="badge bg-success">Aktif</span>
+                        <!-- Pagination -->
+                        @if($products->hasPages())
+                            <div class="d-flex justify-content-center py-3">
+                                {{ $products->links() }}
+                            </div>
+                        @endif
+                    @else
+                        <div class="text-center py-5">
+                            <i class="bi bi-inbox" style="font-size: 3rem; color: #ccc;"></i>
+                            <p class="text-muted mt-3">Belum ada produk</p>
+                            @if(Auth::guard('umkm')->user()->status === 'disetujui')
+                                <a href="{{ route('umkm.products.create') }}" class="btn btn-primary mt-2">
+                                    <i class="bi bi-plus-circle"></i> Tambah Produk Pertama
+                                </a>
                             @else
-                                <span class="badge bg-warning">Pending</span>
+                                <p class="text-danger mt-2">Akun Anda belum disetujui. Hubungi admin untuk persetujuan.</p>
                             @endif
                         </div>
-
-                        <p class="small text-muted mb-2">
-                            <i class="bi bi-box me-1"></i>Stok: {{ $product->stok }} {{ $product->satuan }}
-                        </p>
-
-                        <div class="btn-group w-100" role="group">
-                            <a href="{{ route('umkm.products.edit', $product) }}"
-                               class="btn btn-sm btn-outline-primary">
-                                <i class="bi bi-pencil me-1"></i>Edit
-                            </a>
-                            <form method="POST" action="{{ route('umkm.products.destroy', $product) }}"
-                                  class="d-inline flex-grow-1"
-                                  onsubmit="return confirm('Hapus produk ini?');">
-                                @csrf @method('DELETE')
-                                <button type="submit" class="btn btn-sm btn-outline-danger w-100">
-                                    <i class="bi bi-trash me-1"></i>Hapus
-                                </button>
-                            </form>
-                        </div>
-                    </div>
+                    @endif
                 </div>
             </div>
-            @endforeach
         </div>
-
-        <!-- Pagination -->
-        @if ($products instanceof \Illuminate\Pagination\Paginator)
-            <div class="row mt-4">
-                <div class="col-12">
-                    {{ $products->links() }}
-                </div>
-            </div>
-        @endif
-    @else
-        <div class="alert alert-info text-center py-5">
-            <i class="bi bi-inbox" style="font-size: 2.5rem;"></i>
-            <p class="mt-3 mb-0">Belum ada produk</p>
-            <p class="text-muted small mb-3">Mulai tambahkan produk UMKM Anda sekarang</p>
-            <a href="{{ route('umkm.products.create') }}" class="btn btn-primary btn-sm">
-                <i class="bi bi-plus-circle me-1"></i>Tambah Produk Pertama
-            </a>
-        </div>
-    @endif
+    </div>
 </div>
-
 @endsection

@@ -15,11 +15,12 @@ class Product extends Model
         'umkm_id',
         'nama_produk',
         'deskripsi',
+        'kategori',
+        'satuan',
+        'metode_pemesanan',
         'harga',
         'stok',
-        'satuan',
-        'kategori',
-        'foto',
+        'image',
         'status',
     ];
 

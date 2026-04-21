@@ -115,4 +115,33 @@
     </div>
 </div>
 
+<style>
+.form-select {
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 0.75rem;
+}
+
+.form-select:focus {
+    border-color: #001f5c;
+    box-shadow: 0 0 0 0.2rem rgba(0, 31, 92, 0.15);
+}
+
+.form-select:disabled {
+    background-color: #f5f5f5;
+    opacity: 0.6;
+}
+
+button[type="submit"] {
+    background: linear-gradient(135deg, #001f5c 0%, #000f3d 100%);
+    border: none;
+    color: white;
+}
+
+button[type="submit"]:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 31, 92, 0.3);
+}
+</style>
+
 @endsection

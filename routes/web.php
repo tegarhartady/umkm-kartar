@@ -12,21 +12,26 @@ use App\Http\Controllers\Admin\SettingController;
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\UmkmRegistrationController;
 use App\Http\Controllers\Auth\UmkmAuthController;
+use App\Models\Desa;
 
 // Main Routes
 Route::get('/', function () {
-    return view('home');
+    return view('index');
 })->name('home');
 
 Route::get('/katalog', [CatalogController::class, 'indexProducts'])->name('katalog');
 
-// Catalog routes (E-commerce)
-Route::get('/beli/{product}', [CatalogController::class, 'show'])->name('catalog.show');
-Route::get('/checkout/{product}', [CatalogController::class, 'checkout'])->name('catalog.checkout');
-Route::post('/order/{product}', [CatalogController::class, 'processOrder'])->name('catalog.order');
-Route::get('/payment/{order}', [CatalogController::class, 'payment'])->name('catalog.payment');
-Route::post('/payment/{order}/process', [CatalogController::class, 'processPayment'])->name('catalog.payment.process');
-Route::get('/order-success/{order}', [CatalogController::class, 'success'])->name('catalog.success');
+// Detail produk
+Route::get('/beli/{id}', function ($id) {
+    $product = \App\Models\Product::findOrFail($id);
+    $umkm = $product->umkm;
+    $relatedProducts = \App\Models\Product::where('umkm_id', $umkm->id)
+        ->where('id', '!=', $id)
+        ->limit(4)
+        ->get();
+    
+    return view('beli', compact('product', 'umkm', 'relatedProducts'));
+})->name('beli');
 
 Route::get('/desa-mitra', function () {
     return view('pages.desa-mitra');
@@ -42,8 +47,12 @@ Route::get('/tentang', function () {
 
 // ✨ PUBLIC REGISTRATION FORM
 Route::get('/daftar-umkm', function () {
-    return view('pages.daftar-umkm');
+    $desas = Desa::all();
+    $categories = ['Hasil Laut', 'Makanan Olahan', 'Bumbu Dapur', 'Kerajinan', 'Kuliner'];
+    return view('pages.daftar-umkm', compact('desas', 'categories'));
 })->name('daftar-umkm');
+//     return view('pages.daftar-umkm');
+// })->name('daftar-umkm');
 
 Route::post('/daftar-umkm', [UmkmController::class, 'registerFromPublic'])->name('umkm.register.store');
 
@@ -103,10 +112,28 @@ Route::middleware(['auth', 'admin.superadmin'])->group(function () {
     Route::get('admin/umkm-verifikasi', [UmkmController::class, 'verifikasi'])->name('admin.umkm.verifikasi');
     Route::patch('admin/umkm/{umkm}/approve', [UmkmController::class, 'approve'])->name('admin.umkm.approve');
     Route::patch('admin/umkm/{umkm}/reject', [UmkmController::class, 'reject'])->name('admin.umkm.reject');
+    Route::post('admin/umkm/{umkm}/reset-password', [UmkmController::class, 'resetPassword'])->name('admin.umkm.resetPassword');
     
     // Product Management
-    Route::get('admin/products', [\App\Http\Controllers\ProductController::class, 'index'])->name('admin.products.index');
-    Route::get('admin/products/{product}', [\App\Http\Controllers\ProductController::class, 'show'])->name('admin.products.show');
+    Route::get('admin/products', function () {
+        $products = \App\Models\Product::paginate(15);
+        return view('admin.products.index', compact('products'));
+    })->name('admin.products.index');
+    Route::get('admin/products/create', function () {
+        $umkms = \App\Models\Umkm::where('status', 'disetujui')->get();
+        return view('admin.products.create', compact('umkms'));
+    })->name('admin.products.create');
+    Route::post('admin/products', [ProductController::class, 'store'])->name('admin.products.store');
+    Route::get('admin/products/{product}/edit', function ($id) {
+        $product = \App\Models\Product::findOrFail($id);
+        return view('admin.products.edit', compact('product'));
+    })->name('admin.products.edit');
+    Route::put('admin/products/{product}', [ProductController::class, 'update'])->name('admin.products.update');
+    Route::delete('admin/products/{product}', [ProductController::class, 'destroy'])->name('admin.products.destroy');
+    Route::get('admin/products/{product}', function ($id) {
+        $product = \App\Models\Product::findOrFail($id);
+        return view('admin.products.show', compact('product'));
+    })->name('admin.products.show');
     Route::get('admin/products-moderasi', function () {
         return view('admin.products.moderasi');
     })->name('admin.products.moderasi');
@@ -169,10 +196,23 @@ Route::post('/admin-login-secret-xyz', function (Illuminate\Http\Request $reques
         'email' => 'Email atau password salah.',
     ])->onlyInput('email');
 })->name('admin.authenticate');
-Route::middleware('guest:umkm')->prefix('umkm')->name('umkm.')->group(function () {
-    Route::get('/login', [UmkmAuthController::class, 'showLoginForm'])->name('login');
-    Route::post('/login', [UmkmAuthController::class, 'authenticate'])->name('authenticate');
-});
+
+// ===== UMKM LOGIN =====
+Route::post('/umkm/login', function (\Illuminate\Http\Request $request) {
+    $credentials = $request->validate([
+        'email' => 'required|email',
+        'password' => 'required',
+    ]);
+
+    if (\Illuminate\Support\Facades\Auth::guard('umkm')->attempt($credentials, $request->filled('remember'))) {
+        $request->session()->regenerate();
+        return redirect()->route('umkm.umkm.dashboard');
+    }
+
+    return back()->withErrors([
+        'email' => 'Email atau password salah.',
+    ])->onlyInput('email');
+})->name('umkm.authenticate')->middleware('guest:umkm');
 
 // ===== UMKM Protected Routes (Setelah Login) =====
 Route::middleware('auth:umkm')->prefix('umkm')->name('umkm.')->group(function () {
@@ -188,11 +228,122 @@ Route::middleware('auth:umkm')->prefix('umkm')->name('umkm.')->group(function ()
         return view('umkm.dashboard', compact('umkm', 'products', 'totalProducts', 'activeProducts'));
     })->name('umkm.dashboard');
 
-    // Products
-    Route::resource('products', \App\Http\Controllers\ProductController::class);
+    // Dashboard
+    Route::get('/dashboard', function () {
+        $umkm = Auth::guard('umkm')->user();
+        $products = $umkm->products()->latest()->paginate(10);
+        $totalProducts = $umkm->products()->count();
+        $activeProducts = $umkm->products()->where('status', 'aktif')->count();
 
-    // Reimbursements
-    Route::resource('reimbursement', \App\Http\Controllers\ReimbursementController::class);
+        return view('umkm.dashboard', compact('umkm', 'products', 'totalProducts', 'activeProducts'));
+    })->name('umkm.dashboard');
+
+    // Products - Index
+    Route::get('/products', function () {
+        $umkm = Auth::guard('umkm')->user();
+        $products = $umkm->products()->latest()->paginate(10);
+        return view('umkm.products.index', compact('products'));
+    })->name('products.index');
+
+    // Products - Create
+    Route::get('/products/create', function () {
+        return view('umkm.products.create');
+    })->name('products.create');
+
+    // Products - Store
+    Route::post('/products', function (\Illuminate\Http\Request $request) {
+        $validated = $request->validate([
+            'nama_produk' => 'required|string|max:255',
+            'kategori' => 'required|string',
+            'deskripsi' => 'required|string',
+            'harga' => 'required|numeric|min:0',
+            'stok' => 'required|numeric|min:0',
+            'satuan' => 'required|string',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+        ]);
+
+        $umkm = Auth::guard('umkm')->user();
+        $validated['umkm_id'] = $umkm->id;
+        $validated['status'] = 'aktif';
+
+        if ($request->hasFile('image')) {
+            $path = $request->file('image')->store('products', 'public');
+            $validated['image'] = $path;
+        }
+
+        \App\Models\Product::create($validated);
+
+        return redirect()->route('umkm.products.index')->with('success', 'Produk berhasil ditambahkan');
+    })->name('products.store');
+
+    // Products - Edit
+    Route::get('/products/{product}/edit', function ($id) {
+        $product = \App\Models\Product::findOrFail($id);
+        $umkm = Auth::guard('umkm')->user();
+        
+        if ($product->umkm_id !== $umkm->id) {
+            abort(403);
+        }
+
+        return view('umkm.products.edit', compact('product'));
+    })->name('products.edit');
+
+    // Products - Update
+    Route::put('/products/{product}', function (\Illuminate\Http\Request $request, $id) {
+        $product = \App\Models\Product::findOrFail($id);
+        $umkm = Auth::guard('umkm')->user();
+        
+        if ($product->umkm_id !== $umkm->id) {
+            abort(403);
+        }
+
+        $validated = $request->validate([
+            'nama_produk' => 'required|string|max:255',
+            'kategori' => 'required|string',
+            'deskripsi' => 'required|string',
+            'harga' => 'required|numeric|min:0',
+            'stok' => 'required|numeric|min:0',
+            'satuan' => 'required|string',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+        ]);
+
+        if ($request->hasFile('image')) {
+            if ($product->image) {
+                \Illuminate\Support\Facades\Storage::disk('public')->delete($product->image);
+            }
+            $path = $request->file('image')->store('products', 'public');
+            $validated['image'] = $path;
+        }
+
+        $product->update($validated);
+
+        return redirect()->route('umkm.products.index')->with('success', 'Produk berhasil diperbarui');
+    })->name('products.update');
+
+    // Products - Delete
+    Route::delete('/products/{product}', function ($id) {
+        $product = \App\Models\Product::findOrFail($id);
+        $umkm = Auth::guard('umkm')->user();
+        
+        if ($product->umkm_id !== $umkm->id) {
+            abort(403);
+        }
+
+        if ($product->image) {
+            \Illuminate\Support\Facades\Storage::disk('public')->delete($product->image);
+        }
+
+        $product->delete();
+
+        return redirect()->route('umkm.products.index')->with('success', 'Produk berhasil dihapus');
+    })->name('products.destroy');
 });
+
+// Checkout & Order routes
+Route::get('/checkout/{product}', [CatalogController::class, 'checkout'])->name('catalog.checkout');
+Route::post('/order/{product}', [CatalogController::class, 'processOrder'])->name('catalog.order');
+Route::get('/payment/{order}', [CatalogController::class, 'payment'])->name('catalog.payment');
+Route::post('/payment/{order}/process', [CatalogController::class, 'processPayment'])->name('catalog.payment.process');
+Route::get('/order-success/{order}', [CatalogController::class, 'success'])->name('catalog.success');
 
 // Check routes

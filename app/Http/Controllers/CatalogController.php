@@ -82,10 +82,10 @@ class CatalogController extends Controller
             ->filter()
             ->sort();
 
-        // Get distinct desas from database
-        $desas = \App\Models\Desa::whereHas('umkms.products', function ($q) {
-            $q->whereIn('status', ['published', 'aktif']);
-        })->get();
+        // Get desas with UMKM and product counts
+        $desas = \App\Models\Desa::withCount('umkms')
+            ->withCount('products')
+            ->get();
 
         // Get distinct UMKMs from database
         $umkms = \App\Models\Umkm::whereHas('products', function ($q) {
@@ -123,7 +123,10 @@ class CatalogController extends Controller
             return redirect()->back()->with('error', 'Produk ini sedang tidak tersedia.');
         }
         
-        return view('catalog.checkout', compact('product'));
+        // Get stored form data from session if exists
+        $formData = session('checkout_form_data', []);
+        
+        return view('catalog.checkout', compact('product', 'formData'));
     }
 
     public function processOrder(Request $request, Product $product)
@@ -140,6 +143,9 @@ class CatalogController extends Controller
         if ($product->stok < $validated['quantity']) {
             return redirect()->back()->with('error', 'Stok tidak mencukupi.');
         }
+
+        // Store form data to session for later reference
+        session(['checkout_form_data' => $validated]);
 
         // Create order
         $order = Order::create([
@@ -160,8 +166,11 @@ class CatalogController extends Controller
 
     public function payment(Order $order)
     {
+        // Get stored form data from session
+        $formData = session('checkout_form_data', []);
+        
         $order->load('product.umkm');
-        return view('catalog.payment', compact('order'));
+        return view('catalog.payment', compact('order', 'formData'));
     }
 
     public function processPayment(Request $request, Order $order)
@@ -183,6 +192,9 @@ class CatalogController extends Controller
 
     public function success(Order $order)
     {
+        // Clear session data after success
+        session()->forget('checkout_form_data');
+        
         $order->load('product.umkm');
         return view('catalog.success', compact('order'));
     }

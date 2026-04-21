@@ -86,7 +86,7 @@
                     <div class="product-card" data-category="{{ $product->kategori }}" data-desa="{{ $product->umkm->desa ?? '' }}" data-title="{{ strtolower($product->nama_produk) }}">
                         <div class="product-image">
                             @if($product->image)
-                                <img src="{{ asset('storage/' . $product->image) }}" alt="{{ $product->nama_produk }}" class="img-fluid">
+                                <img src="{{ '/storage/' . $product->image }}" alt="{{ $product->nama_produk }}" class="img-fluid" onerror="this.src='https://via.placeholder.com/400x300?text={{ urlencode($product->nama_produk) }}'">
                             @else
                                 <img src="https://via.placeholder.com/400x300?text={{ urlencode($product->nama_produk) }}" alt="{{ $product->nama_produk }}" class="img-fluid">
                             @endif
@@ -100,7 +100,7 @@
                             <p class="product-seller"><i class="bi bi-shop me-1"></i> {{ $product->umkm->nama_toko ?? 'UMKM' }} &middot; <small class="text-muted">{{ $product->umkm->desa ?? '' }}</small></p>
                             <div class="product-footer d-flex justify-content-between align-items-center">
                                 <span class="product-price">Rp {{ number_format($product->harga, 0, ',', '.') }}</span>
-                                <a href="/beli/{{ $product->id }}" class="btn btn-sm btn-primary rounded-pill">Detail</a>
+                                <a href="{{ route('catalog.show', $product->id) }}" class="btn btn-sm btn-primary rounded-pill">Detail</a>
                             </div>
                         </div>
                     </div>
@@ -170,46 +170,40 @@
     <section class="section-desa-mitra">
         <div class="container">
             <div class="row g-4">
-                @php
-                $desaList = [
-                    ['nama' => 'Desa Teluknaga', 'umkm' => 15, 'produk' => 30, 'deskripsi' => 'Pusat kegiatan Karang Taruna dengan berbagai produk unggulan hasil laut'],
-                    ['nama' => 'Desa Tanjung Pasir', 'umkm' => 12, 'produk' => 25, 'deskripsi' => 'Terkenal dengan produk kerupuk dan ikan asin berkualitas tinggi'],
-                    ['nama' => 'Desa Muara', 'umkm' => 10, 'produk' => 20, 'deskripsi' => 'Penghasil terasi dan bumbu dapur tradisional khas pesisir'],
-                    ['nama' => 'Desa Lemo', 'umkm' => 8, 'produk' => 15, 'deskripsi' => 'Sentra kerajinan dan olahan makanan laut tradisional'],
-                    ['nama' => 'Desa Pangkalan', 'umkm' => 5, 'produk' => 10, 'deskripsi' => 'Penghasil produk kuliner dan makanan olahan seafood'],
-                ];
-                @endphp
-                
-                @foreach($desaList as $index => $desa)
+                @forelse($desas as $index => $desa)
                 <div class="col-lg-6" data-aos="fade-up" data-aos-delay="{{ $index * 100 }}">
                     <div class="desa-card">
                         <div class="row g-0">
                             <div class="col-md-5">
                                 <div class="desa-image">
-                                    <img src="https://images.unsplash.com/photo-{{ 1520000000000 + $index * 100000 }}?w=400" alt="{{ $desa['nama'] }}" class="img-fluid" onerror="this.src='https://via.placeholder.com/400x300?text={{ urlencode($desa['nama']) }}'">
+                                    <img src="https://images.unsplash.com/photo-{{ 1520000000000 + $index * 100000 }}?w=400" alt="{{ $desa->nama_desa }}" class="img-fluid" onerror="this.src='https://via.placeholder.com/400x300?text={{ urlencode($desa->nama_desa) }}'">
                                 </div>
                             </div>
                             <div class="col-md-7">
                                 <div class="desa-body">
-                                    <h4 class="desa-name">{{ $desa['nama'] }}</h4>
-                                    <p class="desa-desc">{{ $desa['deskripsi'] }}</p>
+                                    <h4 class="desa-name">{{ $desa->nama_desa }}</h4>
+                                    <p class="desa-desc">{{ $desa->deskripsi ?? 'Desa dengan berbagai produk UMKM unggulan' }}</p>
                                     <div class="desa-stats d-flex gap-4 mb-3">
                                         <div>
-                                            <span class="stat-number">{{ $desa['umkm'] }}</span>
+                                            <span class="stat-number">{{ $desa->umkms_count ?? 0 }}</span>
                                             <span class="stat-label">UMKM</span>
                                         </div>
                                         <div>
-                                            <span class="stat-number">{{ $desa['produk'] }}</span>
+                                            <span class="stat-number">{{ $desa->products_count ?? 0 }}</span>
                                             <span class="stat-label">Produk</span>
                                         </div>
                                     </div>
-                                    <a href="#" class="btn btn-sm btn-primary rounded-pill">Lihat Detail <i class="bi bi-arrow-right ms-1"></i></a>
+                                    <a href="{{ route('desa-mitra') }}?desa={{ $desa->nama_desa }}" class="btn btn-sm btn-primary rounded-pill">Lihat Detail <i class="bi bi-arrow-right ms-1"></i></a>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
-                @endforeach
+                @empty
+                <div class="col-12 text-center py-5">
+                    <p class="text-muted">Data desa tidak tersedia</p>
+                </div>
+                @endforelse
             </div>
         </div>
     </section>
@@ -434,20 +428,20 @@
 }
 
 .filter-pill:hover {
-    border-color: var(--primary-color);
-    color: var(--primary-color);
-    background: var(--primary-light);
+    border-color: #001f5c;
+    color: #001f5c;
+    background: #e8eef7;
 }
 
 .filter-pill.active {
-    background: var(--primary-color);
-    border-color: var(--primary-color);
+    background: #001f5c;
+    border-color: #001f5c;
     color: white;
 }
 
 .filter-pill.active:hover {
-    background: var(--primary-dark);
-    border-color: var(--primary-dark);
+    background: #000f3d;
+    border-color: #000f3d;
 }
 
 /* Filter Info */
@@ -494,7 +488,7 @@
 
 .results-count span {
     font-weight: 700;
-    color: var(--primary-color);
+    color: #001f5c;
 }
 
 /* ========== Products Grid ========== */

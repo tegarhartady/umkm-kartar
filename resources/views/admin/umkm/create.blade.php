@@ -13,13 +13,193 @@
 @endsection
 
 @section('content')
-<div class="py-5" style="background: linear-gradient(135deg, #f7fafc 0%, #edf2f7 100%); min-height: 100vh;">
-    <div class="container">
-        <div class="card shadow-lg border-0" style="border-radius: 20px; max-width: 700px; margin: 0 auto;">
-            <div class="card-header" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-radius: 20px 20px 0 0; border: none;">
-                <h2 class="mb-2 text-white"><i class="bi bi-shop me-3"></i>Daftar UMKM Baru</h2>
-                <p class="mb-0 small">Lengkapi informasi UMKM untuk pendaftaran</p>
+<div class="container-fluid">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm" style="border-radius: 15px;">
+                <div class="card-header bg-white border-bottom" style="border-radius: 15px 15px 0 0;">
+                    <h5 class="mb-0"><i class="bi bi-plus-circle me-2"></i>Tambah UMKM Baru</h5>
+                </div>
+                <div class="card-body p-4">
+                    @if ($errors->any())
+                        <div class="alert alert-danger alert-dismissible fade show">
+                            <strong>Terjadi Kesalahan!</strong>
+                            <ul class="mb-0 mt-2">
+                                @foreach ($errors->all() as $error)
+                                    <li>{{ $error }}</li>
+                                @endforeach
+                            </ul>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    @endif
+
+                    <form action="{{ route('admin.umkm.store') }}" method="POST">
+                        @csrf
+
+                        <!-- Nama Toko & Pemilik -->
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label fw-600">Nama Toko *</label>
+                                <input type="text" name="nama_toko" class="form-control @error('nama_toko') is-invalid @enderror" 
+                                       value="{{ old('nama_toko') }}" placeholder="Nama toko" required>
+                                @error('nama_toko') <div class="invalid-feedback d-block">{{ $message }}</div> @enderror
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-600">Nama Pemilik *</label>
+                                <input type="text" name="pemilik" class="form-control @error('pemilik') is-invalid @enderror" 
+                                       value="{{ old('pemilik') }}" placeholder="Nama pemilik" required>
+                                @error('pemilik') <div class="invalid-feedback d-block">{{ $message }}</div> @enderror
+                            </div>
+                        </div>
+
+                        <!-- Email & Telepon -->
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label fw-600">Email *</label>
+                                <input type="email" name="email" class="form-control @error('email') is-invalid @enderror" 
+                                       value="{{ old('email') }}" placeholder="Email" required>
+                                @error('email') <div class="invalid-feedback d-block">{{ $message }}</div> @enderror
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-600">Telepon *</label>
+                                <input type="tel" name="phone" class="form-control @error('phone') is-invalid @enderror" 
+                                       value="{{ old('phone') }}" placeholder="Nomor telepon" required>
+                                @error('phone') <div class="invalid-feedback d-block">{{ $message }}</div> @enderror
+                            </div>
+                        </div>
+
+                        <!-- Desa -->
+                        <div class="mb-3">
+                            <label class="form-label fw-600">Desa *</label>
+                            <select name="desa" class="form-select @error('desa') is-invalid @enderror" required>
+                                <option value="">-- Pilih Desa --</option>
+                                @forelse($desas as $desaItem)
+                                    <option value="{{ $desaItem->nama_desa }}" {{ old('desa') == $desaItem->nama_desa ? 'selected' : '' }}>
+                                        {{ $desaItem->nama_desa }}
+                                    </option>
+                                @empty
+                                    <option value="" disabled>Tidak ada desa tersedia</option>
+                                @endforelse
+                            </select>
+                            @error('desa') <div class="invalid-feedback d-block">{{ $message }}</div> @enderror
+                        </div>
+
+                        <!-- Alamat Lengkap -->
+                        <div class="mb-3">
+                            <label class="form-label fw-600">Alamat Lengkap *</label>
+                            <textarea name="alamat" class="form-control @error('alamat') is-invalid @enderror" 
+                                      rows="3" placeholder="Alamat lengkap" required>{{ old('alamat') }}</textarea>
+                            @error('alamat') <div class="invalid-feedback d-block">{{ $message }}</div> @enderror
+                        </div>
+
+                        <!-- Kategori -->
+                        <div class="mb-3">
+                            <label class="form-label fw-600">Kategori Usaha *</label>
+                            <select name="kategori" class="form-select @error('kategori') is-invalid @enderror" required>
+                                <option value="">Pilih Kategori</option>
+                                <option value="Hasil Laut" {{ old('kategori') == 'Hasil Laut' ? 'selected' : '' }}>Hasil Laut</option>
+                                <option value="Makanan Olahan" {{ old('kategori') == 'Makanan Olahan' ? 'selected' : '' }}>Makanan Olahan</option>
+                                <option value="Bumbu Dapur" {{ old('kategori') == 'Bumbu Dapur' ? 'selected' : '' }}>Bumbu Dapur</option>
+                                <option value="Kerajinan" {{ old('kategori') == 'Kerajinan' ? 'selected' : '' }}>Kerajinan</option>
+                                <option value="Kuliner" {{ old('kategori') == 'Kuliner' ? 'selected' : '' }}>Kuliner</option>
+                            </select>
+                            @error('kategori') <div class="invalid-feedback d-block">{{ $message }}</div> @enderror
+                        </div>
+
+                        <!-- Deskripsi -->
+                        <div class="mb-3">
+                            <label class="form-label fw-600">Deskripsi Usaha</label>
+                            <textarea name="deskripsi" class="form-control @error('deskripsi') is-invalid @enderror" 
+                                      rows="4" placeholder="Deskripsi usaha">{{ old('deskripsi') }}</textarea>
+                            @error('deskripsi') <div class="invalid-feedback d-block">{{ $message }}</div> @enderror
+                        </div>
+
+                        <!-- Omzet Bulanan -->
+                        <div class="mb-4">
+                            <label class="form-label fw-600">Omzet Bulanan (Rp)</label>
+                            <input type="number" name="omzet_bulanan" class="form-control @error('omzet_bulanan') is-invalid @enderror" 
+                                   value="{{ old('omzet_bulanan') }}" placeholder="Omzet bulanan" min="0">
+                            @error('omzet_bulanan') <div class="invalid-feedback d-block">{{ $message }}</div> @enderror
+                        </div>
+
+                        <!-- Info Alert -->
+                        <div class="alert alert-info mb-4">
+                            <i class="bi bi-info-circle me-2"></i>
+                            <strong>Informasi:</strong> UMKM yang didaftarkan akan berstatus "Pending" dan perlu persetujuan admin.
+                        </div>
+
+                        <!-- Buttons -->
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-primary btn-lg grow">
+                                <i class="bi bi-check me-2"></i>Simpan UMKM
+                            </button>
+                            <a href="{{ route('admin.umkm.index') }}" class="btn btn-outline-secondary btn-lg grow">
+                                <i class="bi bi-x me-2"></i>Batal
+                            </a>
+                        </div>
+                    </form>
+                </div>
             </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.form-label.fw-600 {
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 0.5rem;
+}
+
+.form-control, .form-select {
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 0.75rem;
+    font-size: 0.95rem;
+    transition: all 0.3s ease;
+}
+
+.form-control:focus, .form-select:focus {
+    border-color: #001f5c;
+    box-shadow: 0 0 0 0.2rem rgba(0, 31, 92, 0.15);
+}
+
+.form-control.is-invalid, .form-select.is-invalid {
+    border-color: #dc3545;
+}
+
+.invalid-feedback {
+    color: #dc3545;
+    font-size: 0.875rem;
+    margin-top: 0.25rem;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #001f5c 0%, #000f3d 100%);
+    border: none;
+    box-shadow: 0 4px 15px rgba(0, 31, 92, 0.2);
+    color: white;
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 31, 92, 0.3);
+    color: white;
+}
+
+.btn-lg.grow {
+    flex: 1;
+}
+
+.alert-info {
+    background: linear-gradient(135deg, #d4e8f7 0%, #e8f3ff 100%);
+    border: 1px solid #90caf9;
+    border-radius: 10px;
+    color: #0056b3;
+}
+</style>
+
+@endsection
             
             <div class="card-body p-5">
                 <style>

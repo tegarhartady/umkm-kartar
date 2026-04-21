@@ -201,7 +201,7 @@
 }
 
 .csr-stat-box {
-    background: var(--primary-light);
+    background: #e8eef7;
     padding: 20px;
     border-radius: 12px;
     text-align: center;
@@ -211,6 +211,7 @@
     font-size: 1.5rem;
     font-weight: 800;
     margin-bottom: 4px;
+    color: #001f5c;
 }
 
 .csr-stat-box p {
@@ -240,13 +241,13 @@
 .program-icon {
     width: 70px;
     height: 70px;
-    background: var(--primary-light);
+    background: #e8eef7;
     border-radius: 16px;
     display: flex;
     align-items: center;
     justify-content: center;
     font-size: 28px;
-    color: var(--primary-color);
+    color: #001f5c;
     margin-bottom: 20px;
 }
 
@@ -275,7 +276,7 @@
 }
 
 .program-features i {
-    color: var(--primary-color);
+    color: #001f5c;
     margin-right: 8px;
 }
 
@@ -284,7 +285,7 @@
 }
 
 .cta-join-wrapper {
-    background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+    background: linear-gradient(135deg, #001f5c 0%, #000f3d 100%);
     padding: 60px;
     color: white;
 }

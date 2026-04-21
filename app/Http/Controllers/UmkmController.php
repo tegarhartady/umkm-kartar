@@ -3,8 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\Umkm;
+use App\Models\Desa;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 
 class UmkmController extends Controller
 {
@@ -16,7 +18,8 @@ class UmkmController extends Controller
 
     public function create()
     {
-        return view('admin.umkm.create');
+        $desas = Desa::all();
+        return view('admin.umkm.create', compact('desas'));
     }
 
     public function store(Request $request)
@@ -46,9 +49,11 @@ class UmkmController extends Controller
         return view('admin.umkm.show', compact('umkm'));
     }
 
-    public function edit(Umkm $umkm)
+    public function edit($id)
     {
-        return view('admin.umkm.edit', compact('umkm'));
+        $umkm = Umkm::findOrFail($id);
+        $desas = Desa::all();
+        return view('admin.umkm.edit', compact('umkm', 'desas'));
     }
 
     public function update(Request $request, Umkm $umkm)
@@ -214,19 +219,16 @@ class UmkmController extends Controller
     /**
      * Reset password UMKM
      */
-    public function resetPassword(Umkm $umkm)
+    public function resetPassword($id)
     {
-        // Generate password baru
-        $newPassword = 'umkm' . str_pad(rand(0, 9999), 4, '0', STR_PAD_LEFT);
-
-        // Update password
-        $umkm->update(['password' => \Illuminate\Support\Facades\Hash::make($newPassword)]);
-
-        return back()->with([
-            'success' => true,
-            'message' => "Password UMKM '{$umkm->nama_toko}' telah di-reset!",
-            'umkm_email' => $umkm->email,
-            'umkm_password' => $newPassword,
+        $umkm = Umkm::findOrFail($id);
+        $defaultPassword = 'password123';
+        
+        $umkm->update([
+            'password' => bcrypt($defaultPassword)
         ]);
+        
+        return redirect()->route('admin.umkm.show', $umkm->id)
+            ->with('success', 'Password berhasil direset ke: password123');
     }
 }
