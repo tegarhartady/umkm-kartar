@@ -9,6 +9,7 @@
     <div class="container">
         <div class="row justify-content-center">
             <div class="col-lg-8 text-center">
+                <img src="/images/logo1.png" alt="Lokalin" style="height: 80px; width: auto;" class="mb-3">
                 <span class="section-badge" data-aos="fade-up">Bergabung</span>
                 <h1 class="page-title" data-aos="fade-up" data-aos-delay="100">
                     Daftar <span class="text-primary">UMKM</span>

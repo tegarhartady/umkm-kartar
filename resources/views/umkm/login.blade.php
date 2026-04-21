@@ -22,6 +22,12 @@
                         </a>
                     </div>
 
+                    <div class="text-center mb-4">
+                        <img src="/images/logo1.png" alt="Lokalin" style="height: 80px; width: auto;" class="mb-3">
+                        <h2 class="fw-bold text-primary">Lokalin</h2>
+                        <p class="text-muted">Akselerasi UMKM Binaan CSR PIK2</p>
+                    </div>
+
                     <div class="login-card">
                         <div class="text-center mb-4">
                             <i class="bi bi-shop text-primary" style="font-size: 2.5rem;"></i>

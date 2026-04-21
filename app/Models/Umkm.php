@@ -45,4 +45,10 @@ class Umkm extends Model implements AuthenticatableContract
     {
         return $this->hasMany(\App\Models\Product::class);
     }
+
+    // Relationship dengan reimbursements
+    public function reimbursements()
+    {
+        return $this->hasMany(\App\Models\Reimbursement::class);
+    }
 }

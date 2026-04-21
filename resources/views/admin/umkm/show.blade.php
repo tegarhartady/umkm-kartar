@@ -145,6 +145,20 @@
                 </div>
             @endif
 
+            <!-- Tombol Reset Password -->
+            @if($umkm->status === 'disetujui')
+                <div class="alert alert-info" role="alert">
+                    <strong>Password UMKM</strong>
+                    <p class="mb-2">Jika UMKM lupa password, klik tombol di bawah untuk generate password baru:</p>
+                    <form action="{{ route('admin.umkm.resetPassword', $umkm->id) }}" method="POST" style="display:inline;">
+                        @csrf
+                        <button type="submit" class="btn btn-warning" onclick="return confirm('Generate password baru untuk UMKM ini?')">
+                            <i class="bi bi-key"></i> Reset Password
+                        </button>
+                    </form>
+                </div>
+            @endif
+
             <div class="card border-0 shadow-sm">
                 <div class="card-header bg-white border-bottom">
                     <h5 class="mb-0">Produk</h5>

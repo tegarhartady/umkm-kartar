@@ -17,6 +17,8 @@ return new class extends Migration
             $table->string('phone');
             $table->string('desa');
             $table->string('alamat');
+            $table->decimal('latitude', 10, 8)->nullable(); // Koordinat lokasi
+            $table->decimal('longitude', 11, 8)->nullable(); // Koordinat lokasi
             $table->string('kategori');
             $table->string('lama_usaha')->nullable();
             $table->text('deskripsi')->nullable();

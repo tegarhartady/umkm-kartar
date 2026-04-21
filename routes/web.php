@@ -47,30 +47,45 @@ Route::get('/daftar-umkm', function () {
 
 Route::post('/daftar-umkm', [UmkmController::class, 'registerFromPublic'])->name('umkm.register.store');
 
-// Auth routes
+// Auth routes - Unified Login
 Route::get('/login', function () {
-    return view('auth.login');
+    return view('auth.login-unified');
 })->name('login');
 
 Route::post('/login', function (Illuminate\Http\Request $request) {
+    $role = $request->input('role');
     $credentials = $request->only('email', 'password');
-    
-    if (auth()->attempt($credentials)) {
-        $request->session()->regenerate();
-        
-        // Redirect based on role
-        $user = auth()->user();
-        if (in_array($user->role, ['admin', 'superadmin'])) {
-            return redirect()->intended('/dashboard/admin');
-        } else {
-            return redirect()->intended('/dashboard/umkm');
+
+    if ($role === 'umkm') {
+        if (Auth::guard('umkm')->attempt($credentials)) {
+            $request->session()->regenerate();
+            $umkm = Auth::guard('umkm')->user();
+            
+            if ($umkm->status !== 'disetujui') {
+                Auth::guard('umkm')->logout();
+                return back()->withErrors(['umkm_error' => 'Akun Anda belum disetujui oleh admin.']);
+            }
+            
+            return redirect()->intended('/umkm/dashboard');
         }
+        return back()->withErrors(['umkm_error' => 'Email atau password salah.'])->onlyInput('email');
+    } elseif ($role === 'admin') {
+        if (Auth::attempt($credentials)) {
+            $request->session()->regenerate();
+            $user = Auth::user();
+            
+            if (!in_array($user->role, ['admin', 'superadmin'])) {
+                Auth::logout();
+                return back()->withErrors(['admin_error' => 'Anda bukan admin.']);
+            }
+            
+            return redirect()->intended(route('dashboard.admin'));
+        }
+        return back()->withErrors(['admin_error' => 'Email atau password salah.'])->onlyInput('email');
     }
-    
-    return back()->withErrors([
-        'email' => 'The provided credentials do not match our records.',
-    ])->onlyInput('email');
-})->name('login.post');
+
+    return back()->withErrors(['error' => 'Pilih role login terlebih dahulu.']);
+})->name('login.authenticate');
 
 Route::post('/logout', function (Illuminate\Http\Request $request) {
     auth()->logout();
@@ -89,12 +104,12 @@ Route::middleware(['auth', 'admin.superadmin'])->group(function () {
     Route::patch('admin/umkm/{umkm}/approve', [UmkmController::class, 'approve'])->name('admin.umkm.approve');
     Route::patch('admin/umkm/{umkm}/reject', [UmkmController::class, 'reject'])->name('admin.umkm.reject');
     
-    // Product Management - GANTI KE Admin ProductController
-    Route::get('admin/products', [\App\Http\Controllers\Admin\ProductController::class, 'index'])->name('admin.products.index');
-    Route::get('admin/products/{product}', [\App\Http\Controllers\Admin\ProductController::class, 'show'])->name('admin.products.show');
-    Route::get('admin/products-moderasi', [\App\Http\Controllers\Admin\ProductController::class, 'moderasi'])->name('admin.products.moderasi');
-    Route::patch('admin/products/{product}/approve', [\App\Http\Controllers\Admin\ProductController::class, 'approve'])->name('admin.products.approve');
-    Route::delete('admin/products/{product}', [\App\Http\Controllers\Admin\ProductController::class, 'destroy'])->name('admin.products.destroy');
+    // Product Management
+    Route::get('admin/products', [\App\Http\Controllers\ProductController::class, 'index'])->name('admin.products.index');
+    Route::get('admin/products/{product}', [\App\Http\Controllers\ProductController::class, 'show'])->name('admin.products.show');
+    Route::get('admin/products-moderasi', function () {
+        return view('admin.products.moderasi');
+    })->name('admin.products.moderasi');
     
     // Desa Management
     Route::resource('admin/desa', DesaController::class, ['as' => 'admin']);
@@ -126,7 +141,34 @@ Route::middleware(['auth', 'role:superadmin'])->group(function () {
     Route::post('/superadmin/settings', [SuperAdminController::class, 'updateSettings'])->name('superadmin.settings.update');
 });
 
-// ===== UMKM Auth Routes (Publik) =====
+// Admin Login - Link tersembunyi (secret URL)
+Route::get('/admin-login-secret-xyz', function () {
+    return view('auth.admin-login');
+})->name('admin.login');
+
+Route::post('/admin-login-secret-xyz', function (Illuminate\Http\Request $request) {
+    $credentials = $request->only('email', 'password');
+    
+    if (auth()->attempt($credentials)) {
+        $request->session()->regenerate();
+        
+        // Cek apakah user adalah admin/superadmin
+        $user = auth()->user();
+        if (in_array($user->role, ['admin', 'superadmin'])) {
+            return redirect()->intended('/dashboard/admin');
+        } else {
+            // Bukan admin, logout
+            auth()->logout();
+            return back()->withErrors([
+                'email' => 'Akses ditolak. Anda bukan admin.',
+            ]);
+        }
+    }
+    
+    return back()->withErrors([
+        'email' => 'Email atau password salah.',
+    ])->onlyInput('email');
+})->name('admin.authenticate');
 Route::middleware('guest:umkm')->prefix('umkm')->name('umkm.')->group(function () {
     Route::get('/login', [UmkmAuthController::class, 'showLoginForm'])->name('login');
     Route::post('/login', [UmkmAuthController::class, 'authenticate'])->name('authenticate');
@@ -144,10 +186,13 @@ Route::middleware('auth:umkm')->prefix('umkm')->name('umkm.')->group(function ()
         $activeProducts = $umkm->products()->where('status', 'aktif')->count();
 
         return view('umkm.dashboard', compact('umkm', 'products', 'totalProducts', 'activeProducts'));
-    })->name('dashboard');
+    })->name('umkm.dashboard');
 
     // Products
     Route::resource('products', \App\Http\Controllers\ProductController::class);
+
+    // Reimbursements
+    Route::resource('reimbursement', \App\Http\Controllers\ReimbursementController::class);
 });
 
 // Check routes

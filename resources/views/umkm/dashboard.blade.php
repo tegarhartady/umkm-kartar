@@ -3,46 +3,36 @@
 @section('title', 'Dashboard UMKM - ' . Auth::guard('umkm')->user()->nama_toko)
 
 @section('content')
-
 <div class="container-fluid py-4">
     <!-- Header -->
     <div class="row mb-4">
-        <div class="col-md-8">
-            <h1 class="h3 mb-0">
-                <i class="bi bi-shop me-2"></i>Dashboard UMKM
-            </h1>
-            <p class="text-muted small">Selamat datang, <strong>{{ Auth::guard('umkm')->user()->pemilik }}</strong></p>
-        </div>
-        <div class="col-md-4 text-end">
-            <form method="POST" action="{{ route('umkm.logout') }}" class="d-inline">
-                @csrf
-                <button type="submit" class="btn btn-sm btn-outline-danger">
-                    <i class="bi bi-box-arrow-right me-1"></i>Logout
-                </button>
-            </form>
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h1 class="h3 mb-1 fw-bold">Dashboard UMKM</h1>
+                    <p class="text-muted mb-0">Kelola informasi dan produk UMKM Anda</p>
+                </div>
+                <form action="{{ route('umkm.logout') }}" method="POST" style="display:inline;">
+                    @csrf
+                    <button type="submit" class="btn btn-outline-danger">
+                        <i class="bi bi-box-arrow-right"></i> Logout
+                    </button>
+                </form>
+            </div>
         </div>
     </div>
-
-    <!-- Alert Success -->
-    @if (session('success'))
-        <div class="alert alert-success alert-dismissible fade show" role="alert">
-            <i class="bi bi-check-circle me-2"></i>
-            {!! session('success') !!}
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        </div>
-    @endif
 
     <!-- Stats Cards -->
     <div class="row mb-4">
         <div class="col-md-3">
             <div class="card border-0 shadow-sm">
                 <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-start">
+                    <div class="d-flex justify-content-between align-items-center">
                         <div>
-                            <p class="text-muted small mb-1">Total Produk</p>
-                            <h3 class="mb-0">{{ $totalProducts }}</h3>
+                            <p class="text-muted mb-1">Total Produk</p>
+                            <h3 class="mb-0 text-primary fw-bold">{{ $totalProducts }}</h3>
                         </div>
-                        <i class="bi bi-box-seam text-primary" style="font-size: 1.5rem;"></i>
+                        <i class="bi bi-box-seam text-primary" style="font-size: 2rem; opacity: 0.5;"></i>
                     </div>
                 </div>
             </div>
@@ -50,12 +40,12 @@
         <div class="col-md-3">
             <div class="card border-0 shadow-sm">
                 <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-start">
+                    <div class="d-flex justify-content-between align-items-center">
                         <div>
-                            <p class="text-muted small mb-1">Produk Aktif</p>
-                            <h3 class="mb-0 text-success">{{ $activeProducts }}</h3>
+                            <p class="text-muted mb-1">Produk Aktif</p>
+                            <h3 class="mb-0 text-success fw-bold">{{ $activeProducts }}</h3>
                         </div>
-                        <i class="bi bi-check-circle text-success" style="font-size: 1.5rem;"></i>
+                        <i class="bi bi-check-circle text-success" style="font-size: 2rem; opacity: 0.5;"></i>
                     </div>
                 </div>
             </div>
@@ -63,177 +53,178 @@
         <div class="col-md-3">
             <div class="card border-0 shadow-sm">
                 <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-start">
+                    <div class="d-flex justify-content-between align-items-center">
                         <div>
-                            <p class="text-muted small mb-1">Pending Review</p>
-                            <h3 class="mb-0 text-warning">{{ $totalProducts - $activeProducts }}</h3>
-                        </div>
-                        <i class="bi bi-clock text-warning" style="font-size: 1.5rem;"></i>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card border-0 shadow-sm">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-start">
-                        <div>
-                            <p class="text-muted small mb-1">Status Toko</p>
+                            <p class="text-muted mb-1">Status</p>
                             <h5 class="mb-0">
-                                <span class="badge bg-success">Aktif</span>
+                                @if($umkm->status === 'disetujui')
+                                    <span class="badge bg-success">Disetujui</span>
+                                @elseif($umkm->status === 'pending')
+                                    <span class="badge bg-warning">Menunggu Approval</span>
+                                @else
+                                    <span class="badge bg-danger">Ditolak</span>
+                                @endif
                             </h5>
                         </div>
-                        <i class="bi bi-shop text-success" style="font-size: 1.5rem;"></i>
+                        <i class="bi bi-info-circle text-info" style="font-size: 2rem; opacity: 0.5;"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <p class="text-muted mb-1">Kategori</p>
+                            <h5 class="mb-0">{{ $umkm->kategori }}</h5>
+                        </div>
+                        <i class="bi bi-tag text-warning" style="font-size: 2rem; opacity: 0.5;"></i>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Main Content Row -->
-    <div class="row">
-        <!-- Kolom Kiri - Info Toko -->
-        <div class="col-md-4 mb-4">
+    <!-- Info UMKM -->
+    <div class="row mb-4">
+        <div class="col-12">
             <div class="card border-0 shadow-sm">
-                <div class="card-header bg-light border-bottom">
-                    <h6 class="mb-0">
-                        <i class="bi bi-info-circle me-2"></i>Informasi Toko
-                    </h6>
+                <div class="card-header bg-white border-bottom">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">Informasi UMKM</h5>
+                    </div>
                 </div>
                 <div class="card-body">
-                    <div class="mb-3">
-                        <label class="text-muted small d-block">Nama Toko</label>
-                        <p class="fw-semibold mb-0">{{ $umkm->nama_toko }}</p>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <table class="table table-borderless">
+                                <tr>
+                                    <td class="fw-bold" width="150">Nama Toko:</td>
+                                    <td>{{ $umkm->nama_toko }}</td>
+                                </tr>
+                                <tr>
+                                    <td class="fw-bold">Pemilik:</td>
+                                    <td>{{ $umkm->pemilik }}</td>
+                                </tr>
+                                <tr>
+                                    <td class="fw-bold">Email:</td>
+                                    <td>{{ $umkm->email }}</td>
+                                </tr>
+                                <tr>
+                                    <td class="fw-bold">No. Telepon:</td>
+                                    <td>{{ $umkm->phone }}</td>
+                                </tr>
+                            </table>
+                        </div>
+                        <div class="col-md-6">
+                            <table class="table table-borderless">
+                                <tr>
+                                    <td class="fw-bold" width="150">Desa:</td>
+                                    <td>{{ $umkm->desa }}</td>
+                                </tr>
+                                <tr>
+                                    <td class="fw-bold">Alamat:</td>
+                                    <td>{{ $umkm->alamat }}</td>
+                                </tr>
+                                <tr>
+                                    <td class="fw-bold">Lama Usaha:</td>
+                                    <td>{{ $umkm->lama_usaha ?? '-' }}</td>
+                                </tr>
+                                <tr>
+                                    <td class="fw-bold">Produk Utama:</td>
+                                    <td>{{ $umkm->produk_utama }}</td>
+                                </tr>
+                            </table>
+                        </div>
                     </div>
-                    <div class="mb-3">
-                        <label class="text-muted small d-block">Pemilik</label>
-                        <p class="fw-semibold mb-0">{{ $umkm->pemilik }}</p>
-                    </div>
-                    <div class="mb-3">
-                        <label class="text-muted small d-block">Email</label>
-                        <p class="fw-semibold mb-0">{{ $umkm->email }}</p>
-                    </div>
-                    <div class="mb-3">
-                        <label class="text-muted small d-block">Telepon</label>
-                        <p class="fw-semibold mb-0">{{ $umkm->phone }}</p>
-                    </div>
-                    <div class="mb-3">
-                        <label class="text-muted small d-block">Kategori</label>
-                        <p class="fw-semibold mb-0">
-                            <span class="badge bg-primary">{{ $umkm->kategori }}</span>
-                        </p>
-                    </div>
-                    <div class="mb-3">
-                        <label class="text-muted small d-block">Desa</label>
-                        <p class="fw-semibold mb-0">{{ $umkm->desa }}</p>
-                    </div>
-                    <div>
-                        <label class="text-muted small d-block">Alamat</label>
-                        <p class="fw-semibold mb-0 small">{{ $umkm->alamat }}</p>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Quick Actions -->
-            <div class="card border-0 shadow-sm mt-3">
-                <div class="card-header bg-light border-bottom">
-                    <h6 class="mb-0">
-                        <i class="bi bi-lightning me-2"></i>Menu Cepat
-                    </h6>
-                </div>
-                <div class="card-body d-grid gap-2">
-                    <a href="{{ route('umkm.products.create') }}" class="btn btn-primary btn-sm">
-                        <i class="bi bi-plus-circle me-1"></i>Tambah Produk Baru
-                    </a>
-                    <a href="{{ route('umkm.products.index') }}" class="btn btn-outline-primary btn-sm">
-                        <i class="bi bi-list me-1"></i>Lihat Semua Produk
-                    </a>
                 </div>
             </div>
         </div>
+    </div>
 
-        <!-- Kolom Kanan - Daftar Produk -->
-        <div class="col-md-8">
+    <!-- Produk Section -->
+    <div class="row">
+        <div class="col-12">
             <div class="card border-0 shadow-sm">
-                <div class="card-header bg-light border-bottom d-flex justify-content-between align-items-center">
-                    <h6 class="mb-0">
-                        <i class="bi bi-box-seam me-2"></i>Produk Saya
-                    </h6>
-                    <a href="{{ route('umkm.products.create') }}" class="btn btn-sm btn-primary">
-                        <i class="bi bi-plus me-1"></i>Tambah
-                    </a>
+                <div class="card-header bg-white border-bottom">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">Daftar Produk</h5>
+                        @if($umkm->status === 'disetujui')
+                            <a href="{{ route('umkm.products.create') }}" class="btn btn-sm btn-primary">
+                                <i class="bi bi-plus-circle"></i> Tambah Produk
+                            </a>
+                        @endif
+                    </div>
                 </div>
-                <div class="card-body">
+                <div class="card-body p-0">
                     @if($products->count() > 0)
                         <div class="table-responsive">
                             <table class="table table-hover mb-0">
                                 <thead class="table-light">
                                     <tr>
-                                        <th>Produk</th>
+                                        <th style="width: 50px;">No</th>
+                                        <th>Nama Produk</th>
                                         <th>Kategori</th>
                                         <th>Harga</th>
                                         <th>Stok</th>
                                         <th>Status</th>
-                                        <th>Aksi</th>
+                                        <th style="width: 150px;">Aksi</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     @foreach($products as $product)
-                                    <tr>
-                                        <td>
-                                            <strong>{{ $product->nama_produk }}</strong>
-                                            <br>
-                                            <small class="text-muted">{{ Str::limit($product->deskripsi, 40) }}</small>
-                                        </td>
-                                        <td><small>{{ $product->kategori ?? 'N/A' }}</small></td>
-                                        <td><strong>Rp {{ number_format($product->harga, 0, ',', '.') }}</strong></td>
-                                        <td>
-                                            <span class="badge bg-light text-dark">
-                                                {{ $product->stok }} {{ $product->satuan ?? 'pcs' }}
-                                            </span>
-                                        </td>
-                                        <td>
-                                            @if($product->status === 'aktif')
-                                                <span class="badge bg-success">Aktif</span>
-                                            @else
-                                                <span class="badge bg-warning">Pending</span>
-                                            @endif
-                                        </td>
-                                        <td>
-                                            <div class="btn-group btn-group-sm" role="group">
-                                                <a href="{{ route('umkm.products.edit', $product) }}"
-                                                   class="btn btn-outline-primary" title="Edit">
+                                        <tr>
+                                            <td><span class="badge bg-light text-dark">{{ $loop->iteration }}</span></td>
+                                            <td>
+                                                <div class="fw-bold">{{ $product->nama_produk }}</div>
+                                                <small class="text-muted">{{ Str::limit($product->deskripsi, 50) }}</small>
+                                            </td>
+                                            <td>{{ $product->kategori }}</td>
+                                            <td>Rp {{ number_format($product->harga, 0, ',', '.') }}</td>
+                                            <td>
+                                                <span class="badge bg-{{ $product->stok > 0 ? 'success' : 'danger' }}">
+                                                    {{ $product->stok }} {{ $product->satuan }}
+                                                </span>
+                                            </td>
+                                            <td>
+                                                @if($product->status === 'aktif')
+                                                    <span class="badge bg-success">Aktif</span>
+                                                @else
+                                                    <span class="badge bg-secondary">Nonaktif</span>
+                                                @endif
+                                            </td>
+                                            <td>
+                                                <a href="{{ route('umkm.products.edit', $product->id) }}" class="btn btn-sm btn-warning">
                                                     <i class="bi bi-pencil"></i>
                                                 </a>
-                                                <form method="POST" action="{{ route('umkm.products.destroy', $product) }}"
-                                                      class="d-inline"
-                                                      onsubmit="return confirm('Hapus produk ini? Tindakan ini tidak bisa dibatalkan.')">
-                                                    @csrf @method('DELETE')
-                                                    <button type="submit" class="btn btn-outline-danger" title="Hapus">
+                                                <form action="{{ route('umkm.products.destroy', $product->id) }}" method="POST" style="display:inline;">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Hapus produk ini?')">
                                                         <i class="bi bi-trash"></i>
                                                     </button>
                                                 </form>
-                                            </div>
-                                        </td>
-                                    </tr>
+                                            </td>
+                                        </tr>
                                     @endforeach
                                 </tbody>
                             </table>
                         </div>
 
                         <!-- Pagination -->
-                        @if($products instanceof \Illuminate\Pagination\Paginator)
-                            <div class="mt-3">
-                                {{ $products->links() }}
-                            </div>
-                        @endif
+                        <div class="d-flex justify-content-center py-3">
+                            {{ $products->links() }}
+                        </div>
                     @else
                         <div class="text-center py-5">
-                            <i class="bi bi-inbox" style="font-size: 2.5rem; color: #ccc;"></i>
-                            <p class="text-muted mt-2">Belum ada produk</p>
-                            <a href="{{ route('umkm.products.create') }}" class="btn btn-primary btn-sm">
-                                <i class="bi bi-plus-circle me-1"></i>Tambah Produk Pertama Anda
-                            </a>
+                            <i class="bi bi-inbox" style="font-size: 3rem; color: #ccc;"></i>
+                            <p class="text-muted mt-3">Belum ada produk</p>
+                            @if($umkm->status === 'disetujui')
+                                <a href="{{ route('umkm.products.create') }}" class="btn btn-primary mt-2">
+                                    <i class="bi bi-plus-circle"></i> Tambah Produk Pertama
+                                </a>
+                            @endif
                         </div>
                     @endif
                 </div>
@@ -241,7 +232,6 @@
         </div>
     </div>
 </div>
-
 @endsection
 
 @push('styles')

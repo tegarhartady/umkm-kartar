@@ -1,16 +1,11 @@
-<nav class="navbar navbar-expand-lg navbar-light bg-white fixed-top shadow-sm py-3">
+<nav class="navbar navbar-expand-lg navbar-light" style="background-color: #fff; box-shadow: 0 2px 4px rgba(0,0,0,0.1); position: fixed; top: 0; width: 100%; z-index: 1000; padding: 10px 0;">
     <div class="container">
         <!-- Brand Logo -->
-        <a class="navbar-brand d-flex align-items-center" href="{{ url('/') }}">
-            <div class="brand-icon me-2">
-                <span>TN</span>
-            </div>
-            <div class="brand-text">
-                <small class="text-muted d-block" style="font-size: 10px; line-height: 1;">KARANG TARUNA</small>
-                <span class="fw-bold text-dark" style="font-size: 16px; line-height: 1.2;">TELUKNAGA<span class="text-primary">.</span></span>
-            </div>
+        <a class="navbar-brand" href="{{ url('/') }}" style="padding: 0; margin: 0;">
+            <img src="/images/logo1.png" alt="Lokalin Logo" style="height: 40px; width: auto;">
         </a>
         
+
         <!-- Mobile Toggle -->
         <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
             <span class="navbar-toggler-icon"></span>
@@ -43,8 +38,8 @@
                         <ul class="dropdown-menu">
                             @if(in_array(auth()->user()->role, ['admin', 'superadmin']))
                                 <li><a class="dropdown-item" href="{{ route('dashboard.admin') }}">Dashboard Admin</a></li>
-                            @else
-                                <li><a class="dropdown-item" href="{{ route('dashboard.umkm') }}">Dashboard UMKM</a></li>
+                            @elseif(auth()->guard('umkm')->check())
+                                <li><a class="dropdown-item" href="/umkm/dashboard">Dashboard UMKM</a></li>
                             @endif
                             <li><hr class="dropdown-divider"></li>
                             <li>
@@ -56,7 +51,7 @@
                         </ul>
                     </div>
                 @else
-                    <a href="{{ url('/login') }}" class="btn btn-dark px-4 rounded-pill">Login</a>
+                    <a href="{{ route('login') }}" class="btn btn-dark px-4 rounded-pill">Login</a>
                 @endauth
             </div>
         </div>

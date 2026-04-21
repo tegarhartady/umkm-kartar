@@ -77,6 +77,9 @@ class UmkmController extends Controller
         return redirect()->route('admin.umkm.index')->with('success', 'UMKM berhasil dihapus!');
     }
 
+    /**
+     * Approve UMKM dan generate password default
+     */
     public function approve(Umkm $umkm)
     {
         // Generate password otomatis: umkm + 4 angka random
@@ -85,7 +88,7 @@ class UmkmController extends Controller
 
         // Update UMKM: set password dan ubah status ke disetujui
         $umkm->update([
-            'password' => Hash::make($defaultPassword),
+            'password' => \Illuminate\Support\Facades\Hash::make($defaultPassword),
             'status' => 'disetujui',
         ]);
 
@@ -206,5 +209,24 @@ class UmkmController extends Controller
 
         return redirect('/daftar-umkm')->with('success', 
             'Pendaftaran berhasil! Silakan tunggu persetujuan dari admin. Email persetujuan akan dikirim ke ' . $validated['email']);
+    }
+
+    /**
+     * Reset password UMKM
+     */
+    public function resetPassword(Umkm $umkm)
+    {
+        // Generate password baru
+        $newPassword = 'umkm' . str_pad(rand(0, 9999), 4, '0', STR_PAD_LEFT);
+
+        // Update password
+        $umkm->update(['password' => \Illuminate\Support\Facades\Hash::make($newPassword)]);
+
+        return back()->with([
+            'success' => true,
+            'message' => "Password UMKM '{$umkm->nama_toko}' telah di-reset!",
+            'umkm_email' => $umkm->email,
+            'umkm_password' => $newPassword,
+        ]);
     }
 }
