@@ -1,25 +1,53 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\UmkmController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\DesaController;
 use App\Http\Controllers\SuperAdminController;
 use App\Http\Controllers\CatalogController;
+use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\LaporanController;
 use App\Http\Controllers\Admin\SettingController;
+use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\Admin\TransactionController;
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\UmkmRegistrationController;
 use App\Http\Controllers\Auth\UmkmAuthController;
+use App\Http\Controllers\PaymentCallbackController;
+use App\Http\Controllers\OrderController;
+use App\Http\Controllers\ProfileController;
 use App\Models\Desa;
+
+Route::post('payment/callback', [PaymentCallbackController::class, 'callback'])->name('payment.callback');
 
 // Main Routes
 Route::get('/', function () {
-    return view('index');
+    $recommendedProducts = \App\Models\Product::where('status', 'aktif')
+        ->limit(4)
+        ->get();
+    return view('index', compact('recommendedProducts'));
 })->name('home');
 
 Route::get('/katalog', [CatalogController::class, 'indexProducts'])->name('katalog');
+
+// Checkout routes (Protected)
+Route::middleware(['auth'])->group(function () {
+    Route::get('/checkout/{productId}', [CheckoutController::class, 'show'])->name('checkout.show');
+    Route::post('/checkout', [CheckoutController::class, 'store'])->name('checkout.store');
+    Route::get('/checkout/success/{transactionId}', [CheckoutController::class, 'success'])->name('checkout.success');
+    
+    // Profile routes
+    Route::get('/profile', [ProfileController::class, 'index'])->name('profile');
+    Route::post('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    
+    // Orders
+    Route::get('/orders', [OrderController::class, 'index'])->name('orders.index');
+    Route::get('/orders/{id}', [OrderController::class, 'show'])->name('orders.show');
+});
 
 // Detail produk
 Route::get('/beli/{id}', function ($id) {
@@ -91,10 +119,40 @@ Route::post('/login', function (Illuminate\Http\Request $request) {
             return redirect()->intended(route('dashboard.admin'));
         }
         return back()->withErrors(['admin_error' => 'Email atau password salah.'])->onlyInput('email');
+    } elseif ($role === 'customer') {
+        if (Auth::attempt($credentials)) {
+            $request->session()->regenerate();
+            return redirect()->intended('/');
+        }
+        return back()->withErrors(['customer_error' => 'Email atau password salah.'])->onlyInput('email');
     }
 
     return back()->withErrors(['error' => 'Pilih role login terlebih dahulu.']);
 })->name('login.authenticate');
+
+// Customer Registration
+Route::get('/register', function () {
+    return view('auth.register-customer');
+})->name('register.customer');
+
+Route::post('/register', function (Illuminate\Http\Request $request) {
+    $validated = $request->validate([
+        'name' => 'required|string|max:255',
+        'email' => 'required|string|email|max:255|unique:users',
+        'password' => 'required|string|min:8|confirmed',
+    ]);
+
+    $user = \App\Models\User::create([
+        'name' => $validated['name'],
+        'email' => $validated['email'],
+        'password' => Hash::make($validated['password']),
+        'role' => 'user', // Default customer role
+    ]);
+
+    Auth::login($user);
+
+    return redirect('/')->with('success', 'Pendaftaran berhasil! Selamat datang.');
+})->name('register.customer.store');
 
 Route::post('/logout', function (Illuminate\Http\Request $request) {
     auth()->logout();
@@ -146,9 +204,19 @@ Route::middleware(['auth', 'admin.superadmin'])->group(function () {
     Route::get('admin/laporan/export/pdf', [LaporanController::class, 'exportPdf'])->name('admin.laporan.export.pdf');
     Route::get('admin/laporan/export/excel', [LaporanController::class, 'exportExcel'])->name('admin.laporan.export.excel');
     
+    // Transaction Management
+    Route::resource('admin/transactions', TransactionController::class, ['as' => 'admin']);
+    
     // Settings
     Route::get('admin/settings/company', [SettingController::class, 'company'])->name('admin.settings.company');
     Route::post('admin/settings/company', [SettingController::class, 'updateCompany'])->name('admin.settings.company.update');
+    Route::get('admin/settings/payment', [SettingController::class, 'payment'])->name('admin.settings.payment');
+    Route::post('admin/settings/payment', [SettingController::class, 'updatePayment'])->name('admin.settings.payment.update');
+    Route::get('admin/settings/delivery', [SettingController::class, 'delivery'])->name('admin.settings.delivery');
+    Route::post('admin/settings/delivery', [SettingController::class, 'updateDelivery'])->name('admin.settings.delivery.update');
+    
+    // User Management
+    Route::resource('admin/users', UserController::class, ['as' => 'admin']);
 });
 
 // SuperAdmin only routes
@@ -224,8 +292,29 @@ Route::middleware('auth:umkm')->prefix('umkm')->name('umkm.')->group(function ()
         $products = $umkm->products()->latest()->paginate(10);
         $totalProducts = $umkm->products()->count();
         $activeProducts = $umkm->products()->where('status', 'aktif')->count();
+        
+        // Fetch transactions for this UMKM
+        $umkmProductIds = $umkm->products()->pluck('id');
+        $recentTransactions = \App\Models\Transaction::whereIn('product_id', $umkmProductIds)
+            ->with('product')
+            ->orderByDesc('created_at')
+            ->limit(10)
+            ->get();
+            
+        $totalTransaksi = \App\Models\Transaction::whereIn('product_id', $umkmProductIds)->count();
+        $totalRevenue = \App\Models\Transaction::whereIn('product_id', $umkmProductIds)
+            ->where('status', 'completed')
+            ->sum('total_price');
 
-        return view('umkm.dashboard', compact('umkm', 'products', 'totalProducts', 'activeProducts'));
+        return view('umkm.dashboard', compact(
+            'umkm', 
+            'products', 
+            'totalProducts', 
+            'activeProducts', 
+            'recentTransactions', 
+            'totalTransaksi', 
+            'totalRevenue'
+        ));
     })->name('umkm.dashboard');
 
     // Dashboard

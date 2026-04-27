@@ -14,7 +14,7 @@ return new class extends Migration
     public function up()
     {
         Schema::table('products', function (Blueprint $table) {
-            $table->enum('metode_pemesanan', ['siap_jadi', 'po', 'keduanya'])->default('siap_jadi')->after('satuan');
+            $table->enum('metode_pemesanan2', ['siap_jadi', 'po', 'keduanya'])->default('siap_jadi')->after('satuan');
         });
     }
 
@@ -26,7 +26,7 @@ return new class extends Migration
     public function down()
     {
         Schema::table('products', function (Blueprint $table) {
-            $table->dropColumn('metode_pemesanan');
+            $table->dropColumn('metode_pemesanan2');
         });
     }
 };

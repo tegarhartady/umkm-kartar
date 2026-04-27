@@ -25,132 +25,161 @@
 <section class="section-about-csr">
     <div class="container">
         <div class="row align-items-center g-5">
-            <div class="col-lg-6" data-aos="fade-right">
-                <img src="https://images.unsplash.com/photo-1559027615-cd4628902d4a?w=600" alt="CSR PIK2" class="img-fluid rounded-4 shadow-lg">
+            <div class="col-lg-6" data-aos="fade-right" data-aos-delay="100">
+                <img src="{{ asset('images/IMG_6410.JPG') }}" alt="CSR PIK2" class="img-fluid rounded-4 shadow-lg">
             </div>
-            <div class="col-lg-6" data-aos="fade-left">
+            <div class="col-lg-6" data-aos="fade-left" data-aos-delay="100">
                 <span class="section-badge">Tentang Program</span>
                 <h2 class="section-title-lg mb-4">
-                    Apa itu <span class="text-primary">CSR PIK2?</span>
+                    Akselerasi UMKM Binaan <span class="text-primary">CSR PIK2</span>
                 </h2>
+                
+                <h5 class="mb-3">Program Inkubasi UMKM</h5>
                 <p class="text-muted mb-4">
-                    CSR PIK2 (Corporate Social Responsibility Pusat Industri Kecil 2) adalah program tanggung jawab sosial perusahaan yang berfokus pada pemberdayaan Usaha Mikro, Kecil, dan Menengah (UMKM) di wilayah pesisir Teluknaga.
+                    Peningkatan kapasitas dan digitalisasi UMKM melalui pelatihan, pendampingan, dan platform website — mendorong UMKM naik kelas dan mendukung ekonomi lokal.
                 </p>
-                <p class="text-muted mb-4">
-                    Melalui kolaborasi dengan Karang Taruna Teluknaga, program ini memberikan berbagai bentuk dukungan untuk membantu UMKM lokal berkembang dan bersaing di era digital.
-                </p>
-                <div class="row g-3">
-                    <div class="col-6">
-                        <div class="csr-stat-box">
-                            <h3 class="text-primary">Rp 500 Jt+</h3>
-                            <p>Total Bantuan</p>
-                        </div>
-                    </div>
-                    <div class="col-6">
-                        <div class="csr-stat-box">
-                            <h3 class="text-primary">50+</h3>
-                            <p>UMKM Dibantu</p>
-                        </div>
-                    </div>
-                </div>
+
             </div>
         </div>
     </div>
 </section>
 
-<!-- Programs -->
-<section class="section-programs bg-light">
+<!-- About CSR 2 - Gambar di Kiri -->
+<section class="section-about-csr">
     <div class="container">
-        <div class="text-center mb-5">
-            <span class="section-badge" data-aos="fade-up">Program Kami</span>
-            <h2 class="section-title-lg" data-aos="fade-up" data-aos-delay="100">
-                Bentuk <span class="text-primary">Dukungan</span>
-            </h2>
-        </div>
-        
-        <div class="row g-4">
-            <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="100">
-                <div class="program-card">
-                    <div class="program-icon">
-                        <i class="bi bi-cash-stack"></i>
-                    </div>
-                    <h4>Bantuan Modal Usaha</h4>
-                    <p>Akses permodalan tanpa bunga untuk pengembangan usaha UMKM</p>
-                    <ul class="program-features">
-                        <li><i class="bi bi-check2"></i> Pinjaman tanpa bunga</li>
-                        <li><i class="bi bi-check2"></i> Tenor fleksibel</li>
-                        <li><i class="bi bi-check2"></i> Proses mudah</li>
-                    </ul>
-                </div>
+        <div class="row align-items-center g-5">
+            <div class="col-lg-6 order-lg-2" data-aos="fade-left" data-aos-delay="100">
+                <img src="{{ asset('images/yangkedua.jpeg') }}" alt="CSR PIK2 2" class="img-fluid rounded-4 shadow-lg">
             </div>
-            <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="200">
-                <div class="program-card">
-                    <div class="program-icon">
+            <div class="col-lg-6 order-lg-1" data-aos="fade-right" data-aos-delay="100">
+                <h2 class="section-title-lg mb-4">
+                    Mengapa Perlu <span class="text-primary">Akselerasi UMKM?</span>
+                </h2>
+                
+                <p class="text-muted mb-4">
+                    UMKM memiliki peran penting dalam perekonomian, namun masih menghadapi kendala dalam keuangan dan pemasaran digital. Program ini hadir untuk meningkatkan kapasitas dan digitalisasi UMKM melalui pelatihan dan platform website.
+                </p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Why Acceleration Section -->
+<section class="section-why-acceleration bg-light">
+    <div class="container">
+        <div class="row justify-content-center mb-5">
+            <div class="col-lg-8 text-center">
+                <span class="section-badge" data-aos="fade-up">Manfaat Program</span>
+                <h2 class="section-title-lg" data-aos="fade-up" data-aos-delay="100">
+                    Manfaat Bagi <span class="text-primary">UMKM</span>
+                </h2>
+                <p class="page-subtitle" data-aos="fade-up" data-aos-delay="200">
+                    Dapatkan berbagai keuntungan dan dukungan untuk mengembangkan bisnis Anda
+                </p>
+            </div>
+        </div>
+
+        <div class="row g-4 justify-content-center">
+            <!-- Row 1: 3 cards -->
+            <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="100">
+                <div class="benefit-card">
+                    <div class="benefit-icon">
                         <i class="bi bi-mortarboard"></i>
                     </div>
-                    <h4>Pelatihan & Workshop</h4>
-                    <p>Program peningkatan kapasitas dan keterampilan pelaku UMKM</p>
-                    <ul class="program-features">
-                        <li><i class="bi bi-check2"></i> Digital marketing</li>
-                        <li><i class="bi bi-check2"></i> Manajemen usaha</li>
-                        <li><i class="bi bi-check2"></i> Packaging & branding</li>
-                    </ul>
+                    <h5>Kapasitas UMKM</h5>
+                    <p class="text-muted mb-0">Meningkatkan kapasitas UMKM binaan</p>
                 </div>
             </div>
+
+            <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="200">
+                <div class="benefit-card">
+                    <div class="benefit-icon">
+                        <i class="bi bi-laptop"></i>
+                    </div>
+                    <h5>Digitalisasi</h5>
+                    <p class="text-muted mb-0">Mendorong digitalisasi UMKM</p>
+                </div>
+            </div>
+
             <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="300">
-                <div class="program-card">
-                    <div class="program-icon">
-                        <i class="bi bi-tools"></i>
+                <div class="benefit-card">
+                    <div class="benefit-icon">
+                        <i class="bi bi-shop"></i>
                     </div>
-                    <h4>Bantuan Peralatan</h4>
-                    <p>Penyediaan alat produksi modern untuk meningkatkan kapasitas</p>
-                    <ul class="program-features">
-                        <li><i class="bi bi-check2"></i> Mesin produksi</li>
-                        <li><i class="bi bi-check2"></i> Alat pengemasan</li>
-                        <li><i class="bi bi-check2"></i> Peralatan pendukung</li>
-                    </ul>
+                    <h5>Akses Pasar</h5>
+                    <p class="text-muted mb-0">Meningkatkan akses pasar</p>
                 </div>
             </div>
+
+            <!-- Row 2: 2 cards -->
             <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="400">
-                <div class="program-card">
-                    <div class="program-icon">
-                        <i class="bi bi-megaphone"></i>
+                <div class="benefit-card">
+                    <div class="benefit-icon">
+                        <i class="bi bi-star"></i>
                     </div>
-                    <h4>Promosi & Pemasaran</h4>
-                    <p>Dukungan pemasaran produk melalui berbagai channel</p>
-                    <ul class="program-features">
-                        <li><i class="bi bi-check2"></i> Social media marketing</li>
-                        <li><i class="bi bi-check2"></i> Event pameran</li>
-                        <li><i class="bi bi-check2"></i> Platform digital</li>
-                    </ul>
+                    <h5>UMKM Unggulan</h5>
+                    <p class="text-muted mb-0">Menciptakan UMKM unggulan</p>
                 </div>
             </div>
+
             <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="500">
-                <div class="program-card">
-                    <div class="program-icon">
-                        <i class="bi bi-file-earmark-check"></i>
-                    </div>
-                    <h4>Legalitas & Sertifikasi</h4>
-                    <p>Pendampingan pengurusan izin usaha dan sertifikasi produk</p>
-                    <ul class="program-features">
-                        <li><i class="bi bi-check2"></i> NIB & SIUP</li>
-                        <li><i class="bi bi-check2"></i> Sertifikat halal</li>
-                        <li><i class="bi bi-check2"></i> BPOM & PIRT</li>
-                    </ul>
-                </div>
-            </div>
-            <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="600">
-                <div class="program-card">
-                    <div class="program-icon">
+                <div class="benefit-card">
+                    <div class="benefit-icon">
                         <i class="bi bi-people"></i>
                     </div>
-                    <h4>Pendampingan Usaha</h4>
-                    <p>Mentoring dan konsultasi bisnis berkelanjutan</p>
-                    <ul class="program-features">
-                        <li><i class="bi bi-check2"></i> Business coaching</li>
-                        <li><i class="bi bi-check2"></i> Financial planning</li>
-                        <li><i class="bi bi-check2"></i> Problem solving</li>
-                    </ul>
+                    <h5>Ekonomi Lokal</h5>
+                    <p class="text-muted mb-0">Mendukung ekonomi lokal</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<!-- Sasaran Program Section -->
+<section class="section-programs">
+    <div class="container">
+        <div class="row align-items-center g-5">
+            <!-- Left: Interactive Map -->
+            <div class="col-lg-6" data-aos="fade-right" data-aos-delay="100">
+                <h2 class="section-title-lg mb-5">
+                    Sasaran <span class="text-primary">Program</span>
+                </h2>
+                <div id="map" class="map-container rounded-4 shadow-lg"></div>
+            </div>
+
+            <!-- Right: Desa List -->
+            <div class="col-lg-6" data-aos="fade-left" data-aos-delay="100">
+                <div class="sasaran-info mb-5">
+                    <p class="text-muted mb-2">Program menargetkan <strong class="text-dark">40-50 UMKM</strong> dari <strong class="text-dark">9 kecamatan</strong> di wilayah PIK2:</p>
+                </div>
+
+                <div class="desa-list">
+                    <button class="desa-item" data-aos="fade-up" data-aos-delay="100" data-lat="-6.2961" data-lng="106.5649" data-name="Kronjo">
+                        <span>Kronjo</span>
+                    </button>
+                    <button class="desa-item" data-aos="fade-up" data-aos-delay="150" data-lat="-6.1892" data-lng="106.5328" data-name="Mauk">
+                        <span>Mauk</span>
+                    </button>
+                    <button class="desa-item" data-aos="fade-up" data-aos-delay="200" data-lat="-6.2089" data-lng="106.5541" data-name="Kemiri">
+                        <span>Kemiri</span>
+                    </button>
+                    <button class="desa-item" data-aos="fade-up" data-aos-delay="250" data-lat="-6.1708" data-lng="106.5956" data-name="Teluknaga">
+                        <span>Teluknaga</span>
+                    </button>
+                    <button class="desa-item" data-aos="fade-up" data-aos-delay="300" data-lat="-6.2201" data-lng="106.5845" data-name="Kosambi">
+                        <span>Kosambi</span>
+                    </button>
+                    <button class="desa-item" data-aos="fade-up" data-aos-delay="350" data-lat="-6.2432" data-lng="106.5693" data-name="Pakuhaji">
+                        <span>Pakuhaji</span>
+                    </button>
+                    <button class="desa-item" data-aos="fade-up" data-aos-delay="400" data-lat="-6.2123" data-lng="106.6123" data-name="Sepatan">
+                        <span>Sepatan</span>
+                    </button>
+                    <button class="desa-item" data-aos="fade-up" data-aos-delay="450" data-lat="-6.2289" data-lng="106.6234" data-name="Sepatan Timur">
+                        <span>Sepatan Timur</span>
+                    </button>
+                    <button class="desa-item" data-aos="fade-up" data-aos-delay="500" data-lat="-6.1645" data-lng="106.5672" data-name="Tanjung Pasir">
+                        <span>Tanjung Pasir</span>
+                    </button>
                 </div>
             </div>
         </div>
@@ -224,60 +253,52 @@
     padding: 100px 0;
 }
 
-.program-card {
+.map-container {
+    width: 100%;
+    height: 450px;
+    background: #f8f9fa;
+    border: 1px solid #dee2e6;
+}
+
+.sasaran-info p {
+    font-size: 1rem;
+}
+
+.desa-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.desa-item {
     background: white;
-    border-radius: 20px;
-    padding: 32px;
-    height: 100%;
-    box-shadow: var(--shadow-sm);
-    transition: var(--transition-base);
-}
-
-.program-card:hover {
-    transform: translateY(-8px);
-    box-shadow: var(--shadow-xl);
-}
-
-.program-icon {
-    width: 70px;
-    height: 70px;
-    background: #e8eef7;
-    border-radius: 16px;
+    border: 2px solid #dee2e6;
+    border-radius: 8px;
+    padding: 14px 20px;
+    text-align: left;
+    font-size: 1rem;
+    font-weight: 500;
+    color: #333;
+    cursor: pointer;
+    transition: all 0.3s ease;
     display: flex;
     align-items: center;
-    justify-content: center;
-    font-size: 28px;
-    color: #001f5c;
-    margin-bottom: 20px;
 }
 
-.program-card h4 {
-    font-size: 1.25rem;
-    font-weight: 700;
-    margin-bottom: 12px;
+.desa-item:hover {
+    border-color: #001f5c;
+    background: #f8f9fa;
+    transform: translateX(8px);
 }
 
-.program-card > p {
-    color: var(--text-muted);
-    font-size: 14px;
-    margin-bottom: 20px;
+.desa-item span {
+    display: block;
 }
 
-.program-features {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-}
-
-.program-features li {
-    padding: 6px 0;
-    font-size: 14px;
-    color: var(--text-dark);
-}
-
-.program-features i {
-    color: #001f5c;
-    margin-right: 8px;
+.desa-item.active {
+    background: linear-gradient(135deg, #001f5c 0%, #000f3d 100%);
+    border-color: #001f5c;
+    color: white;
 }
 
 .section-cta-join {
@@ -299,5 +320,114 @@
 .cta-join-wrapper p {
     color: rgba(255,255,255,0.85);
 }
+
+/* Why Acceleration Section */
+.section-why-acceleration {
+    padding: 100px 0;
+}
+
+.benefit-card {
+    background: linear-gradient(135deg, #e8eef7 0%, #d5e1f2 100%);
+    border-radius: 16px;
+    padding: 32px;
+    text-align: left;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+    transition: all 0.3s ease;
+    height: 100%;
+    border: 1px solid rgba(0, 31, 92, 0.1);
+}
+
+.benefit-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 8px 24px rgba(0, 31, 92, 0.15);
+}
+
+.benefit-icon {
+    width: 60px;
+    height: 60px;
+    background: linear-gradient(135deg, #001f5c 0%, #000f3d 100%);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 28px;
+    color: white;
+    margin-bottom: 16px;
+}
+
+.benefit-card h5 {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #333;
+    margin-bottom: 8px;
+}
+
+.benefit-card p {
+    font-size: 0.95rem;
+    line-height: 1.5;
+    margin-bottom: 0;
+}
 </style>
+@endpush
+
+@push('scripts')
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize Leaflet Map
+    const map = L.map('map').setView([-6.2195, 106.5654], 11);
+    
+    // Add OpenStreetMap tiles
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap contributors',
+        maxZoom: 19
+    }).addTo(map);
+
+    // Markers data
+    const markers = {};
+    const desaItems = document.querySelectorAll('.desa-item');
+    
+    desaItems.forEach(item => {
+        const lat = parseFloat(item.dataset.lat);
+        const lng = parseFloat(item.dataset.lng);
+        const name = item.dataset.name;
+        
+        // Create marker
+        const marker = L.marker([lat, lng], {
+            icon: L.icon({
+                iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-blue.png',
+                shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+                iconSize: [25, 41],
+                iconAnchor: [12, 41],
+                popupAnchor: [1, -34],
+                shadowSize: [41, 41]
+            })
+        }).bindPopup(`<div class="map-popup"><strong>${name}</strong></div>`).addTo(map);
+        
+        markers[name] = { marker, item };
+        
+        // Click event on button
+        item.addEventListener('click', function(e) {
+            e.preventDefault();
+            
+            // Remove active class from all items
+            desaItems.forEach(btn => btn.classList.remove('active'));
+            
+            // Add active class to clicked item
+            this.classList.add('active');
+            
+            // Pan to marker and open popup
+            map.setView([lat, lng], 13);
+            marker.openPopup();
+        });
+    });
+
+    // Auto-select first marker on load
+    if (desaItems.length > 0) {
+        desaItems[0].click();
+    }
+});
+</script>
 @endpush

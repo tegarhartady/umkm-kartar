@@ -52,7 +52,7 @@
                         <div class="row align-items-center">
                             <div class="col-auto">
                                 @if($product->image)
-                                    <img src="{{ asset($product->image) }}" alt="{{ $product->nama_produk }}" class="product-image-small">
+                                    <img src="{{ asset('storage/' . $product->image) }}" alt="{{ $product->nama_produk }}" class="product-image-small">
                                 @else
                                     <div class="product-image-small bg-light d-flex align-items-center justify-content-center">
                                         <i class="bi bi-image text-muted"></i>

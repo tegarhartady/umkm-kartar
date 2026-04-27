@@ -2,6 +2,10 @@
 
 @section('title', 'Edit UMKM')
 
+@php
+    use Illuminate\Support\Facades\Storage;
+@endphp
+
 @section('breadcrumb')
     <nav aria-label="breadcrumb">
         <ol class="breadcrumb mb-0">
@@ -41,7 +45,7 @@
                         </div>
                     @endif
 
-                    <form action="{{ route('admin.umkm.update', $umkm->id) }}" method="POST">
+                    <form action="{{ route('admin.umkm.update', $umkm->id) }}" method="POST" enctype="multipart/form-data">
                         @csrf
                         @method('PUT')
 
@@ -137,17 +141,178 @@
                         <!-- Omzet Bulanan -->
                         <div class="mb-4">
                             <label class="form-label fw-600">Omzet Bulanan (Rp)</label>
-                            <input type="number" name="omzet_bulanan" class="form-control @error('omzet_bulanan') is-invalid @enderror" 
-                                   value="{{ old('omzet_bulanan', $umkm->omzet_bulanan) }}" min="0">
+                            <div class="input-group">
+                                <span class="input-group-text" style="background: #f8f9fa; border: 1px solid #ddd; border-radius: 8px 0 0 8px;">Rp</span>
+                                <input type="text" id="omzet_display_admin" class="form-control @error('omzet_bulanan') is-invalid @enderror" 
+                                       placeholder="Contoh: 5.000.000" 
+                                       value="{{ old('omzet_bulanan', $umkm->omzet_bulanan ? number_format($umkm->omzet_bulanan, 0, ',', '.') : '') }}" 
+                                       style="border-radius: 0 8px 8px 0;">
+                                <input type="hidden" name="omzet_bulanan" id="omzet_actual_admin" value="{{ $umkm->omzet_bulanan ?? '' }}">
+                            </div>
                             @error('omzet_bulanan') <div class="invalid-feedback d-block">{{ $message }}</div> @enderror
                         </div>
 
-                        <!-- Buttons -->
+                        <!-- Upload Foto Section -->
+                        <div class="border-top pt-4 mt-4 mb-4">
+                            <h6 class="fw-600 mb-3"><i class="bi bi-image me-2"></i>Unggah Foto</h6>
+                            
+                            <!-- Foto KTP -->
+                            <div class="mb-4">
+                                <label class="form-label fw-600">Foto KTP Pemilik</label>
+                                <div class="input-group mb-2">
+                                    <input type="file" name="foto_ktp" class="form-control @error('foto_ktp') is-invalid @enderror" 
+                                           accept="image/*">
+                                    @error('foto_ktp') <div class="invalid-feedback d-block">{{ $message }}</div> @enderror
+                                </div>
+                                <small class="text-muted d-block">Format: JPG, PNG | Max: 5MB</small>
+                                
+                                @if($umkm->foto_ktp)
+                                    <div class="mt-3">
+                                        <p class="small text-muted mb-2">Foto KTP Saat Ini:</p>
+                                        @if(Storage::disk('public')->exists($umkm->foto_ktp))
+                                            <div style="max-width: 250px; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                                                <img src="{{ asset('storage/' . $umkm->foto_ktp) }}" 
+                                                     alt="Foto KTP" 
+                                                     class="img-fluid" 
+                                                     style="width: 100%; height: auto; display: block;">
+                                            </div>
+                                        @else
+                                            <div class="alert alert-warning" role="alert">
+                                                <i class="bi bi-exclamation-triangle me-2"></i>File tidak ditemukan di storage
+                                            </div>
+                                        @endif
+                                    </div>
+                                @endif
+                            </div>
+
+                            <!-- Foto Tempat -->
+                            <div class="mb-4">
+                                <label class="form-label fw-600">Foto Tempat Usaha</label>
+                                <div class="input-group mb-2">
+                                    <input type="file" name="foto_tempat" class="form-control @error('foto_tempat') is-invalid @enderror" 
+                                           accept="image/*">
+                                    @error('foto_tempat') <div class="invalid-feedback d-block">{{ $message }}</div> @enderror
+                                </div>
+                                <small class="text-muted d-block">Format: JPG, PNG | Max: 5MB | Rekomendasi ukuran: 800x600px</small>
+                                
+                                @if($umkm->foto_tempat)
+                                    <div class="mt-3">
+                                        <p class="small text-muted mb-2">Foto Tempat Usaha Saat Ini:</p>
+                                        @if(Storage::disk('public')->exists($umkm->foto_tempat))
+                                            <div style="max-width: 300px; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                                                <img src="{{ asset('storage/' . $umkm->foto_tempat) }}" 
+                                                     alt="Foto Tempat" 
+                                                     class="img-fluid" 
+                                                     style="width: 100%; height: auto; display: block;">
+                                            </div>
+                                        @else
+                                            <div class="alert alert-warning" role="alert">
+                                                <i class="bi bi-exclamation-triangle me-2"></i>File tidak ditemukan di storage
+                                            </div>
+                                        @endif
+                                    </div>
+                                @endif
+                            </div>
+                        </div>
+
+                        <!-- Lokasi dengan OpenStreetMap -->
+                        <div class="form-section mb-4 border-top pt-4 mt-4">
+                            <h6 class="fw-600 mb-3"><i class="bi bi-geo-alt me-2"></i>Lokasi Usaha (Pilih di Peta)</h6>
+                            
+                            <!-- Map Container -->
+                            <div class="mb-3">
+                                <div id="map" style="height: 400px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);"></div>
+                                <small class="text-muted d-block mt-2">💡 Klik pada peta untuk memilih lokasi usaha</small>
+                            </div>
+
+                            <!-- Koordinat Display -->
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label class="form-label fw-600">Latitude</label>
+                                    <input type="number" id="latitude" name="latitude" step="0.000001" 
+                                           class="form-control @error('latitude') is-invalid @enderror" 
+                                           placeholder="-6.123456" value="{{ old('latitude', $umkm->latitude ?? '-6.1753') }}" readonly>
+                                    @error('latitude') <div class="invalid-feedback d-block">{{ $message }}</div> @enderror
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label fw-600">Longitude</label>
+                                    <input type="number" id="longitude" name="longitude" step="0.000001" 
+                                           class="form-control @error('longitude') is-invalid @enderror" 
+                                           placeholder="106.123456" value="{{ old('longitude', $umkm->longitude ?? '106.9749') }}" readonly>
+                                    @error('longitude') <div class="invalid-feedback d-block">{{ $message }}</div> @enderror
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Password Section -->
+                        <div class="border-top pt-4 mt-4 mb-4">
+                            <h6 class="fw-600 mb-3"><i class="bi bi-key me-2"></i>Ubah Password (Opsional)</h6>
+                            <p class="text-muted small mb-3">Kosongkan jika tidak ingin mengubah password</p>
+
+                            <!-- Password Baru -->
+                            <div class="mb-3">
+                                <label class="form-label fw-600">Password Baru</label>
+                                <input type="password" name="password" class="form-control @error('password') is-invalid @enderror" 
+                                       placeholder="Masukkan password baru (minimal 8 karakter)">
+                                @error('password') <div class="invalid-feedback d-block">{{ $message }}</div> @enderror
+                                <small class="text-muted d-block mt-1">Gunakan kombinasi huruf besar, kecil, angka, dan simbol untuk keamanan maksimal</small>
+                            </div>
+
+                            <!-- Password Konfirmasi -->
+                            <div class="mb-4">
+                                <label class="form-label fw-600">Konfirmasi Password</label>
+                                <input type="password" name="password_confirmation" class="form-control @error('password_confirmation') is-invalid @enderror" 
+                                       placeholder="Ulangi password baru">
+                                @error('password_confirmation') <div class="invalid-feedback d-block">{{ $message }}</div> @enderror
+                            </div>
+                        </div>
+
+                        <!-- Rekening & E-Wallet Section -->
+                        <div class="border-top pt-4 mt-4 mb-4">
+                            <h6 class="fw-600 mb-3"><i class="bi bi-wallet2 me-2"></i>Rekening / E-Wallet (Opsional)</h6>
+                            <p class="text-muted small mb-3">Informasi rekening untuk transaksi pembayaran</p>
+
+                            <!-- Tipe Rekening -->
+                            <div class="mb-3">
+                                <label class="form-label fw-600">Tipe Rekening / E-Wallet</label>
+                                <select name="tipe_rekening" class="form-select @error('tipe_rekening') is-invalid @enderror">
+                                    <option value="">-- Pilih Tipe --</option>
+                                    <option value="BCA" {{ old('tipe_rekening', $umkm->tipe_rekening) == 'BCA' ? 'selected' : '' }}>BCA</option>
+                                    <option value="Mandiri" {{ old('tipe_rekening', $umkm->tipe_rekening) == 'Mandiri' ? 'selected' : '' }}>Mandiri</option>
+                                    <option value="BNI" {{ old('tipe_rekening', $umkm->tipe_rekening) == 'BNI' ? 'selected' : '' }}>BNI</option>
+                                    <option value="CIMB" {{ old('tipe_rekening', $umkm->tipe_rekening) == 'CIMB' ? 'selected' : '' }}>CIMB Niaga</option>
+                                    <option value="Danamon" {{ old('tipe_rekening', $umkm->tipe_rekening) == 'Danamon' ? 'selected' : '' }}>Danamon</option>
+                                    <option value="GCash" {{ old('tipe_rekening', $umkm->tipe_rekening) == 'GCash' ? 'selected' : '' }}>GCash (PH)</option>
+                                    <option value="Dana" {{ old('tipe_rekening', $umkm->tipe_rekening) == 'Dana' ? 'selected' : '' }}>Dana</option>
+                                    <option value="OVO" {{ old('tipe_rekening', $umkm->tipe_rekening) == 'OVO' ? 'selected' : '' }}>OVO</option>
+                                    <option value="GOPAY" {{ old('tipe_rekening', $umkm->tipe_rekening) == 'GOPAY' ? 'selected' : '' }}>GoPay</option>
+                                </select>
+                                @error('tipe_rekening') <div class="invalid-feedback d-block">{{ $message }}</div> @enderror
+                            </div>
+
+                            <!-- Nomor Rekening -->
+                            <div class="mb-3">
+                                <label class="form-label fw-600">Nomor Rekening / No E-Wallet</label>
+                                <input type="text" name="no_rekening" class="form-control @error('no_rekening') is-invalid @enderror" 
+                                       value="{{ old('no_rekening', $umkm->no_rekening) }}" placeholder="Contoh: 1234567890">
+                                @error('no_rekening') <div class="invalid-feedback d-block">{{ $message }}</div> @enderror
+                                <small class="text-muted d-block mt-1">Nomor rekening atau nomor e-wallet yang aktif</small>
+                            </div>
+
+                            <!-- Nama Pemilik Rekening -->
+                            <div class="mb-4">
+                                <label class="form-label fw-600">Nama Pemilik Rekening</label>
+                                <input type="text" name="nama_pemilik_rekening" class="form-control @error('nama_pemilik_rekening') is-invalid @enderror" 
+                                       value="{{ old('nama_pemilik_rekening', $umkm->nama_pemilik_rekening) }}" placeholder="Nama sesuai rekening/e-wallet">
+                                @error('nama_pemilik_rekening') <div class="invalid-feedback d-block">{{ $message }}</div> @enderror
+                                <small class="text-muted d-block mt-1">Nama pemilik rekening untuk verifikasi pembayaran</small>
+                            </div>
+                        </div>
                         <div class="d-flex gap-2">
-                            <button type="submit" class="btn btn-primary btn-lg flex-grow-1">
+                            <button type="submit" class="btn btn-primary btn-lg grow">
                                 <i class="bi bi-check me-2"></i>Simpan Perubahan
                             </button>
-                            <a href="{{ route('admin.umkm.show', $umkm->id) }}" class="btn btn-outline-secondary btn-lg flex-grow-1">
+                            <a href="{{ route('admin.umkm.show', $umkm->id) }}" class="btn btn-outline-secondary btn-lg grow">
                                 <i class="bi bi-x me-2"></i>Batal
                             </a>
                         </div>
@@ -204,6 +369,184 @@
 .btn-lg.grow {
     flex: 1;
 }
+
+/* Leaflet CSS Override */
+#map {
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    z-index: 1;
+}
+
+.leaflet-control-container {
+    font-family: inherit;
+}
+
+.leaflet-bar {
+    border-radius: 8px;
+}
+
+.leaflet-control-search {
+    border-radius: 8px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+
+.leaflet-control-search input {
+    padding: 10px 12px;
+    font-size: 14px;
+    border-radius: 4px;
+    border: 1px solid #ddd;
+    width: 280px;
+}
+
+.leaflet-control-search button {
+    background: #001f5c;
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    cursor: pointer;
+    border-radius: 4px;
+}
+
+.leaflet-control-search button:hover {
+    background: #000f3d;
+}
+
+@media (max-width: 767px) {
+    #map {
+        height: 300px !important;
+    }
+    
+    .leaflet-control-search input {
+        width: 180px;
+    }
+}
 </style>
+
+<!-- Leaflet CSS & JS -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet-control-geocoder/2.4.0/Control.Geocoder.min.css" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet-control-geocoder/2.4.0/Control.Geocoder.min.js"></script>
+
+<script>
+// Default location: Teluknaga, Tangerang
+const DEFAULT_LAT = -6.1753;
+const DEFAULT_LNG = 106.9749;
+
+let map;
+let marker;
+
+function initMap() {
+    // Initialize Leaflet map
+    map = L.map('map').setView([DEFAULT_LAT, DEFAULT_LNG], 15);
+
+    // Add OpenStreetMap tiles
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+        maxZoom: 19,
+    }).addTo(map);
+
+    // Get initial values from inputs
+    const initialLat = parseFloat(document.getElementById('latitude').value) || DEFAULT_LAT;
+    const initialLng = parseFloat(document.getElementById('longitude').value) || DEFAULT_LNG;
+
+    // Create initial marker
+    marker = L.marker([initialLat, initialLng], {
+        draggable: true,
+        title: 'Lokasi Usaha Anda - Drag untuk menggeser',
+    }).addTo(map);
+
+    // Update coordinates when marker is dragged
+    marker.on('dragend', function() {
+        const position = marker.getLatLng();
+        document.getElementById('latitude').value = position.lat.toFixed(6);
+        document.getElementById('longitude').value = position.lng.toFixed(6);
+    });
+
+    // Click on map to place marker
+    map.on('click', function(e) {
+        const position = e.latlng;
+        marker.setLatLng(position);
+        document.getElementById('latitude').value = position.lat.toFixed(6);
+        document.getElementById('longitude').value = position.lng.toFixed(6);
+    });
+
+    // Add search/geocoding control
+    const geocoder = L.Control.geocoder({
+        defaultMarkGeocode: false,
+        position: 'topleft',
+    })
+    .on('markgeocode', function(e) {
+        const bbox = e.geocode.bbox;
+        const center = [
+            (bbox.getSouthWest().lat + bbox.getNorthEast().lat) / 2,
+            (bbox.getSouthWest().lng + bbox.getNorthEast().lng) / 2
+        ];
+        
+        marker.setLatLng(center);
+        map.fitBounds(bbox);
+        
+        document.getElementById('latitude').value = center[0].toFixed(6);
+        document.getElementById('longitude').value = center[1].toFixed(6);
+    })
+    .addTo(map);
+
+    // Add attribution
+    L.control.attribution({
+        prefix: '<a href="https://leafletjs.com">Leaflet</a>'
+    }).addTo(map);
+
+    // Ensure map resizes properly
+    setTimeout(() => {
+        map.invalidateSize();
+    }, 100);
+}
+
+// Initialize map when page loads
+document.addEventListener('DOMContentLoaded', function() {
+    initMap();
+});
+
+// Format Rupiah untuk Omzet Bulanan di Admin Edit
+function formatRupiah(value) {
+    // Hapus karakter non-digit
+    value = value.replace(/\D/g, '');
+    
+    // Format dengan separator
+    value = value.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+    
+    return value;
+}
+
+const omzetDisplayAdmin = document.getElementById('omzet_display_admin');
+const omzetActualAdmin = document.getElementById('omzet_actual_admin');
+
+if (omzetDisplayAdmin && omzetActualAdmin) {
+    omzetDisplayAdmin.addEventListener('input', function() {
+        const formatted = formatRupiah(this.value);
+        this.value = formatted;
+        
+        // Simpan nilai asli (tanpa format) ke input hidden
+        omzetActualAdmin.value = this.value.replace(/\D/g, '');
+    });
+
+    // Set nilai awal jika ada
+    if (omzetDisplayAdmin.value) {
+        omzetActualAdmin.value = omzetDisplayAdmin.value.replace(/\D/g, '');
+    }
+    
+    // Before form submit, ensure hidden input is filled
+    const form = omzetDisplayAdmin.closest('form');
+    if (form) {
+        form.addEventListener('submit', function(e) {
+            // Update hidden field from display field
+            const displayValue = omzetDisplayAdmin.value;
+            if (displayValue) {
+                omzetActualAdmin.value = displayValue.replace(/\D/g, '');
+            }
+        });
+    }
+}
+</script>
 
 @endsection

@@ -253,8 +253,13 @@
 
 /* ========== Filter Section Styles ========== */
 .section-filter {
-    padding: 40px 0;
-    background: linear-gradient(180deg, #f8f9fa 0%, #ffffff 100%);
+    padding: 15px 0;
+    background: white;
+    position: sticky;
+    top: 95px; /* Slightly overlap navbar bottom border for seamless look */
+    z-index: 990;
+    border-bottom: 1px solid #f1f3f5;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
 }
 
 /* Search Box */
@@ -575,7 +580,8 @@
 
 @media (max-width: 767.98px) {
     .section-filter {
-        padding: 30px 0;
+        padding: 10px 0;
+        top: 90px; /* Adjust for mobile navbar if needed, keeping it sticky */
     }
     
     .search-box {

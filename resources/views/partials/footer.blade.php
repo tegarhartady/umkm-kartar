@@ -4,12 +4,10 @@
             <!-- Brand Section -->
             <div class="col-lg-4 col-md-6">
                 <a class="d-flex align-items-center mb-4 text-decoration-none" href="{{ url('/') }}">
-                    <div class="brand-icon-footer me-2">
-                        <span>TN</span>
-                    </div>
+                    <img src="{{ asset('images/smartumkm.svg') }}" alt="Smart UMKM Logo" style="height: 60px; width: auto; margin-right: 12px;">
                     <div>
-                        <small class="text-white-50 d-block" style="font-size: 10px; line-height: 1;">KARANG TARUNA</small>
-                        <span class="fw-bold text-white" style="font-size: 18px; line-height: 1.2;">TELUKNAGA<span class="text-primary">.</span></span>
+                        <small class="text-white-50 d-block" style="font-size: 10px; line-height: 1;">SEDAYU MART</small>
+                        <span class="fw-bold text-white" style="font-size: 18px; line-height: 1.2;">UMKM<span class="text-primary">.</span></span>
                     </div>
                 </a>
                 <p class="text-white-50 mb-4">Membangun ekonomi desa Teluknaga melalui digitalisasi UMKM. Kolaborasi antara Karang Taruna dan CSR PIK2.</p>
@@ -23,18 +21,18 @@
             
             <!-- Quick Links -->
             <div class="col-lg-2 col-md-6">
-                <h6 class="fw-semibold mb-4">Menu</h6>
+                <h6 class="fw-semibold mb-4 text-white">Menu</h6>
                 <ul class="list-unstyled footer-links">
                     <li><a href="{{ url('/') }}">Beranda</a></li>
-                    <li><a href="{{ url('/katalog') }}">Katalog</a></li>
-                    <li><a href="{{ url('/desa-mitra') }}">Desa Mitra</a></li>
-                    <li><a href="{{ url('/csr-pik2') }}">CSR PIK2</a></li>
+                    <li><a href="{{ url('/katalog') }}">Katalog & Desa Mitra</a></li>
+                    {{-- <li><a href="{{ url('/desa-mitra') }}">Desa Mitra</a></li> --}}
+                    <li><a href="{{ url('/csr-pik2') }}">Dukungan CSR PIK2</a></li>
                 </ul>
             </div>
             
             <!-- Resources -->
             <div class="col-lg-2 col-md-6">
-                <h6 class="fw-semibold mb-4">Layanan</h6>
+                <h6 class="fw-semibold mb-4 text-white">Layanan</h6>
                 <ul class="list-unstyled footer-links">
                     <li><a href="#">Daftar UMKM</a></li>
                     <li><a href="#">Pelatihan</a></li>
@@ -45,7 +43,7 @@
             
             <!-- Contact -->
             <div class="col-lg-4 col-md-6">
-                <h6 class="fw-semibold mb-4">Hubungi Kami</h6>
+                <h6 class="fw-semibold mb-4 text-white">Hubungi Kami</h6>
                 <ul class="list-unstyled footer-contact">
                     <li class="d-flex mb-3">
                         <i class="bi bi-geo-alt me-3 text-primary"></i>
@@ -67,7 +65,7 @@
         <div class="border-top border-secondary py-4">
             <div class="row align-items-center">
                 <div class="col-md-6 text-center text-md-start">
-                    <p class="text-white-50 mb-0 small">&copy; {{ date('Y') }} Karang Taruna Teluknaga. All rights reserved.</p>
+                    <p class="text-white-50 mb-0 small">&copy; {{ date('Y') }} Sedayu Mart UMKM. All rights reserved.</p>
                 </div>
                 <div class="col-md-6 text-center text-md-end">
                     <p class="text-white-50 mb-0 small">Kolaborasi dengan CSR PIK2</p>

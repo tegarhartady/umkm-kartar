@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\User;
 use App\Models\Umkm;
 use App\Models\Product;
+use App\Models\Transaction;
 
 class DashboardController extends Controller
 {
@@ -16,6 +17,11 @@ class DashboardController extends Controller
         $umkmBaru = Umkm::where('created_at', '>=', now()->subDays(7))->count();
         $produkCount = Product::where('status', 'published')->count();
         $produkMenunggu = Product::where('status', 'pending')->count();
+        
+        // Transaction statistics
+        $totalTransaksi = Transaction::count();
+        $transaksiBerhasil = Transaction::where('status', 'completed')->count();
+        $totalRevenue = Transaction::where('status', 'completed')->sum('total_price');
         
         // Hitung total omzet dari UMKM
         $totalOmzet = Umkm::sum('omzet_bulanan') / 1000000; // konversi ke juta
@@ -55,6 +61,13 @@ class DashboardController extends Controller
             })
             ->toArray();
         
+        // Ambil transaksi terbaru
+        $transaksiTerbaru = Transaction::with(['product', 'user'])
+            ->select('id', 'transaction_code', 'product_id', 'user_id', 'buyer_name', 'status', 'total_price', 'created_at')
+            ->orderByDesc('created_at')
+            ->limit(5)
+            ->get();
+        
         // Ambil produk terbaru
         $produkTerbaru = Product::select('id', 'nama_produk', 'kategori', 'status', 'created_at')
             ->orderByDesc('created_at')
@@ -68,8 +81,12 @@ class DashboardController extends Controller
             'umkm_baru' => $umkmBaru,
             'total_produk' => $produkCount,
             'menunggu_verifikasi' => $produkMenunggu,
+            'total_transaksi' => $totalTransaksi,
+            'transaksi_berhasil' => $transaksiBerhasil,
+            'total_revenue' => $totalRevenue,
             'peningkatan_desa' => $peningkatanDesa,
             'verifikasi_pending' => $verifikasiPending,
+            'transaksi_terbaru' => $transaksiTerbaru,
             'produk_terbaru' => $produkTerbaru
         ];
         
@@ -100,6 +117,12 @@ class DashboardController extends Controller
         $activeProducts = $umkm->products()->where('status', 'published')->count();
         $pendingProducts = $umkm->products()->where('status', 'pending')->count();
         
+        // Get transactions for this UMKM's products
+        $umkmProductIds = $umkm->products()->pluck('id');
+        $totalTransaksi = Transaction::whereIn('product_id', $umkmProductIds)->count();
+        $transaksiSelesai = Transaction::whereIn('product_id', $umkmProductIds)->where('status', 'completed')->count();
+        $totalRevenue = Transaction::whereIn('product_id', $umkmProductIds)->where('status', 'completed')->sum('total_price');
+        
         // Get total sales (from products)
         $totalSales = $umkm->products()
             ->sum(\DB::raw('stok * harga')); // This is an estimate; real implementation might use order data
@@ -120,10 +143,17 @@ class DashboardController extends Controller
             ->get()
             ->toArray();
         
+        // Get recent transactions for this UMKM
+        $transaksiTerbaru = Transaction::whereIn('product_id', $umkmProductIds)
+            ->with(['product', 'user'])
+            ->select('id', 'transaction_code', 'product_id', 'buyer_name', 'status', 'total_price', 'created_at')
+            ->orderByDesc('created_at')
+            ->limit(5)
+            ->get();
+        
         // Calculate monthly growth (this is mock, in real app would use order data)
         $monthlyGrowth = rand(-10, 30); // Mock data
         $shopRating = round(rand(40, 50) / 10, 1); // Mock rating 4.0-5.0
-        $totalOrders = rand(50, 300); // Mock orders
         
         $data = [
             'nama_toko' => $umkm->nama_toko,
@@ -135,9 +165,12 @@ class DashboardController extends Controller
             'total_sales' => $totalSales,
             'monthly_growth' => $monthlyGrowth,
             'shop_rating' => $shopRating,
-            'total_orders' => $totalOrders,
+            'total_transaksi' => $totalTransaksi,
+            'transaksi_selesai' => $transaksiSelesai,
+            'total_revenue' => $totalRevenue,
             'recent_products' => $recentProducts,
             'low_stock_products' => $lowStockProducts,
+            'transaksi_terbaru' => $transaksiTerbaru,
             'umkm_id' => $umkm->id,
             'umkm_status' => $umkm->status,
         ];

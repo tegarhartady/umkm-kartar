@@ -67,30 +67,30 @@
             </div>
         </div>
 
-        <!-- Total Produk -->
+        <!-- Total Transaksi -->
         <div class="col-lg-3 col-md-6" data-aos="fade-up" data-aos-delay="200">
             <div class="stats-card">
                 <div class="stats-icon bg-info">
-                    <i class="bi bi-box-seam"></i>
+                    <i class="bi bi-receipt"></i>
                 </div>
                 <div class="stats-content">
-                    <h3 class="stats-number">{{ $data['total_produk'] }}</h3>
-                    <p class="stats-label">Total Produk Aktif</p>
-                    <span class="stats-growth neutral">Semua UMKM</span>
+                    <h3 class="stats-number">{{ $data['total_transaksi'] }}</h3>
+                    <p class="stats-label">Total Transaksi</p>
+                    <span class="stats-growth positive">✓ {{ $data['transaksi_berhasil'] }} Berhasil</span>
                 </div>
             </div>
         </div>
 
-        <!-- Menunggu Verifikasi -->
+        <!-- Total Revenue -->
         <div class="col-lg-3 col-md-6" data-aos="fade-up" data-aos-delay="300">
             <div class="stats-card">
                 <div class="stats-icon bg-warning">
-                    <i class="bi bi-hourglass-split"></i>
+                    <i class="bi bi-graph-up"></i>
                 </div>
                 <div class="stats-content">
-                    <h3 class="stats-number">{{ $data['menunggu_verifikasi'] }}</h3>
-                    <p class="stats-label">Menunggu Verifikasi</p>
-                    <span class="stats-growth warning">Perlu Review</span>
+                    <h3 class="stats-number">Rp{{ number_format($data['total_revenue'] / 1000000, 1) }}M</h3>
+                    <p class="stats-label">Total Revenue (Transaksi)</p>
+                    <span class="stats-growth positive">Dari checkout online</span>
                 </div>
             </div>
         </div>
@@ -100,6 +100,72 @@
 <!-- Data & Verification Section -->
 <div class="data-section">
     <div class="row g-4">
+        <!-- Recent Transactions -->
+        <div class="col-lg-8" data-aos="fade-up">
+            <div class="data-card">
+                <div class="data-header">
+                    <h5><i class="bi bi-receipt me-2"></i>Transaksi Terbaru</h5>
+                    <a href="{{ route('admin.transactions.index') }}" class="btn btn-sm btn-outline-primary">Lihat Semua</a>
+                </div>
+                <div class="data-body">
+                    @forelse($data['transaksi_terbaru'] as $txn)
+                    <div class="transaction-item">
+                        <div class="txn-info">
+                            <h6 class="txn-code">{{ $txn->transaction_code }}</h6>
+                            <p class="txn-buyer">{{ $txn->buyer_name }}</p>
+                            <small class="text-muted">{{ $txn->product->nama_produk ?? 'Produk' }} • {{ $txn->created_at->format('d M Y H:i') }}</small>
+                        </div>
+                        <div class="txn-status">
+                            @if ($txn->status === 'pending')
+                                <span class="badge bg-warning text-dark">Menunggu</span>
+                            @elseif ($txn->status === 'completed')
+                                <span class="badge bg-success">Selesai</span>
+                            @elseif ($txn->status === 'cancelled')
+                                <span class="badge bg-secondary">Dibatalkan</span>
+                            @else
+                                <span class="badge bg-danger">Gagal</span>
+                            @endif
+                        </div>
+                        <div class="txn-amount">
+                            <strong>Rp{{ number_format($txn->total_price, 0, ',', '.') }}</strong>
+                        </div>
+                    </div>
+                    @empty
+                    <div class="text-center py-4 text-muted">
+                        <i class="bi bi-inbox" style="font-size: 2rem;"></i>
+                        <p class="mt-2">Belum ada transaksi</p>
+                    </div>
+                    @endforelse
+                </div>
+            </div>
+        </div>
+
+        <!-- Peningkatan Penjualan Desa -->
+        <div class="col-lg-4" data-aos="fade-up" data-aos-delay="100">
+            <div class="data-card">
+                <div class="data-header">
+                    <h5><i class="bi bi-graph-up me-2"></i>Top Desa</h5>
+                    <small class="text-muted">Desa dengan penjualan tertinggi</small>
+                </div>
+                <div class="data-body">
+                    @foreach($data['peningkatan_desa'] as $index => $desa)
+                    @if ($index < 5)
+                    <div class="desa-item-compact">
+                        <div class="desa-rank">#{{ $index + 1 }}</div>
+                        <div class="desa-info">
+                            <h6 class="desa-name">{{ $desa['nama'] }}</h6>
+                            <p class="desa-transactions">{{ $desa['transaksi'] }} transaksi</p>
+                            <span class="omzet-amount">Rp{{ number_format($desa['omzet'], 1) }}M</span>
+                        </div>
+                    </div>
+                    @endif
+                    @endforeach
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4 mt-2">
         <!-- Peningkatan Penjualan Desa -->
         <div class="col-lg-8" data-aos="fade-up">
             <div class="data-card">
@@ -476,6 +542,111 @@
     height: 100%;
     transition: width 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
     box-shadow: 0 0 8px rgba(102, 126, 234, 0.4);
+}
+
+/* ========== Transaction Items ========== */
+.transaction-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px;
+    border-radius: 12px;
+    border: 1px solid #f0f0f0;
+    margin-bottom: 12px;
+    transition: all 0.3s ease;
+    background: linear-gradient(135deg, rgba(247, 250, 252, 0.5), rgba(237, 242, 247, 0.5));
+}
+
+.transaction-item:last-child {
+    margin-bottom: 0;
+}
+
+.transaction-item:hover {
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.05), rgba(118, 75, 162, 0.05));
+    border-color: #e2e8f0;
+    transform: translateX(4px);
+}
+
+.txn-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.txn-code {
+    font-weight: 700;
+    color: var(--text-dark);
+    margin-bottom: 4px;
+    font-size: 13px;
+    font-family: 'Courier New', monospace;
+}
+
+.txn-buyer {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin: 0 0 4px 0;
+}
+
+.transaction-item small {
+    font-size: 11px;
+    color: var(--text-muted);
+}
+
+.txn-status {
+    margin: 0 16px;
+    min-width: 80px;
+}
+
+.txn-amount {
+    font-weight: 700;
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    font-size: 14px;
+    min-width: 120px;
+    text-align: right;
+}
+
+/* Compact Desa Items */
+.desa-item-compact {
+    display: flex;
+    align-items: flex-start;
+    padding: 12px;
+    border-radius: 8px;
+    margin-bottom: 10px;
+    border-left: 3px solid var(--primary-color);
+    background: rgba(102, 126, 234, 0.02);
+}
+
+.desa-item-compact:last-child {
+    margin-bottom: 0;
+}
+
+.desa-item-compact .desa-rank {
+    width: 32px;
+    height: 32px;
+    font-size: 12px;
+    margin-right: 12px;
+}
+
+.desa-item-compact .desa-info {
+    flex: 1;
+    margin-right: 0;
+}
+
+.desa-item-compact .desa-name {
+    font-size: 13px;
+    margin-bottom: 2px;
+}
+
+.desa-item-compact .desa-transactions {
+    font-size: 11px;
+    margin-bottom: 2px;
+}
+
+.desa-item-compact .omzet-amount {
+    font-size: 12px;
+    margin-bottom: 0;
 }
 
 /* ========== Verification ========== */

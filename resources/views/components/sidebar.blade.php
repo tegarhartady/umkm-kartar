@@ -88,6 +88,10 @@
                     <i class="bi bi-map me-2"></i>
                     <span>Desa</span>
                 </a>
+                <a href="{{ route('admin.users.index') }}" class="nav-link {{ Route::is('admin.users.*') ? 'active' : '' }}">
+                    <i class="bi bi-people me-2"></i>
+                    <span>Manajemen User</span>
+                </a>
                 <a href="{{ route('admin.laporan.index') }}" class="nav-link {{ Route::is('admin.laporan.*') ? 'active' : '' }}">
                     <i class="bi bi-file-text me-2"></i>
                     <span>Laporan</span>

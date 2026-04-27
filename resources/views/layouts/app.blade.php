@@ -3,9 +3,10 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="UMKM Karang Taruna Teluknaga - Dukung Produk Lokal Pesisir">
+    <meta name="description" content="Sedayu Mart UMKM">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     
-    <title>@yield('title', 'Karang Taruna Teluknaga')</title>
+    <title>@yield('title', 'Sedayu Mart UMKM')</title>
     
     <!-- Favicon -->
     <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}">

@@ -27,7 +27,7 @@
     <!-- Stats Cards -->
     <div class="row mb-4">
         <div class="col-md-3">
-            <div class="card border-0 shadow-sm">
+            <div class="card border-0 shadow-sm h-100">
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
@@ -40,48 +40,48 @@
             </div>
         </div>
         <div class="col-md-3">
-            <div class="card border-0 shadow-sm">
+            <div class="card border-0 shadow-sm h-100">
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
-                            <p class="text-muted mb-1">Produk Aktif</p>
-                            <h3 class="mb-0 text-success fw-bold">{{ $activeProducts ?? 0 }}</h3>
+                            <p class="text-muted mb-1">Total Transaksi</p>
+                            <h3 class="mb-0 text-info fw-bold">{{ $totalTransaksi ?? 0 }}</h3>
                         </div>
-                        <i class="bi bi-check-circle text-success" style="font-size: 2rem; opacity: 0.5;"></i>
+                        <i class="bi bi-receipt text-info" style="font-size: 2rem; opacity: 0.5;"></i>
                     </div>
                 </div>
             </div>
         </div>
         <div class="col-md-3">
-            <div class="card border-0 shadow-sm">
+            <div class="card border-0 shadow-sm h-100">
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
-                            <p class="text-muted mb-1">Status</p>
+                            <p class="text-muted mb-1">Total Pendapatan</p>
+                            <h3 class="mb-0 text-success fw-bold">Rp {{ number_format($totalRevenue ?? 0, 0, ',', '.') }}</h3>
+                        </div>
+                        <i class="bi bi-currency-dollar text-success" style="font-size: 2rem; opacity: 0.5;"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <p class="text-muted mb-1">Status UMKM</p>
                             <h5 class="mb-0">
                                 @if($umkm->status === 'disetujui')
                                     <span class="badge bg-success">Disetujui</span>
                                 @elseif($umkm->status === 'pending')
-                                    <span class="badge bg-warning">Menunggu Approval</span>
+                                    <span class="badge bg-warning text-dark">Menunggu</span>
                                 @else
                                     <span class="badge bg-danger">Ditolak</span>
                                 @endif
                             </h5>
                         </div>
-                        <i class="bi bi-info-circle text-info" style="font-size: 2rem; opacity: 0.5;"></i>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card border-0 shadow-sm">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <p class="text-muted mb-1">Kategori</p>
-                            <h5 class="mb-0">{{ $umkm->kategori ?? '-' }}</h5>
-                        </div>
-                        <i class="bi bi-tag text-warning" style="font-size: 2rem; opacity: 0.5;"></i>
+                        <i class="bi bi-info-circle text-warning" style="font-size: 2rem; opacity: 0.5;"></i>
                     </div>
                 </div>
             </div>
@@ -90,58 +90,77 @@
 
     <!-- Info UMKM -->
     <div class="row mb-4">
-        <div class="col-12">
-            <div class="card border-0 shadow-sm">
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm h-100">
                 <div class="card-header bg-white border-bottom">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <h5 class="mb-0"><i class="bi bi-info-circle me-2"></i>Informasi UMKM</h5>
-                        <a href="#" class="btn btn-sm btn-primary">
-                            <i class="bi bi-pencil"></i> Edit
-                        </a>
-                    </div>
+                    <h5 class="mb-0"><i class="bi bi-info-circle me-2"></i>Profil UMKM</h5>
                 </div>
                 <div class="card-body">
-                    <div class="row">
-                        <div class="col-md-6">
-                            <table class="table table-borderless">
+                    <div class="mb-3">
+                        <label class="text-muted small d-block">Nama Toko</label>
+                        <span class="fw-bold">{{ $umkm->nama_toko ?? '-' }}</span>
+                    </div>
+                    <div class="mb-3">
+                        <label class="text-muted small d-block">Pemilik</label>
+                        <span>{{ $umkm->pemilik ?? '-' }}</span>
+                    </div>
+                    <div class="mb-3">
+                        <label class="text-muted small d-block">Kategori</label>
+                        <span class="badge bg-light text-dark">{{ $umkm->kategori ?? '-' }}</span>
+                    </div>
+                    <div class="mb-0">
+                        <label class="text-muted small d-block">Alamat</label>
+                        <small>{{ $umkm->alamat ?? '-' }}, {{ $umkm->desa ?? '' }}</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-8">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-header bg-white border-bottom d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0"><i class="bi bi-receipt me-2"></i>Transaksi Terbaru</h5>
+                    <a href="#" class="btn btn-sm btn-outline-primary">Lihat Semua</a>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead class="table-light">
                                 <tr>
-                                    <td class="fw-bold" width="150">Nama Toko:</td>
-                                    <td>{{ $umkm->nama_toko ?? '-' }}</td>
+                                    <th>Kode</th>
+                                    <th>Produk</th>
+                                    <th>Pembeli</th>
+                                    <th>Total</th>
+                                    <th>Status</th>
+                                    <th>Tanggal</th>
                                 </tr>
-                                <tr>
-                                    <td class="fw-bold">Pemilik:</td>
-                                    <td>{{ $umkm->pemilik ?? '-' }}</td>
-                                </tr>
-                                <tr>
-                                    <td class="fw-bold">Email:</td>
-                                    <td>{{ $umkm->email ?? '-' }}</td>
-                                </tr>
-                                <tr>
-                                    <td class="fw-bold">No. Telepon:</td>
-                                    <td>{{ $umkm->phone ?? '-' }}</td>
-                                </tr>
-                            </table>
-                        </div>
-                        <div class="col-md-6">
-                            <table class="table table-borderless">
-                                <tr>
-                                    <td class="fw-bold" width="150">Desa:</td>
-                                    <td>{{ $umkm->desa ?? '-' }}</td>
-                                </tr>
-                                <tr>
-                                    <td class="fw-bold">Alamat:</td>
-                                    <td>{{ $umkm->alamat ?? '-' }}</td>
-                                </tr>
-                                <tr>
-                                    <td class="fw-bold">Lama Usaha:</td>
-                                    <td>{{ $umkm->lama_usaha ?? '-' }}</td>
-                                </tr>
-                                <tr>
-                                    <td class="fw-bold">Produk Utama:</td>
-                                    <td>{{ $umkm->produk_utama ?? '-' }}</td>
-                                </tr>
-                            </table>
-                        </div>
+                            </thead>
+                            <tbody>
+                                @forelse($recentTransactions as $txn)
+                                    <tr>
+                                        <td><small class="fw-bold">{{ $txn->transaction_code }}</small></td>
+                                        <td>{{ Str::limit($txn->product->nama_produk ?? 'Produk Dihapus', 20) }}</td>
+                                        <td>{{ $txn->buyer_name }}</td>
+                                        <td>Rp {{ number_format($txn->total_price, 0, ',', '.') }}</td>
+                                        <td>
+                                            @if($txn->status === 'pending')
+                                                <span class="badge bg-warning text-dark">Pending</span>
+                                            @elseif($txn->status === 'completed')
+                                                <span class="badge bg-success">Selesai</span>
+                                            @elseif($txn->status === 'cancelled')
+                                                <span class="badge bg-secondary">Batal</span>
+                                            @else
+                                                <span class="badge bg-danger">Gagal</span>
+                                            @endif
+                                        </td>
+                                        <td><small>{{ $txn->created_at->format('d/m/Y') }}</small></td>
+                                    </tr>
+                                @empty
+                                    <tr>
+                                        <td colspan="6" class="text-center py-4 text-muted">Belum ada transaksi</td>
+                                    </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>

@@ -6,6 +6,7 @@ use App\Models\Umkm;
 use App\Models\Desa;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class UmkmController extends Controller
@@ -34,9 +35,34 @@ class UmkmController extends Controller
             'kategori' => 'required|string|max:100',
             'deskripsi' => 'nullable|string',
             'omzet_bulanan' => 'nullable|numeric',
+            'latitude' => 'nullable|numeric|between:-90,90',
+            'longitude' => 'nullable|numeric|between:-180,180',
+            'status' => 'required|in:pending,approved,rejected,disetujui,ditolak',
+            'password' => 'required|string|min:8|confirmed',
+            'foto_ktp' => 'nullable|image|mimes:jpeg,png,jpg|max:5120',
+            'foto_tempat' => 'nullable|image|mimes:jpeg,png,jpg|max:5120',
+            'no_rekening' => 'nullable|string|max:20',
+            'tipe_rekening' => 'nullable|string|max:50',
+            'nama_pemilik_rekening' => 'nullable|string|max:255',
+        ], [
+            'latitude.numeric' => 'Latitude harus berupa angka',
+            'latitude.between' => 'Latitude harus antara -90 hingga 90',
+            'longitude.numeric' => 'Longitude harus berupa angka',
+            'longitude.between' => 'Longitude harus antara -180 hingga 180',
         ]);
 
-        $validated['status'] = 'pending';
+        // Hash password
+        $validated['password'] = Hash::make($validated['password']);
+
+        // Handle foto KTP upload
+        if ($request->hasFile('foto_ktp')) {
+            $validated['foto_ktp'] = $request->file('foto_ktp')->store('umkm/ktp', 'public');
+        }
+
+        // Handle foto Tempat upload
+        if ($request->hasFile('foto_tempat')) {
+            $validated['foto_tempat'] = $request->file('foto_tempat')->store('umkm/tempat', 'public');
+        }
 
         Umkm::create($validated);
 
@@ -68,8 +94,46 @@ class UmkmController extends Controller
             'kategori' => 'required|string|max:100',
             'deskripsi' => 'nullable|string',
             'omzet_bulanan' => 'nullable|numeric',
-            'status' => 'required|in:pending,approved,rejected',
+            'latitude' => 'nullable|numeric|between:-90,90',
+            'longitude' => 'nullable|numeric|between:-180,180',
+            'status' => 'required|in:pending,approved,rejected,disetujui,ditolak',
+            'password' => 'nullable|string|min:8|confirmed',
+            'foto_ktp' => 'nullable|image|mimes:jpeg,png,jpg|max:5120',
+            'foto_tempat' => 'nullable|image|mimes:jpeg,png,jpg|max:5120',
+            'no_rekening' => 'nullable|string|max:20',
+            'tipe_rekening' => 'nullable|string|max:50',
+            'nama_pemilik_rekening' => 'nullable|string|max:255',
+        ], [
+            'latitude.numeric' => 'Latitude harus berupa angka',
+            'latitude.between' => 'Latitude harus antara -90 hingga 90',
+            'longitude.numeric' => 'Longitude harus berupa angka',
+            'longitude.between' => 'Longitude harus antara -180 hingga 180',
         ]);
+
+        // Handle password update if provided
+        if ($request->filled('password')) {
+            $validated['password'] = Hash::make($validated['password']);
+        } else {
+            unset($validated['password']);
+        }
+
+        // Handle foto KTP upload
+        if ($request->hasFile('foto_ktp')) {
+            // Delete old file if exists
+            if ($umkm->foto_ktp) {
+                \Storage::disk('public')->delete($umkm->foto_ktp);
+            }
+            $validated['foto_ktp'] = $request->file('foto_ktp')->store('umkm/ktp', 'public');
+        }
+
+        // Handle foto tempat upload
+        if ($request->hasFile('foto_tempat')) {
+            // Delete old file if exists
+            if ($umkm->foto_tempat) {
+                Storage::disk('public')->delete($umkm->foto_tempat);
+            }
+            $validated['foto_tempat'] = $request->file('foto_tempat')->store('umkm/tempat', 'public');
+        }
 
         $umkm->update($validated);
 
@@ -159,10 +223,25 @@ class UmkmController extends Controller
             'deskripsi' => 'nullable|string',
             'lama_usaha' => 'nullable|string',
             'produk_utama' => 'required|string',
+            'omzet_bulanan' => 'required|numeric|min:0',
+            'latitude' => 'required|numeric|between:-90,90',
+            'longitude' => 'required|numeric|between:-180,180',
             'foto_ktp' => 'required|file|mimes:jpeg,jpg,png|max:2048',
             'foto_tempat' => 'required|file|mimes:jpeg,jpg,png|max:2048',
+            'no_rekening' => 'nullable|string|max:20',
+            'tipe_rekening' => 'nullable|string|max:50',
+            'nama_pemilik_rekening' => 'nullable|string|max:255',
             'agreement' => 'required',
         ], [
+            'omzet_bulanan.required' => 'Omzet bulanan harus diisi',
+            'omzet_bulanan.numeric' => 'Omzet bulanan harus berupa angka',
+            'omzet_bulanan.min' => 'Omzet bulanan minimal 0',
+            'latitude.required' => 'Silakan pilih lokasi di peta',
+            'latitude.numeric' => 'Latitude tidak valid',
+            'latitude.between' => 'Latitude harus antara -90 hingga 90',
+            'longitude.required' => 'Silakan pilih lokasi di peta',
+            'longitude.numeric' => 'Longitude tidak valid',
+            'longitude.between' => 'Longitude harus antara -180 hingga 180',
             'foto_ktp.required' => 'Foto KTP harus diupload',
             'foto_ktp.file' => 'File foto KTP tidak valid',
             'foto_ktp.mimes' => 'Foto KTP harus berformat JPEG, JPG, atau PNG',
@@ -198,10 +277,16 @@ class UmkmController extends Controller
             'deskripsi' => $validated['deskripsi'],
             'lama_usaha' => $validated['lama_usaha'],
             'produk_utama' => $validated['produk_utama'],
+            'omzet_bulanan' => $validated['omzet_bulanan'],
+            'latitude' => $validated['latitude'],
+            'longitude' => $validated['longitude'],
             'foto_ktp' => $fotoKtpPath,
             'foto_tempat' => $fotoTempatPath,
             'status' => 'pending',
             'no_ktp' => $validated['no_ktp'],
+            'no_rekening' => $validated['no_rekening'] ?? null,
+            'tipe_rekening' => $validated['tipe_rekening'] ?? null,
+            'nama_pemilik_rekening' => $validated['nama_pemilik_rekening'] ?? null,
         ]);
 
         if ($request->expectsJson()) {

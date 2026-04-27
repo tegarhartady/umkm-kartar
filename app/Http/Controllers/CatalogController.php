@@ -73,7 +73,7 @@ class CatalogController extends Controller
         }
 
         // Paginate
-        $products = $query->paginate(12)->withQueryString();
+        $products = $query->paginate(8)->withQueryString();
 
         // Get distinct categories from database
         $categories = Product::whereIn('status', ['published', 'aktif'])

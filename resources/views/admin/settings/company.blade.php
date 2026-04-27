@@ -180,9 +180,20 @@
 </div>
 
 @if(session('success'))
-    <div class="alert-success">
-        <i class="bi bi-check-circle"></i>
-        <span>{{ session('success') }}</span>
+    <div class="alert alert-success border-0 shadow-sm mb-4">
+        <i class="bi bi-check-circle-fill me-2"></i>
+        {{ session('success') }}
+    </div>
+@endif
+
+@if($errors->any())
+    <div class="alert alert-danger border-0 shadow-sm mb-4">
+        <h6 class="fw-bold mb-2"><i class="bi bi-exclamation-triangle-fill me-2"></i>Terjadi Kesalahan:</h6>
+        <ul class="mb-0 small ps-3">
+            @foreach($errors->all() as $error)
+                <li>{{ $error }}</li>
+            @endforeach
+        </ul>
     </div>
 @endif
 

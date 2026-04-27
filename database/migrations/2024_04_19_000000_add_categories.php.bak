@@ -3,7 +3,6 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
-use App\Models\Category;
 
 return new class extends Migration
 {
@@ -18,13 +17,6 @@ return new class extends Migration
             ['nama_kategori' => 'Fashion', 'icon' => 'bi-bag'],
             ['nama_kategori' => 'Lainnya', 'icon' => 'bi-box'],
         ];
-
-        foreach ($categories as $cat) {
-            Category::updateOrCreate(
-                ['nama_kategori' => $cat['nama_kategori']],
-                ['icon' => $cat['icon']]
-            );
-        }
     }
 
     public function down(): void

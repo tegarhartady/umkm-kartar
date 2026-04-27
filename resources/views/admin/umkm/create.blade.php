@@ -2,6 +2,10 @@
 
 @section('title', 'Tambah UMKM')
 
+@php
+    use Illuminate\Support\Facades\Storage;
+@endphp
+
 @section('breadcrumb')
     <nav aria-label="breadcrumb">
         <ol class="breadcrumb mb-0">
@@ -14,11 +18,18 @@
 
 @section('content')
 <div class="container-fluid">
+    <div class="card mb-4 border-0 shadow-sm">
+        <div class="card-body">
+            <h1 class="h3 mb-0 fw-bold">Tambah Data UMKM Baru</h1>
+            <p class="text-muted mb-0">Tambahkan informasi UMKM dengan benar dan lengkap</p>
+        </div>
+    </div>
+
     <div class="row justify-content-center">
         <div class="col-lg-8">
             <div class="card border-0 shadow-sm" style="border-radius: 15px;">
                 <div class="card-header bg-white border-bottom" style="border-radius: 15px 15px 0 0;">
-                    <h5 class="mb-0"><i class="bi bi-plus-circle me-2"></i>Tambah UMKM Baru</h5>
+                    <h5 class="mb-0"><i class="bi bi-plus-circle me-2"></i>Form Tambah UMKM</h5>
                 </div>
                 <div class="card-body p-4">
                     @if ($errors->any())
@@ -33,7 +44,7 @@
                         </div>
                     @endif
 
-                    <form action="{{ route('admin.umkm.store') }}" method="POST">
+                    <form action="{{ route('admin.umkm.store') }}" method="POST" enctype="multipart/form-data">
                         @csrf
 
                         <!-- Nama Toko & Pemilik -->
@@ -92,18 +103,29 @@
                             @error('alamat') <div class="invalid-feedback d-block">{{ $message }}</div> @enderror
                         </div>
 
-                        <!-- Kategori -->
-                        <div class="mb-3">
-                            <label class="form-label fw-600">Kategori Usaha *</label>
-                            <select name="kategori" class="form-select @error('kategori') is-invalid @enderror" required>
-                                <option value="">Pilih Kategori</option>
-                                <option value="Hasil Laut" {{ old('kategori') == 'Hasil Laut' ? 'selected' : '' }}>Hasil Laut</option>
-                                <option value="Makanan Olahan" {{ old('kategori') == 'Makanan Olahan' ? 'selected' : '' }}>Makanan Olahan</option>
-                                <option value="Bumbu Dapur" {{ old('kategori') == 'Bumbu Dapur' ? 'selected' : '' }}>Bumbu Dapur</option>
-                                <option value="Kerajinan" {{ old('kategori') == 'Kerajinan' ? 'selected' : '' }}>Kerajinan</option>
-                                <option value="Kuliner" {{ old('kategori') == 'Kuliner' ? 'selected' : '' }}>Kuliner</option>
-                            </select>
-                            @error('kategori') <div class="invalid-feedback d-block">{{ $message }}</div> @enderror
+                        <!-- Kategori & Status -->
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label fw-600">Kategori Usaha *</label>
+                                <select name="kategori" class="form-select @error('kategori') is-invalid @enderror" required>
+                                    <option value="">Pilih Kategori</option>
+                                    <option value="Hasil Laut" {{ old('kategori') == 'Hasil Laut' ? 'selected' : '' }}>Hasil Laut</option>
+                                    <option value="Makanan Olahan" {{ old('kategori') == 'Makanan Olahan' ? 'selected' : '' }}>Makanan Olahan</option>
+                                    <option value="Bumbu Dapur" {{ old('kategori') == 'Bumbu Dapur' ? 'selected' : '' }}>Bumbu Dapur</option>
+                                    <option value="Kerajinan" {{ old('kategori') == 'Kerajinan' ? 'selected' : '' }}>Kerajinan</option>
+                                    <option value="Kuliner" {{ old('kategori') == 'Kuliner' ? 'selected' : '' }}>Kuliner</option>
+                                </select>
+                                @error('kategori') <div class="invalid-feedback d-block">{{ $message }}</div> @enderror
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-600">Status *</label>
+                                <select name="status" class="form-select @error('status') is-invalid @enderror" required>
+                                    <option value="pending" {{ old('status') == 'pending' ? 'selected' : '' }}>Pending</option>
+                                    <option value="disetujui" {{ old('status') == 'disetujui' ? 'selected' : '' }}>Disetujui</option>
+                                    <option value="ditolak" {{ old('status') == 'ditolak' ? 'selected' : '' }}>Ditolak</option>
+                                </select>
+                                @error('status') <div class="invalid-feedback d-block">{{ $message }}</div> @enderror
+                            </div>
                         </div>
 
                         <!-- Deskripsi -->
@@ -117,15 +139,136 @@
                         <!-- Omzet Bulanan -->
                         <div class="mb-4">
                             <label class="form-label fw-600">Omzet Bulanan (Rp)</label>
-                            <input type="number" name="omzet_bulanan" class="form-control @error('omzet_bulanan') is-invalid @enderror" 
-                                   value="{{ old('omzet_bulanan') }}" placeholder="Omzet bulanan" min="0">
+                            <div class="input-group">
+                                <span class="input-group-text" style="background: #f8f9fa; border: 1px solid #ddd; border-radius: 8px 0 0 8px;">Rp</span>
+                                <input type="text" id="omzet_display_admin" class="form-control @error('omzet_bulanan') is-invalid @enderror" 
+                                       placeholder="Contoh: 5.000.000" 
+                                       value="{{ old('omzet_bulanan') }}" 
+                                       style="border-radius: 0 8px 8px 0;">
+                                <input type="hidden" name="omzet_bulanan" id="omzet_actual_admin">
+                            </div>
                             @error('omzet_bulanan') <div class="invalid-feedback d-block">{{ $message }}</div> @enderror
                         </div>
 
-                        <!-- Info Alert -->
-                        <div class="alert alert-info mb-4">
-                            <i class="bi bi-info-circle me-2"></i>
-                            <strong>Informasi:</strong> UMKM yang didaftarkan akan berstatus "Pending" dan perlu persetujuan admin.
+                        <!-- Upload Foto Section -->
+                        <div class="border-top pt-4 mt-4 mb-4">
+                            <h6 class="fw-600 mb-3"><i class="bi bi-image me-2"></i>Unggah Foto</h6>
+                            
+                            <!-- Foto KTP -->
+                            <div class="mb-4">
+                                <label class="form-label fw-600">Foto KTP Pemilik</label>
+                                <div class="input-group mb-2">
+                                    <input type="file" name="foto_ktp" class="form-control @error('foto_ktp') is-invalid @enderror" 
+                                           accept="image/*">
+                                    @error('foto_ktp') <div class="invalid-feedback d-block">{{ $message }}</div> @enderror
+                                </div>
+                                <small class="text-muted d-block">Format: JPG, PNG | Max: 5MB</small>
+                            </div>
+
+                            <!-- Foto Tempat -->
+                            <div class="mb-4">
+                                <label class="form-label fw-600">Foto Tempat Usaha</label>
+                                <div class="input-group mb-2">
+                                    <input type="file" name="foto_tempat" class="form-control @error('foto_tempat') is-invalid @enderror" 
+                                           accept="image/*">
+                                    @error('foto_tempat') <div class="invalid-feedback d-block">{{ $message }}</div> @enderror
+                                </div>
+                                <small class="text-muted d-block">Format: JPG, PNG | Max: 5MB | Rekomendasi ukuran: 800x600px</small>
+                            </div>
+                        </div>
+
+                        <!-- Lokasi dengan OpenStreetMap -->
+                        <div class="form-section mb-4 border-top pt-4 mt-4">
+                            <h6 class="fw-600 mb-3"><i class="bi bi-geo-alt me-2"></i>Lokasi Usaha (Pilih di Peta)</h6>
+                            
+                            <!-- Map Container -->
+                            <div class="mb-3">
+                                <div id="map" style="height: 400px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);"></div>
+                                <small class="text-muted d-block mt-2">💡 Klik pada peta untuk memilih lokasi usaha</small>
+                            </div>
+
+                            <!-- Koordinat Display -->
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label class="form-label fw-600">Latitude</label>
+                                    <input type="number" id="latitude" name="latitude" step="0.000001" 
+                                           class="form-control @error('latitude') is-invalid @enderror" 
+                                           placeholder="-6.123456" value="{{ old('latitude', '-6.1753') }}" readonly>
+                                    @error('latitude') <div class="invalid-feedback d-block">{{ $message }}</div> @enderror
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label fw-600">Longitude</label>
+                                    <input type="number" id="longitude" name="longitude" step="0.000001" 
+                                           class="form-control @error('longitude') is-invalid @enderror" 
+                                           placeholder="106.123456" value="{{ old('longitude', '106.9749') }}" readonly>
+                                    @error('longitude') <div class="invalid-feedback d-block">{{ $message }}</div> @enderror
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Password Section -->
+                        <div class="border-top pt-4 mt-4 mb-4">
+                            <h6 class="fw-600 mb-3"><i class="bi bi-key me-2"></i>Password UMKM *</label></h6>
+                            <p class="text-muted small mb-3">Password untuk login UMKM</p>
+
+                            <!-- Password -->
+                            <div class="mb-3">
+                                <label class="form-label fw-600">Password *</label>
+                                <input type="password" name="password" class="form-control @error('password') is-invalid @enderror" 
+                                       placeholder="Masukkan password (minimal 8 karakter)" required>
+                                @error('password') <div class="invalid-feedback d-block">{{ $message }}</div> @enderror
+                                <small class="text-muted d-block mt-1">Gunakan kombinasi huruf besar, kecil, angka, dan simbol untuk keamanan maksimal</small>
+                            </div>
+
+                            <!-- Password Konfirmasi -->
+                            <div class="mb-4">
+                                <label class="form-label fw-600">Konfirmasi Password *</label>
+                                <input type="password" name="password_confirmation" class="form-control @error('password_confirmation') is-invalid @enderror" 
+                                       placeholder="Ulangi password" required>
+                                @error('password_confirmation') <div class="invalid-feedback d-block">{{ $message }}</div> @enderror
+                            </div>
+                        </div>
+
+                        <!-- Rekening & E-Wallet Section -->
+                        <div class="border-top pt-4 mt-4 mb-4">
+                            <h6 class="fw-600 mb-3"><i class="bi bi-wallet2 me-2"></i>Rekening / E-Wallet (Opsional)</h6>
+                            <p class="text-muted small mb-3">Informasi rekening untuk transaksi pembayaran</p>
+
+                            <!-- Tipe Rekening -->
+                            <div class="mb-3">
+                                <label class="form-label fw-600">Tipe Rekening / E-Wallet</label>
+                                <select name="tipe_rekening" class="form-select @error('tipe_rekening') is-invalid @enderror">
+                                    <option value="">-- Pilih Tipe --</option>
+                                    <option value="BCA" {{ old('tipe_rekening') == 'BCA' ? 'selected' : '' }}>BCA</option>
+                                    <option value="Mandiri" {{ old('tipe_rekening') == 'Mandiri' ? 'selected' : '' }}>Mandiri</option>
+                                    <option value="BNI" {{ old('tipe_rekening') == 'BNI' ? 'selected' : '' }}>BNI</option>
+                                    <option value="CIMB" {{ old('tipe_rekening') == 'CIMB' ? 'selected' : '' }}>CIMB Niaga</option>
+                                    <option value="Danamon" {{ old('tipe_rekening') == 'Danamon' ? 'selected' : '' }}>Danamon</option>
+                                    <option value="GCash" {{ old('tipe_rekening') == 'GCash' ? 'selected' : '' }}>GCash (PH)</option>
+                                    <option value="Dana" {{ old('tipe_rekening') == 'Dana' ? 'selected' : '' }}>Dana</option>
+                                    <option value="OVO" {{ old('tipe_rekening') == 'OVO' ? 'selected' : '' }}>OVO</option>
+                                    <option value="GOPAY" {{ old('tipe_rekening') == 'GOPAY' ? 'selected' : '' }}>GoPay</option>
+                                </select>
+                                @error('tipe_rekening') <div class="invalid-feedback d-block">{{ $message }}</div> @enderror
+                            </div>
+
+                            <!-- Nomor Rekening -->
+                            <div class="mb-3">
+                                <label class="form-label fw-600">Nomor Rekening / No E-Wallet</label>
+                                <input type="text" name="no_rekening" class="form-control @error('no_rekening') is-invalid @enderror" 
+                                       value="{{ old('no_rekening') }}" placeholder="Contoh: 1234567890">
+                                @error('no_rekening') <div class="invalid-feedback d-block">{{ $message }}</div> @enderror
+                                <small class="text-muted d-block mt-1">Nomor rekening atau nomor e-wallet yang aktif</small>
+                            </div>
+
+                            <!-- Nama Pemilik Rekening -->
+                            <div class="mb-4">
+                                <label class="form-label fw-600">Nama Pemilik Rekening</label>
+                                <input type="text" name="nama_pemilik_rekening" class="form-control @error('nama_pemilik_rekening') is-invalid @enderror" 
+                                       value="{{ old('nama_pemilik_rekening') }}" placeholder="Nama sesuai rekening/e-wallet">
+                                @error('nama_pemilik_rekening') <div class="invalid-feedback d-block">{{ $message }}</div> @enderror
+                                <small class="text-muted d-block mt-1">Nama pemilik rekening untuk verifikasi pembayaran</small>
+                            </div>
                         </div>
 
                         <!-- Buttons -->
@@ -191,534 +334,171 @@
     flex: 1;
 }
 
-.alert-info {
-    background: linear-gradient(135deg, #d4e8f7 0%, #e8f3ff 100%);
-    border: 1px solid #90caf9;
-    border-radius: 10px;
-    color: #0056b3;
+/* Leaflet CSS Override */
+#map {
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    z-index: 1;
+}
+
+.leaflet-control-container {
+    font-family: inherit;
+}
+
+.leaflet-bar {
+    border-radius: 8px;
+}
+
+.leaflet-control-search {
+    border-radius: 8px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+
+.leaflet-control-search input {
+    padding: 10px 12px;
+    font-size: 14px;
+    border-radius: 4px;
+    border: 1px solid #ddd;
+    width: 280px;
+}
+
+.leaflet-control-search button {
+    background: #001f5c;
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    cursor: pointer;
+    border-radius: 4px;
+}
+
+.leaflet-control-search button:hover {
+    background: #000f3d;
+}
+
+@media (max-width: 767px) {
+    #map {
+        height: 300px !important;
+    }
+    
+    .leaflet-control-search input {
+        width: 180px;
+    }
 }
 </style>
 
-@endsection
-            
-            <div class="card-body p-5">
-                <style>
-                    .step-indicator {
-                        display: flex;
-                        justify-content: center;
-                        align-items: center;
-                        margin-bottom: 2rem;
-                        flex-wrap: wrap;
-                        gap: 1rem;
-                    }
-                    .step-item {
-                        display: flex;
-                        align-items: center;
-                        gap: 0.5rem;
-                    }
-                    .step-dot {
-                        width: 40px;
-                        height: 40px;
-                        border-radius: 50%;
-                        background: #dee2e6;
-                        color: #6c757d;
-                        display: flex;
-                        align-items: center;
-                        justify-content: center;
-                        font-weight: bold;
-                        transition: all 0.3s ease;
-                    }
-                    .step-dot.active {
-                        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-                        color: white;
-                        transform: scale(1.1);
-                        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
-                    }
-                    .step-dot.completed {
-                        background: #28a745;
-                        color: white;
-                    }
-                    .step-line {
-                        width: 60px;
-                        height: 2px;
-                        background: #dee2e6;
-                    }
-                    .step-line.completed {
-                        background: #28a745;
-                    }
-                    .wizard-step {
-                        display: none;
-                        animation: fadeIn 0.3s ease;
-                    }
-                    .wizard-step.active {
-                        display: block;
-                    }
-                    @keyframes fadeIn {
-                        from {
-                            opacity: 0;
-                            transform: translateY(10px);
-                        }
-                        to {
-                            opacity: 1;
-                            transform: translateY(0);
-                        }
-                    }
-                    .form-section-title {
-                        color: #495057;
-                        font-size: 1.1rem;
-                        font-weight: 600;
-                        margin-bottom: 1.5rem;
-                        text-align: center;
-                    }
-                    .btn-wizard {
-                        padding: 0.75rem 1.5rem;
-                        font-weight: 500;
-                        border: none;
-                        border-radius: 10px;
-                        transition: all 0.3s ease;
-                    }
-                    .btn-primary.btn-wizard {
-                        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-                        box-shadow: 0 6px 20px rgba(102, 126, 234, 0.25);
-                    }
-                    .btn-primary.btn-wizard:hover {
-                        transform: translateY(-2px);
-                        box-shadow: 0 10px 30px rgba(102, 126, 234, 0.35);
-                    }
-                    .btn-success.btn-wizard {
-                        background: linear-gradient(135deg, #11c980 0%, #0d9d5f 100%);
-                        box-shadow: 0 6px 20px rgba(17, 201, 128, 0.25);
-                    }
-                    .btn-success.btn-wizard:hover {
-                        transform: translateY(-2px);
-                        box-shadow: 0 10px 30px rgba(17, 201, 128, 0.35);
-                    }
-                </style>
-                <div class="step-indicator">
-                    <div class="step-item">
-                        <div class="step-dot active" id="step-1">1</div>
-                        <span class="ms-2 d-none d-sm-inline text-muted">Info Dasar</span>
-                    </div>
-                    <div class="step-line" id="line-1"></div>
-                    <div class="step-item">
-                        <div class="step-dot" id="step-2">2</div>
-                        <span class="ms-2 d-none d-sm-inline text-muted">Kontak & Lokasi</span>
-                    </div>
-                    <div class="step-line" id="line-2"></div>
-                    <div class="step-item">
-                        <div class="step-dot" id="step-3">3</div>
-                        <span class="ms-2 d-none d-sm-inline text-muted">Detail Bisnis</span>
-                    </div>
-                </div>
+<!-- Leaflet CSS & JS -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet-control-geocoder/2.4.0/Control.Geocoder.min.css" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet-control-geocoder/2.4.0/Control.Geocoder.min.js"></script>
 
-                <form action="{{ route('admin.umkm.store') }}" method="POST" id="umkmForm">
-                    @csrf
-                    
-                    <!-- Step 1: Info Dasar -->
-                    <div class="wizard-step active" id="step-content-1">
-                        <h4 class="form-section-title">
-                            <i class="bi bi-building me-2 text-primary"></i>Informasi Dasar UMKM
-                        </h4>
-                        
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="form-floating">
-                                    <input type="text" name="nama_toko" class="form-control @error('nama_toko') is-invalid @enderror" 
-                                           id="nama_toko" value="{{ old('nama_toko') }}" placeholder="Nama Toko" required>
-                                    <label for="nama_toko">Nama Toko *</label>
-                                    @error('nama_toko')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-floating">
-                                    <input type="text" name="pemilik" class="form-control @error('pemilik') is-invalid @enderror" 
-                                           id="pemilik" value="{{ old('pemilik') }}" placeholder="Nama Pemilik" required>
-                                    <label for="pemilik">Nama Pemilik *</label>
-                                    @error('pemilik')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="form-floating">
-                            <select name="kategori" class="form-select @error('kategori') is-invalid @enderror" 
-                                    id="kategori" required>
-                                <option value="">Pilih Kategori</option>
-                                <option value="Hasil Laut" {{ old('kategori') == 'Hasil Laut' ? 'selected' : '' }}>Hasil Laut</option>
-                                <option value="Makanan Olahan" {{ old('kategori') == 'Makanan Olahan' ? 'selected' : '' }}>Makanan Olahan</option>
-                                <option value="Bumbu Dapur" {{ old('kategori') == 'Bumbu Dapur' ? 'selected' : '' }}>Bumbu Dapur</option>
-                                <option value="Kerajinan" {{ old('kategori') == 'Kerajinan' ? 'selected' : '' }}>Kerajinan</option>
-                                <option value="Kuliner" {{ old('kategori') == 'Kuliner' ? 'selected' : '' }}>Kuliner</option>
-                            </select>
-                            <label for="kategori">Kategori Usaha *</label>
-                            @error('kategori')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-                    </div>
-
-                    <!-- Step 2: Kontak & Lokasi -->
-                    <div class="wizard-step" id="step-content-2">
-                        <h4 class="form-section-title">
-                            <i class="bi bi-telephone me-2 text-primary"></i>Kontak & Lokasi
-                        </h4>
-                        
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="form-floating">
-                                    <input type="email" name="email" class="form-control @error('email') is-invalid @enderror" 
-                                           id="email" value="{{ old('email') }}" placeholder="Email" required>
-                                    <label for="email">Email *</label>
-                                    @error('email')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-floating">
-                                    <input type="tel" name="phone" class="form-control @error('phone') is-invalid @enderror" 
-                                           id="phone" value="{{ old('phone') }}" placeholder="Nomor Telepon" required>
-                                    <label for="phone">Nomor Telepon *</label>
-                                    @error('phone')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="form-floating">
-                                    <select name="desa" class="form-select @error('desa') is-invalid @enderror" 
-                                            id="desa" required>
-                                        <option value="">Pilih Desa</option>
-                                        <option value="Teluknaga" {{ old('desa') == 'Teluknaga' ? 'selected' : '' }}>Teluknaga</option>
-                                        <option value="Tanjung Pasir" {{ old('desa') == 'Tanjung Pasir' ? 'selected' : '' }}>Tanjung Pasir</option>
-                                        <option value="Muara" {{ old('desa') == 'Muara' ? 'selected' : '' }}>Muara</option>
-                                        <option value="Lemo" {{ old('desa') == 'Lemo' ? 'selected' : '' }}>Lemo</option>
-                                        <option value="Pangkalan" {{ old('desa') == 'Pangkalan' ? 'selected' : '' }}>Pangkalan</option>
-                                    </select>
-                                    <label for="desa">Desa *</label>
-                                    @error('desa')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="form-floating">
-                            <textarea name="alamat" class="form-control @error('alamat') is-invalid @enderror" 
-                                      id="alamat" placeholder="Alamat Lengkap" style="height: 120px" required>{{ old('alamat') }}</textarea>
-                            <label for="alamat">Alamat Lengkap *</label>
-                            @error('alamat')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-                    </div>
-
-                    <!-- Step 3: Detail Bisnis -->
-                    <div class="wizard-step" id="step-content-3">
-                        <h4 class="form-section-title">
-                            <i class="bi bi-briefcase me-2 text-primary"></i>Detail Bisnis
-                        </h4>
-                        
-                        <div class="form-floating mb-3">
-                            <textarea name="deskripsi" class="form-control @error('deskripsi') is-invalid @enderror" 
-                                      id="deskripsi" placeholder="Deskripsi UMKM" style="height: 120px">{{ old('deskripsi') }}</textarea>
-                            <label for="deskripsi">Deskripsi UMKM</label>
-                            @error('deskripsi')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-
-                        <div class="form-floating">
-                            <input type="number" name="omzet_bulanan" class="form-control @error('omzet_bulanan') is-invalid @enderror" 
-                                   id="omzet_bulanan" value="{{ old('omzet_bulanan') }}" placeholder="Omzet Bulanan">
-                            <label for="omzet_bulanan">Omzet Bulanan (Rp)</label>
-                            @error('omzet_bulanan')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-
-                        <div class="alert alert-info mt-3">
-                            <i class="bi bi-info-circle me-2"></i>
-                            <strong>Informasi:</strong> UMKM yang didaftarkan akan berstatus "Pending" dan perlu persetujuan admin.
-                        </div>
-                    </div>
-
-                    <!-- Navigation Buttons -->
-                    <div class="d-flex justify-content-between mt-4">
-                        <button type="button" class="btn btn-secondary btn-wizard" id="prevBtn" onclick="changeStep(-1)" style="display: none;">
-                            <i class="bi bi-arrow-left me-2"></i>Sebelumnya
-                        </button>
-                        <div class="ms-auto">
-                            <button type="button" class="btn btn-primary btn-wizard" id="nextBtn" onclick="changeStep(1)">
-                                Selanjutnya <i class="bi bi-arrow-right ms-2"></i>
-                            </button>
-                            <button type="submit" class="btn btn-success btn-wizard" id="submitBtn" style="display: none;">
-                                <i class="bi bi-check me-2"></i>Daftar UMKM
-                            </button>
-                        </div>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-</div>
-@endsection
-
-@push('styles')
-<style>
-.form-wizard {
-    background: linear-gradient(135deg, #f7fafc 0%, #edf2f7 100%);
-    min-height: 100vh;
-    padding: 2rem 0;
-}
-.wizard-card {
-    background: white;
-    border: none;
-    border-radius: 20px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
-    overflow: hidden;
-    max-width: 700px;
-    margin: 0 auto;
-}
-.wizard-header {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
-    padding: 2.5rem 2rem;
-    text-align: center;
-}
-.wizard-header h2 {
-    font-size: 1.8rem;
-    font-weight: 700;
-    margin-bottom: 0.5rem;
-}
-.wizard-header p {
-    font-size: 0.95rem;
-    opacity: 0.95;
-    margin-bottom: 0;
-}
-.wizard-body {
-    padding: 3rem 2.5rem;
-}
-.form-floating {
-    margin-bottom: 1.5rem;
-}
-.form-floating > .form-control {
-    border: 2px solid #e2e8f0;
-    border-radius: 12px;
-    padding: 1rem 0.75rem;
-    transition: all 0.3s ease;
-}
-.form-floating > .form-control:focus {
-    border-color: #667eea;
-    box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.15);
-}
-.form-floating > .form-select {
-    border: 2px solid #e2e8f0;
-    border-radius: 12px;
-    padding: 1rem 0.75rem;
-    transition: all 0.3s ease;
-}
-.form-floating > .form-select:focus {
-    border-color: #667eea;
-    box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.15);
-}
-.form-floating > label {
-    color: #718096;
-    font-weight: 500;
-}
-.form-floating > .form-control:focus ~ label,
-.form-floating > .form-control:not(:placeholder-shown) ~ label,
-.form-floating > .form-select:focus ~ label,
-.form-floating > .form-select:not(:first-option) ~ label {
-    color: #667eea;
-}
-.wizard-step {
-    display: none;
-    animation: fadeIn 0.3s ease;
-}
-.wizard-step.active {
-    display: block;
-}
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(10px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-.btn-wizard {
-    padding: 0.75rem 1.5rem;
-    font-weight: 500;
-    border: none;
-    border-radius: 10px;
-    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-}
-.btn-primary.btn-wizard {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.25);
-}
-.btn-primary.btn-wizard:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 10px 30px rgba(102, 126, 234, 0.35);
-}
-.btn-success.btn-wizard {
-    background: linear-gradient(135deg, #11c980 0%, #0d9d5f 100%);
-    box-shadow: 0 6px 20px rgba(17, 201, 128, 0.25);
-}
-.btn-success.btn-wizard:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 10px 30px rgba(17, 201, 128, 0.35);
-}
-.btn-secondary.btn-wizard {
-    background: #cbd5e0;
-    color: white;
-}
-.step-indicator {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin-bottom: 3rem;
-    flex-wrap: wrap;
-}
-.step-item {
-    display: flex;
-    align-items: center;
-    margin: 0.5rem 1rem;
-}
-.step-dot {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    background: #dee2e6;
-    color: #6c757d;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: bold;
-    transition: all 0.3s ease;
-}
-.step-dot.active {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
-    transform: scale(1.1);
-    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
-}
-.step-dot.completed {
-    background: #28a745;
-    color: white;
-}
-.step-line {
-    width: 80px;
-    height: 2px;
-    background: #dee2e6;
-    margin: 0 10px;
-}
-.step-line.completed {
-    background: #28a745;
-}
-.form-section-title {
-    color: #495057;
-    font-size: 1.3rem;
-    font-weight: 600;
-    margin-bottom: 1.5rem;
-    text-align: center;
-}
-.alert-info {
-    background: linear-gradient(135deg, #d4e8f7 0%, #e8f3ff 100%);
-    border: 1px solid #90caf9;
-    border-radius: 10px;
-}
-.invalid-feedback {
-    display: block;
-    color: #e74c3c;
-    font-size: 0.875rem;
-    margin-top: 0.25rem;
-}
-.is-invalid {
-    border-color: #e74c3c !important;
-}
-</style>
-@endpush
-
-@push('scripts')
 <script>
-let currentStep = 1;
-const totalSteps = 3;
+// Default location: Teluknaga, Tangerang
+const DEFAULT_LAT = -6.1753;
+const DEFAULT_LNG = 106.9749;
 
-function changeStep(direction) {
-    if (direction === 1 && currentStep < totalSteps) {
-        // Validate current step
-        if (validateStep(currentStep)) {
-            currentStep++;
-            showStep();
-        }
-    } else if (direction === -1 && currentStep > 1) {
-        currentStep--;
-        showStep();
-    }
-}
+let map;
+let marker;
 
-function showStep() {
-    // Hide all steps
-    for (let i = 1; i <= totalSteps; i++) {
-        document.getElementById(`step-content-${i}`).classList.remove('active');
-        document.getElementById(`step-${i}`).classList.remove('active', 'completed');
-        if (i < totalSteps) {
-            document.getElementById(`line-${i}`).classList.remove('completed');
-        }
-    }
-    
-    // Show current step
-    document.getElementById(`step-content-${currentStep}`).classList.add('active');
-    document.getElementById(`step-${currentStep}`).classList.add('active');
-    
-    // Mark completed steps
-    for (let i = 1; i < currentStep; i++) {
-        document.getElementById(`step-${i}`).classList.add('completed');
-        if (i < totalSteps) {
-            document.getElementById(`line-${i}`).classList.add('completed');
-        }
-    }
-    
-    // Update navigation buttons
-    document.getElementById('prevBtn').style.display = currentStep === 1 ? 'none' : 'block';
-    document.getElementById('nextBtn').style.display = currentStep === totalSteps ? 'none' : 'block';
-    document.getElementById('submitBtn').style.display = currentStep === totalSteps ? 'block' : 'none';
-}
+function initMap() {
+    // Initialize Leaflet map
+    map = L.map('map').setView([DEFAULT_LAT, DEFAULT_LNG], 15);
 
-function validateStep(step) {
-    const requiredFields = {
-        1: ['nama_toko', 'pemilik', 'kategori'],
-        2: ['email', 'phone', 'desa', 'alamat'],
-        3: [] // No required fields for step 3
-    };
-    
-    const fields = requiredFields[step];
-    let isValid = true;
-    
-    fields.forEach(fieldName => {
-        const field = document.getElementById(fieldName);
-        if (!field.value.trim()) {
-            field.classList.add('is-invalid');
-            isValid = false;
-        } else {
-            field.classList.remove('is-invalid');
-        }
+    // Add OpenStreetMap tiles
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+        maxZoom: 19,
+    }).addTo(map);
+
+    // Get initial values from inputs
+    const initialLat = parseFloat(document.getElementById('latitude').value) || DEFAULT_LAT;
+    const initialLng = parseFloat(document.getElementById('longitude').value) || DEFAULT_LNG;
+
+    // Create initial marker
+    marker = L.marker([initialLat, initialLng], {
+        draggable: true,
+        title: 'Lokasi Usaha Anda - Drag untuk menggeser',
+    }).addTo(map);
+
+    // Update coordinates when marker is dragged
+    marker.on('dragend', function() {
+        const position = marker.getLatLng();
+        document.getElementById('latitude').value = position.lat.toFixed(6);
+        document.getElementById('longitude').value = position.lng.toFixed(6);
     });
-    
-    return isValid;
+
+    // Click on map to place marker
+    map.on('click', function(e) {
+        const position = e.latlng;
+        marker.setLatLng(position);
+        document.getElementById('latitude').value = position.lat.toFixed(6);
+        document.getElementById('longitude').value = position.lng.toFixed(6);
+    });
+
+    // Add search/geocoding control
+    const geocoder = L.Control.geocoder({
+        defaultMarkGeocode: false,
+        position: 'topleft',
+    })
+    .on('markgeocode', function(e) {
+        const bbox = e.geocode.bbox;
+        const center = [
+            (bbox.getSouthWest().lat + bbox.getNorthEast().lat) / 2,
+            (bbox.getSouthWest().lng + bbox.getNorthEast().lng) / 2
+        ];
+        
+        marker.setLatLng(center);
+        map.fitBounds(bbox);
+        
+        document.getElementById('latitude').value = center[0].toFixed(6);
+        document.getElementById('longitude').value = center[1].toFixed(6);
+    })
+    .addTo(map);
+
+    // Add attribution
+    L.control.attribution({
+        prefix: '<a href="https://leafletjs.com">Leaflet</a>'
+    }).addTo(map);
+
+    // Ensure map resizes properly
+    setTimeout(() => {
+        map.invalidateSize();
+    }, 100);
 }
 
-// Initialize
-showStep();
+// Initialize map when page loads
+document.addEventListener('DOMContentLoaded', function() {
+    initMap();
+});
+
+// Format Rupiah untuk Omzet Bulanan di Admin Create
+function formatRupiah(value) {
+    // Hapus karakter non-digit
+    value = value.replace(/\D/g, '');
+    
+    // Format dengan separator
+    value = value.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+    
+    return value;
+}
+
+const omzetDisplayAdmin = document.getElementById('omzet_display_admin');
+const omzetActualAdmin = document.getElementById('omzet_actual_admin');
+
+if (omzetDisplayAdmin) {
+    omzetDisplayAdmin.addEventListener('input', function() {
+        const formatted = formatRupiah(this.value);
+        this.value = formatted;
+        
+        // Simpan nilai asli (tanpa format) ke input hidden
+        omzetActualAdmin.value = this.value.replace(/\D/g, '');
+    });
+
+    // Set nilai awal jika ada
+    if (omzetDisplayAdmin.value) {
+        omzetActualAdmin.value = omzetDisplayAdmin.value.replace(/\D/g, '');
+    }
+}
 </script>
-@endpush
+            
+            

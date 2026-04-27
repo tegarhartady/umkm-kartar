@@ -11,14 +11,8 @@
                 <div class="login-wrapper" data-aos="fade-up">
                     <!-- Logo -->
                     <div class="text-center mb-4">
-                        <a href="{{ url('/') }}" class="d-inline-flex align-items-center text-decoration-none">
-                            <div class="brand-icon me-2">
-                                <span>TN</span>
-                            </div>
-                            <div class="brand-text">
-                                <small class="text-muted d-block" style="font-size: 10px; line-height: 1;">KARANG TARUNA</small>
-                                <span class="fw-bold text-dark" style="font-size: 16px; line-height: 1.2;">TELUKNAGA<span class="text-primary">.</span></span>
-                            </div>
+                        <a href="{{ url('/') }}" class="d-inline-flex">
+                            <img src="{{ asset('images/smartumkm.svg') }}" alt="Smart UMKM Logo" style="height: 80px; width: auto;">
                         </a>
                     </div>
                     

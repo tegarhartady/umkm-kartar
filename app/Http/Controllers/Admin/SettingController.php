@@ -52,13 +52,96 @@ class SettingController extends Controller
 
         // Save all settings
         foreach ($validated as $key => $value) {
+            // Don't overwrite logo if no new file uploaded
+            if ($key === 'company_logo' && is_null($value)) {
+                continue;
+            }
+
             Setting::updateOrCreate(
-                ['key' => $key, 'group' => 'company'],
-                ['value' => $value]
+                ['key' => $key],
+                ['value' => $value, 'group' => 'company']
             );
         }
 
         return redirect()->back()->with('success', 'Pengaturan perusahaan berhasil diperbarui!');
+    }
+
+    /**
+     * Display payment settings
+     */
+    public function payment()
+    {
+        $settings = Setting::where('group', 'payment')->get()->keyBy('key');
+        return view('admin.settings.payment', compact('settings'));
+    }
+
+    /**
+     * Update payment settings
+     */
+    public function updatePayment(Request $request)
+    {
+        $validated = $request->validate([
+            'payment_bank_holder' => 'nullable|string|max:255',
+            'payment_qris_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'payment_manual_enabled' => 'nullable|in:0,1',
+            'payment_midtrans_enabled' => 'nullable|in:0,1',
+            'midtrans_server_key' => 'nullable|string|max:255',
+            'midtrans_client_key' => 'nullable|string|max:255',
+            'midtrans_is_production' => 'nullable|string|in:0,1',
+        ]);
+
+        if ($request->hasFile('payment_qris_image')) {
+            $file = $request->file('payment_qris_image');
+            $filename = 'qris_' . time() . '.' . $file->getClientOriginalExtension();
+            $file->move(public_path('uploads/payment'), $filename);
+            $validated['payment_qris_image'] = 'uploads/payment/' . $filename;
+        }
+
+        foreach ($validated as $key => $value) {
+            // Don't overwrite image if no new file uploaded
+            if ($key === 'payment_qris_image' && is_null($value)) {
+                continue;
+            }
+
+            Setting::updateOrCreate(
+                ['key' => $key],
+                ['value' => $value, 'group' => 'payment']
+            );
+        }
+
+        return redirect()->back()->with('success', 'Pengaturan pembayaran berhasil diperbarui!');
+    }
+
+    /**
+     * Display delivery settings
+     */
+    public function delivery()
+    {
+        $settings = Setting::where('group', 'delivery')->get()->keyBy('key');
+        return view('admin.settings.delivery', compact('settings'));
+    }
+
+    /**
+     * Update delivery settings
+     */
+    public function updateDelivery(Request $request)
+    {
+        $validated = $request->validate([
+            'delivery_enabled' => 'required|string',
+            'delivery_fee_type' => 'required|in:flat,distance',
+            'delivery_fee_flat' => 'nullable|numeric|min:0',
+            'delivery_fee_per_km' => 'nullable|numeric|min:0',
+            'delivery_min_distance' => 'nullable|numeric|min:0',
+        ]);
+
+        foreach ($validated as $key => $value) {
+            Setting::updateOrCreate(
+                ['key' => $key],
+                ['value' => $value, 'group' => 'delivery']
+            );
+        }
+
+        return redirect()->back()->with('success', 'Pengaturan pengiriman berhasil diperbarui!');
     }
 
     /**

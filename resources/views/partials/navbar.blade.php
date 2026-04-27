@@ -2,7 +2,7 @@
     <div class="container">
         <!-- Brand Logo -->
         <a class="navbar-brand" href="{{ url('/') }}" style="padding: 0; margin: 0;">
-            <img src="/images/logo1.png" alt="Lokalin Logo" style="height: 40px; width: auto;">
+            <img src="{{ asset('images/smartumkm.svg') }}" alt="Smart UMKM Logo" style="height: 80px; width: auto;">
         </a>
         
 
@@ -21,7 +21,7 @@
                     <a class="nav-link {{ Request::is('katalog') ? 'active' : '' }} px-4" href="{{ url('/katalog') }}">Katalog & Desa Mitra</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link {{ Request::is('csr-pik2') ? 'active' : '' }} px-4" href="{{ url('/csr-pik2') }}">DUKUNGAN CSR PIK2</a>
+                    <a class="nav-link {{ Request::is('csr-pik2') ? 'active' : '' }} px-4" href="{{ url('/csr-pik2') }}">Dukungan CSR PIK2</a>
                 </li>
             </ul>
             
@@ -38,6 +38,8 @@
                             @elseif(auth()->guard('umkm')->check())
                                 <li><a class="dropdown-item" href="/umkm/dashboard">Dashboard UMKM</a></li>
                             @endif
+                            <li><a class="dropdown-item" href="/profile"><i class="bi bi-person me-2"></i>Profil Saya</a></li>
+                            <li><a class="dropdown-item" href="/orders"><i class="bi bi-bag-check me-2"></i>Pesanan Saya</a></li>
                             <li><hr class="dropdown-divider"></li>
                             <li>
                                 <form method="POST" action="{{ route('logout') }}">

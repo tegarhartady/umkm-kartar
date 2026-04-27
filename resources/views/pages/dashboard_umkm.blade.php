@@ -61,22 +61,36 @@
 <!-- Overview Cards -->
 <div class="overview-section">
     <div class="row g-4 mb-4">
-        <!-- Total Penjualan -->
+        <!-- Total Revenue -->
         <div class="col-lg-3 col-md-6" data-aos="fade-up">
             <div class="stats-card">
                 <div class="stats-icon bg-primary">
                     <i class="bi bi-currency-dollar"></i>
                 </div>
                 <div class="stats-content">
-                    <h3 class="stats-number">Rp {{ number_format($data['total_sales'] ?? 0, 0, ',', '.') }}</h3>
-                    <p class="stats-label">Total Penjualan</p>
-                    <span class="stats-growth positive">{{ $data['monthly_growth'] ?? 0 }}% bulan ini</span>
+                    <h3 class="stats-number">Rp {{ number_format($data['total_revenue'] ?? 0, 0, ',', '.') }}</h3>
+                    <p class="stats-label">Total Revenue</p>
+                    <span class="stats-growth positive">{{ $data['total_transaksi'] ?? 0 }} transaksi selesai</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Total Transaksi -->
+        <div class="col-lg-3 col-md-6" data-aos="fade-up" data-aos-delay="100">
+            <div class="stats-card">
+                <div class="stats-icon bg-warning">
+                    <i class="bi bi-receipt"></i>
+                </div>
+                <div class="stats-content">
+                    <h3 class="stats-number">{{ $data['total_transaksi'] ?? 0 }}</h3>
+                    <p class="stats-label">Total Transaksi</p>
+                    <span class="stats-growth positive">✓ {{ $data['transaksi_selesai'] ?? 0 }} Selesai</span>
                 </div>
             </div>
         </div>
 
         <!-- Total Produk -->
-        <div class="col-lg-3 col-md-6" data-aos="fade-up" data-aos-delay="100">
+        <div class="col-lg-3 col-md-6" data-aos="fade-up" data-aos-delay="200">
             <div class="stats-card">
                 <div class="stats-icon bg-success">
                     <i class="bi bi-box-seam"></i>
@@ -88,25 +102,10 @@
                 </div>
             </div>
         </div>
-
-        <!-- Total Pesanan -->
-        <div class="col-lg-3 col-md-6" data-aos="fade-up" data-aos-delay="200">
-            <div class="stats-card">
-                <div class="stats-icon bg-info">
-                    <i class="bi bi-receipt"></i>
-                </div>
-                <div class="stats-content">
-                    <h3 class="stats-number">{{ $data['total_orders'] ?? 0 }}</h3>
-                    <p class="stats-label">Total Pesanan</p>
-                    <span class="stats-growth neutral">Sepanjang waktu</span>
-                </div>
-            </div>
-        </div>
-
-        <!-- Rating Toko -->
+        <!-- Rating -->
         <div class="col-lg-3 col-md-6" data-aos="fade-up" data-aos-delay="300">
             <div class="stats-card">
-                <div class="stats-icon bg-warning">
+                <div class="stats-icon bg-info">
                     <i class="bi bi-star-fill"></i>
                 </div>
                 <div class="stats-content">
@@ -122,6 +121,75 @@
 <!-- Content Sections -->
 <div class="data-section">
     <div class="row g-4">
+        <!-- Transaksi Terbaru -->
+        <div class="col-lg-8" data-aos="fade-up">
+            <div class="data-card">
+                <div class="data-header">
+                    <h5><i class="bi bi-receipt me-2"></i>Transaksi Terbaru</h5>
+                    <a href="{{ route('admin.transactions.index') }}" class="btn btn-sm btn-outline-primary">Lihat Semua</a>
+                </div>
+                <div class="data-body">
+                    @forelse($data['transaksi_terbaru'] ?? [] as $txn)
+                    <div class="transaction-item">
+                        <div class="txn-info">
+                            <h6 class="txn-code">{{ $txn->transaction_code }}</h6>
+                            <p class="txn-buyer">{{ $txn->buyer_name }}</p>
+                            <small class="text-muted">{{ $txn->product->nama_produk ?? 'Produk' }} ({{ $txn->quantity }}x) • {{ $txn->created_at->format('d M Y H:i') }}</small>
+                        </div>
+                        <div class="txn-status">
+                            @if ($txn->status === 'pending')
+                                <span class="badge bg-warning text-dark">Menunggu</span>
+                            @elseif ($txn->status === 'completed')
+                                <span class="badge bg-success">Selesai</span>
+                            @elseif ($txn->status === 'cancelled')
+                                <span class="badge bg-secondary">Dibatalkan</span>
+                            @else
+                                <span class="badge bg-danger">Gagal</span>
+                            @endif
+                        </div>
+                        <div class="txn-amount">
+                            <strong>Rp{{ number_format($txn->total_price, 0, ',', '.') }}</strong>
+                        </div>
+                    </div>
+                    @empty
+                    <div class="text-center py-4 text-muted">
+                        <i class="bi bi-inbox" style="font-size: 2rem;"></i>
+                        <p class="mt-2">Belum ada transaksi</p>
+                    </div>
+                    @endforelse
+                </div>
+            </div>
+        </div>
+
+        <!-- Stok Menipis & Info Cepat -->
+        <div class="col-lg-4" data-aos="fade-up" data-aos-delay="100">
+            <div class="data-card">
+                <div class="data-header">
+                    <h5><i class="bi bi-exclamation-triangle me-2"></i>Stok Menipis</h5>
+                    <small class="text-muted">Produk dengan stok < 5</small>
+                </div>
+                <div class="data-body activity-list">
+                    @forelse($data['low_stock_products'] ?? [] as $product)
+                    <div class="activity-item">
+                        <div class="activity-icon" style="background: linear-gradient(135deg, #f6ad55, #ed8936);">
+                            <i class="bi bi-exclamation-lg"></i>
+                        </div>
+                        <div class="activity-content">
+                            <p>{{ $product['nama_produk'] }}</p>
+                            <small>Stok: {{ $product['stok'] }} - Rp {{ number_format($product['harga'] ?? 0, 0, ',', '.') }}</small>
+                        </div>
+                    </div>
+                    @empty
+                    <div class="text-center py-4">
+                        <p class="text-muted">Semua produk stok aman</p>
+                    </div>
+                    @endforelse
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4 mt-2">
         <!-- Produk Terbaru -->
         <div class="col-lg-8" data-aos="fade-up">
             <div class="data-card">

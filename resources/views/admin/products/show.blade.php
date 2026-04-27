@@ -24,7 +24,7 @@
                     <div class="row mb-4">
                         <div class="col-md-4">
                             @if($product->image && file_exists(public_path($product->image)))
-                                <img src="{{ asset($product->image) }}" alt="{{ $product->nama_produk }}" class="img-fluid rounded shadow-sm">
+                                <img src="{{ asset('storage/' . $product->image) }}" alt="{{ $product->nama_produk }}" class="img-fluid rounded shadow-sm">
                             @else
                                 <div class="bg-light rounded d-flex align-items-center justify-content-center" style="height: 300px;">
                                     <div class="text-center">

@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Hash;
 class Umkm extends Model implements AuthenticatableContract
 {
     use Authenticatable;
+    protected $table = 'umkms';
 
     protected $fillable = [
         'nama_toko',
@@ -29,6 +30,11 @@ class Umkm extends Model implements AuthenticatableContract
         'foto_ktp',
         'foto_tempat',
         'produk_utama',
+        'latitude',
+        'longitude',
+        'no_rekening',
+        'tipe_rekening',
+        'nama_pemilik_rekening',
     ];
 
     protected $hidden = [

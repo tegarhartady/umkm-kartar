@@ -8,7 +8,7 @@
                 <div class="card shadow-lg border-0">
                     <div class="card-body p-5">
                     <div class="text-center mb-4">
-                        <img src="/images/logo1.png" alt="Lokalin" style="height: 80px; width: auto;" class="mb-3">
+                        <img src="{{ asset('images/smartumkm.svg') }}" alt="Smart UMKM Logo" style="height: 80px; width: auto;" class="mb-3">
                         <h2 class="fw-bold text-primary">Lokalin</h2>
                         <p class="text-muted">Admin Panel</p>
                     </div>                        @if($errors->any())

@@ -8,6 +8,7 @@ return new class extends Migration
 {
     public function up(): void
     {
+        if (!Schema::hasTable('umkms')) {
         Schema::create('umkms', function (Blueprint $table) {
             $table->id();
             $table->string('nama_toko');
@@ -32,21 +33,26 @@ return new class extends Migration
             $table->string('foto_toko')->nullable();
             $table->timestamps();
         });
+    }
+    
+        if (!Schema::hasTable('products')) {
+            Schema::create('products', function (Blueprint $table) {
+                $table->id();
+                $table->foreignId('umkm_id')->constrained()->onDelete('cascade');
+                $table->string('nama_produk');
+                $table->text('deskripsi');
+                $table->string('metode_pemesanan')->default('siap_jadi'); // siap_jadi, po, keduanya
+                $table->decimal('harga', 10, 2);
+                $table->integer('stok')->default(0);
+                $table->string('satuan'); // kg, pcs, dll
+                $table->string('foto_produk')->nullable();
+                $table->string('status')->default('aktif'); // aktif, nonaktif
+                $table->string('kategori')->nullable();
+                $table->timestamps();
+            });
+        }
 
-        Schema::create('products', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('umkm_id')->constrained()->onDelete('cascade');
-            $table->string('nama_produk');
-            $table->text('deskripsi');
-            $table->decimal('harga', 10, 2);
-            $table->string('kategori');
-            $table->integer('stok')->default(0);
-            $table->string('satuan'); // kg, pcs, dll
-            $table->string('foto_produk')->nullable();
-            $table->string('status')->default('aktif'); // aktif, nonaktif
-            $table->timestamps();
-        });
-
+        if (!Schema::hasTable('desas')) {
         Schema::create('desas', function (Blueprint $table) {
             $table->id();
             $table->string('nama_desa');
@@ -56,14 +62,17 @@ return new class extends Migration
             $table->integer('jumlah_umkm')->default(0);
             $table->timestamps();
         });
+    }
 
-        Schema::create('categories', function (Blueprint $table) {
-            $table->id();
-            $table->string('nama_kategori');
-            $table->text('deskripsi')->nullable();
-            $table->string('icon')->nullable();
-            $table->timestamps();
-        });
+        if (!Schema::hasTable('categories')) {
+            Schema::create('categories', function (Blueprint $table) {
+                $table->id();
+                $table->string('nama_kategori');
+                $table->text('deskripsi')->nullable();
+                $table->string('icon')->nullable();
+                $table->timestamps();
+            });
+        }
 
         Schema::table('umkms', function (Blueprint $table) {
             // Add columns if they don't exist
@@ -84,10 +93,6 @@ return new class extends Migration
 
     public function down(): void
     {
-        Schema::table('umkms', function (Blueprint $table) {
-            $table->dropColumn(['no_ktp', 'lama_usaha', 'status', 'password']);
-        });
-
         Schema::dropIfExists('products');
         Schema::dropIfExists('umkms');
         Schema::dropIfExists('desas');

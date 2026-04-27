@@ -508,7 +508,7 @@
             <div class="col-lg-10 text-center">
                 <!-- Badge -->
                 <div class="hero-badge mb-4" data-aos="fade-up">
-                    <span>KOLABORASI KARANG TARUNA & CSR PIK2</span>
+                    <span>AKSELERASI UMKM Binaan CSR PIK2</span>
                 </div>
                 
                 <!-- Main Heading -->
@@ -520,7 +520,7 @@
                 
                 <!-- Subtitle -->
                 <p class="hero-subtitle" data-aos="fade-up" data-aos-delay="200">
-                    "Membangun ekonomi desa Teluknaga melalui digitalisasi UMKM."
+                    "Membangun Ekonomi Pesisir Melalui Inkubasi dan Digitalisasi UMKM."
                 </p>
                 
                 <!-- CTA Buttons -->
@@ -559,79 +559,31 @@
         </div>
         
         <div class="row g-4">
-            <!-- Product Card 1 -->
-            <div class="col-lg-3 col-md-6" data-aos="fade-up" data-aos-delay="100">
-                <div class="product-card">
-                    <div class="product-image">
-                        <img src="https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=400" alt="Kerupuk Udang" class="img-fluid">
-                        <span class="product-badge">Bestseller</span>
-                    </div>
-                    <div class="product-body">
-                        <span class="product-category">Makanan Olahan</span>
-                        <h5 class="product-title">Kerupuk Udang Premium</h5>
-                        <p class="product-seller"><i class="bi bi-shop me-1"></i> UMKM Pak Jaya</p>
-                        <div class="product-footer d-flex justify-content-between align-items-center">
-                            <span class="product-price">Rp 25.000</span>
-                            <a href="#" class="btn btn-sm btn-primary rounded-pill">Detail</a>
+            @forelse($recommendedProducts as $index => $product)
+                <div class="col-lg-3 col-md-6" data-aos="fade-up" data-aos-delay="{{ ($index + 1) * 100 }}">
+                    <div class="product-card">
+                        <div class="product-image">
+                            <img src="{{ $product->image ? asset('storage/' . $product->image) : 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=400' }}" alt="{{ $product->nama_produk }}" class="img-fluid" style="height: 200px; object-fit: cover;">
+                            @if($index === 0)
+                                <span class="product-badge">Bestseller</span>
+                            @endif
+                        </div>
+                        <div class="product-body">
+                            <span class="product-category">{{ $product->kategori }}</span>
+                            <h5 class="product-title">{{ Str::limit($product->nama_produk, 30) }}</h5>
+                            <p class="product-seller"><i class="bi bi-shop me-1"></i> {{ $product->umkm->nama_umkm ?? 'Unknown UMKM' }}</p>
+                            <div class="product-footer d-flex justify-content-between align-items-center">
+                                <span class="product-price">Rp {{ number_format($product->harga, 0, ',', '.') }}</span>
+                                <a href="{{ route('beli', $product->id) }}" class="btn btn-sm btn-primary rounded-pill">Detail</a>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
-            
-            <!-- Product Card 2 -->
-            <div class="col-lg-3 col-md-6" data-aos="fade-up" data-aos-delay="200">
-                <div class="product-card">
-                    <div class="product-image">
-                        <img src="https://images.unsplash.com/photo-1571091718767-18b5b1457add?w=400" alt="Ikan Asin" class="img-fluid">
-                    </div>
-                    <div class="product-body">
-                        <span class="product-category">Hasil Laut</span>
-                        <h5 class="product-title">Ikan Asin Pesisir</h5>
-                        <p class="product-seller"><i class="bi bi-shop me-1"></i> UMKM Bu Siti</p>
-                        <div class="product-footer d-flex justify-content-between align-items-center">
-                            <span class="product-price">Rp 35.000</span>
-                            <a href="#" class="btn btn-sm btn-primary rounded-pill">Detail</a>
-                        </div>
-                    </div>
+            @empty
+                <div class="col-12">
+                    <p class="text-center text-muted">Tidak ada produk yang tersedia saat ini.</p>
                 </div>
-            </div>
-            
-            <!-- Product Card 3 -->
-            <div class="col-lg-3 col-md-6" data-aos="fade-up" data-aos-delay="300">
-                <div class="product-card">
-                    <div class="product-image">
-                        <img src="https://images.unsplash.com/photo-1565958011703-44f9829ba187?w=400" alt="Terasi" class="img-fluid">
-                        <span class="product-badge bg-warning">Promo</span>
-                    </div>
-                    <div class="product-body">
-                        <span class="product-category">Bumbu Dapur</span>
-                        <h5 class="product-title">Terasi Udang Asli</h5>
-                        <p class="product-seller"><i class="bi bi-shop me-1"></i> UMKM Hj. Aminah</p>
-                        <div class="product-footer d-flex justify-content-between align-items-center">
-                            <span class="product-price">Rp 15.000</span>
-                            <a href="#" class="btn btn-sm btn-primary rounded-pill">Detail</a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Product Card 4 -->
-            <div class="col-lg-3 col-md-6" data-aos="fade-up" data-aos-delay="400">
-                <div class="product-card">
-                    <div class="product-image">
-                        <img src="https://images.unsplash.com/photo-1473093295043-cdd812d0e601?w=400" alt="Otak-otak" class="img-fluid">
-                    </div>
-                    <div class="product-body">
-                        <span class="product-category">Makanan Olahan</span>
-                        <h5 class="product-title">Otak-otak Ikan Segar</h5>
-                        <p class="product-seller"><i class="bi bi-shop me-1"></i> UMKM Pak Rudi</p>
-                        <div class="product-footer d-flex justify-content-between align-items-center">
-                            <span class="product-price">Rp 20.000</span>
-                            <a href="#" class="btn btn-sm btn-primary rounded-pill">Detail</a>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            @endforelse
         </div>
     </div>
 </section>
@@ -642,22 +594,22 @@
         <div class="row align-items-center g-5">
             <div class="col-lg-6" data-aos="fade-right">
                 <div class="about-image-wrapper">
-                    <img src="https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=600" alt="About Us" class="img-fluid rounded-4 shadow-lg">
-                    <div class="about-stats">
-                        <div class="stat-item">
-                            <h3>50+</h3>
-                            <p>UMKM Terdaftar</p>
-                        </div>
-                    </div>
+                    <img src="{{ asset('images/IMG_0054.JPG') }}" alt="About Us" class="img-fluid rounded-4 shadow-lg">
+                    <!--<div class="about-stats">-->
+                    <!--    <div class="stat-item">-->
+                    <!--        <h3>50+</h3>-->
+                    <!--        <p>UMKM Terdaftar</p>-->
+                    <!--    </div>-->
+                    <!--</div>-->
                 </div>
             </div>
             <div class="col-lg-6" data-aos="fade-left">
                 <span class="section-badge">Tentang Kami</span>
                 <h2 class="section-title-lg mb-4">
-                    Membangun <span class="text-primary">Ekonomi Lokal</span> Bersama
+                    Manfaat <span class="text-primary">UMKM</span>
                 </h2>
                 <p class="text-muted mb-4">
-                    Karang Taruna Teluknaga berkomitmen untuk mengembangkan potensi UMKM di desa pesisir melalui digitalisasi dan pendampingan usaha. Bersama CSR PIK2, kami membangun ekosistem ekonomi yang berkelanjutan.
+                    CSR PIK2 bekerja sama dengan Karang Taruna Teluknaga terus menunjukkan komitmennya dalam memberdayakan UMKM desa pesisir melalui digitalisasi dan pendampingan usaha, untuk membangun ekonomi yang berkelanjutan.
                 </p>
                 <div class="about-features">
                     <div class="feature-item d-flex mb-3">
@@ -709,13 +661,13 @@
                 </div>
                 <div class="col-6 col-lg-3" data-aos="fade-up" data-aos-delay="200">
                     <div class="stat-box">
-                        <h2 class="stat-number">100+</h2>
+                        <h2 class="stat-number">281</h2>
                         <p class="stat-label">Produk Tersedia</p>
                     </div>
                 </div>
                 <div class="col-6 col-lg-3" data-aos="fade-up" data-aos-delay="300">
                     <div class="stat-box">
-                        <h2 class="stat-number">5</h2>
+                        <h2 class="stat-number">14</h2>
                         <p class="stat-label">Desa Mitra</p>
                     </div>
                 </div>
@@ -792,24 +744,29 @@
         </div>
         
         <div class="row align-items-center justify-content-center g-4">
+            <div class="col-6 col-md-4 col-lg-2" data-aos="fade-up" data-aos-delay="400">
+                <div class="partner-logo">
+                    <img src="{{ asset('images/Logo/pemkab.png') }}" alt="Pemkab Tangerang" class="img-fluid">
+                </div>
+            </div>
             <div class="col-6 col-md-4 col-lg-2" data-aos="fade-up" data-aos-delay="100">
                 <div class="partner-logo">
-                    <img src="https://via.placeholder.com/150x60?text=PIK2" alt="CSR PIK2" class="img-fluid">
+                    <img src="{{ asset('images/Logo/asg.png') }}" alt="ASG Indonesia" class="img-fluid">
                 </div>
             </div>
             <div class="col-6 col-md-4 col-lg-2" data-aos="fade-up" data-aos-delay="200">
                 <div class="partner-logo">
-                    <img src="https://via.placeholder.com/150x60?text=Tangerang" alt="Kabupaten Tangerang" class="img-fluid">
+                    <img src="{{ asset('images/Logo/csrpik2.png') }}" alt="CSR PIK2" class="img-fluid">
                 </div>
             </div>
             <div class="col-6 col-md-4 col-lg-2" data-aos="fade-up" data-aos-delay="300">
                 <div class="partner-logo">
-                    <img src="https://via.placeholder.com/150x60?text=Kartar" alt="Karang Taruna" class="img-fluid">
+                    <img src="{{ asset('images/cbd.png') }}" alt="Lokalin" class="img-fluid">
                 </div>
             </div>
-            <div class="col-6 col-md-4 col-lg-2" data-aos="fade-up" data-aos-delay="400">
+            <div class="col-6 col-md-4 col-lg-2" data-aos="fade-up" data-aos-delay="300">
                 <div class="partner-logo">
-                    <img src="https://via.placeholder.com/150x60?text=UMKM" alt="UMKM Indonesia" class="img-fluid">
+                    <img src="{{ asset('images/unnamed.png') }}" alt="Lokalin" class="img-fluid">
                 </div>
             </div>
         </div>
@@ -915,7 +872,7 @@
                         </div>
                         <div>
                             <h6>Email</h6>
-                            <p class="text-muted mb-0">info@kartarteluknaga.id</p>
+                            <p class="text-muted mb-0">info@lokalin.id</p>
                         </div>
                     </div>
                     <div class="contact-item d-flex mb-4">

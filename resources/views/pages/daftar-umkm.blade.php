@@ -9,7 +9,7 @@
     <div class="container">
         <div class="row justify-content-center">
             <div class="col-lg-8 text-center">
-                <img src="/images/logo1.png" alt="Lokalin" style="height: 80px; width: auto;" class="mb-3">
+                <img src="{{ asset('images/smartumkm.svg') }}" alt="Smart UMKM Logo" style="height: 80px; width: auto;" class="mb-3">
                 <span class="section-badge" data-aos="fade-up">Bergabung</span>
                 <h1 class="page-title" data-aos="fade-up" data-aos-delay="100">
                     Daftar <span class="text-primary">UMKM</span>
@@ -216,29 +216,94 @@
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
                                 </div>
+                                <div class="col-md-12">
+                                    <label class="form-label">Omzet Bulanan <span class="text-danger">*</span></label>
+                                    <div class="input-group">
+                                        <span class="input-group-text" style="background: #f8f9fa; border: 1px solid var(--border-color); border-radius: 10px 0 0 10px;">Rp</span>
+                                        <input type="text" id="omzet_display" class="form-control @error('omzet_bulanan') is-invalid @enderror" 
+                                               placeholder="Contoh: 5.000.000" value="{{ old('omzet_bulanan') ? number_format(old('omzet_bulanan'), 0, ',', '.') : '' }}" required
+                                               style="border-radius: 0 10px 10px 0;">
+                                        <input type="hidden" name="omzet_bulanan" id="omzet_actual">
+                                    </div>
+                                    @error('omzet_bulanan')
+                                        <div class="invalid-feedback d-block">{{ $message }}</div>
+                                    @enderror
+                                </div>
                             </div>
                         </div>
 
-                        <!-- Latitude & Longitude untuk Lokasi Penjualan -->
-                        <div class="row mt-3">
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label class="form-label">Latitude (Titik Lokasi) <span class="text-danger">*</span></label>
-                                    <input type="number" name="latitude" step="0.000001" class="form-control @error('latitude') is-invalid @enderror" placeholder="-6.123456" value="{{ old('latitude') }}" required>
+                        <!-- Lokasi dengan Google Maps -->
+                        <div class="form-section mb-4">
+                            <h5 class="form-section-title"><i class="bi bi-geo-alt me-2"></i> Lokasi Usaha (Pilih di Peta)</h5>
+                            
+                            <!-- Google Maps Container -->
+                            <div class="mb-3">
+                                <div id="map" style="height: 400px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);"></div>
+                                <small class="text-muted d-block mt-2">💡 Klik pada peta untuk memilih lokasi usaha Anda</small>
+                            </div>
+
+                            <!-- Koordinat Display -->
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label class="form-label">Latitude <span class="text-danger">*</span></label>
+                                    <input type="number" id="latitude" name="latitude" step="0.000001" 
+                                           class="form-control @error('latitude') is-invalid @enderror" 
+                                           placeholder="-6.123456" value="{{ old('latitude', '-6.1753') }}" required readonly>
                                     @error('latitude')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
-                                    <small class="text-muted">📍 Cari di Google Maps</small>
                                 </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label class="form-label">Longitude (Titik Lokasi) <span class="text-danger">*</span></label>
-                                    <input type="number" name="longitude" step="0.000001" class="form-control @error('longitude') is-invalid @enderror" placeholder="106.123456" value="{{ old('longitude') }}" required>
+                                <div class="col-md-6">
+                                    <label class="form-label">Longitude <span class="text-danger">*</span></label>
+                                    <input type="number" id="longitude" name="longitude" step="0.000001" 
+                                           class="form-control @error('longitude') is-invalid @enderror" 
+                                           placeholder="106.123456" value="{{ old('longitude', '106.9749') }}" required readonly>
                                     @error('longitude')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
-                                    <small class="text-muted">📍 Cari di Google Maps</small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Rekening & E-Wallet Section -->
+                        <div class="form-section mb-4">
+                            <h5 class="form-section-title"><i class="bi bi-wallet2 me-2"></i> Rekening / E-Wallet (Opsional)</h5>
+                            <p class="text-muted small mb-3">Informasi untuk kemudahan transaksi pembayaran</p>
+                            
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label class="form-label">Tipe Rekening / E-Wallet</label>
+                                    <select name="tipe_rekening" class="form-select @error('tipe_rekening') is-invalid @enderror">
+                                        <option value="">-- Pilih Tipe --</option>
+                                        <option value="BCA" {{ old('tipe_rekening') == 'BCA' ? 'selected' : '' }}>BCA</option>
+                                        <option value="Mandiri" {{ old('tipe_rekening') == 'Mandiri' ? 'selected' : '' }}>Mandiri</option>
+                                        <option value="BNI" {{ old('tipe_rekening') == 'BNI' ? 'selected' : '' }}>BNI</option>
+                                        <option value="CIMB" {{ old('tipe_rekening') == 'CIMB' ? 'selected' : '' }}>CIMB Niaga</option>
+                                        <option value="Danamon" {{ old('tipe_rekening') == 'Danamon' ? 'selected' : '' }}>Danamon</option>
+                                        <option value="GCash" {{ old('tipe_rekening') == 'GCash' ? 'selected' : '' }}>GCash (PH)</option>
+                                        <option value="Dana" {{ old('tipe_rekening') == 'Dana' ? 'selected' : '' }}>Dana</option>
+                                        <option value="OVO" {{ old('tipe_rekening') == 'OVO' ? 'selected' : '' }}>OVO</option>
+                                        <option value="GOPAY" {{ old('tipe_rekening') == 'GOPAY' ? 'selected' : '' }}>GoPay</option>
+                                    </select>
+                                    @error('tipe_rekening')
+                                        <div class="invalid-feedback d-block">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Nomor Rekening / No E-Wallet</label>
+                                    <input type="text" name="no_rekening" class="form-control @error('no_rekening') is-invalid @enderror" 
+                                           placeholder="Contoh: 1234567890" value="{{ old('no_rekening') }}">
+                                    @error('no_rekening')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                                <div class="col-12">
+                                    <label class="form-label">Nama Pemilik Rekening</label>
+                                    <input type="text" name="nama_pemilik_rekening" class="form-control @error('nama_pemilik_rekening') is-invalid @enderror" 
+                                           placeholder="Nama sesuai rekening/e-wallet" value="{{ old('nama_pemilik_rekening') }}">
+                                    @error('nama_pemilik_rekening')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
                                 </div>
                             </div>
                         </div>
@@ -363,6 +428,11 @@
     box-shadow: 0 0 0 0.2rem rgba(0, 31, 92, 0.15);
 }
 
+.form-control:read-only {
+    background-color: #f8f9fa;
+    cursor: default;
+}
+
 .form-label {
     font-weight: 500;
     color: var(--text-dark);
@@ -400,10 +470,188 @@ a:hover {
     color: #000f3d;
 }
 
+/* Leaflet CSS Override */
+#map {
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    z-index: 1;
+}
+
+.leaflet-control-container {
+    font-family: inherit;
+}
+
+.leaflet-bar {
+    border-radius: 8px;
+}
+
+.leaflet-control-search {
+    border-radius: 8px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+
+.leaflet-control-search input {
+    padding: 10px 12px;
+    font-size: 14px;
+    border-radius: 4px;
+    border: 1px solid #ddd;
+    width: 280px;
+}
+
+.leaflet-control-search button {
+    background: #001f5c;
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    cursor: pointer;
+    border-radius: 4px;
+}
+
+.leaflet-control-search button:hover {
+    background: #000f3d;
+}
+
 @media (max-width: 767px) {
     .registration-form-wrapper {
         padding: 30px 20px;
     }
+    
+    #map {
+        height: 300px !important;
+    }
+    
+    .leaflet-control-search input {
+        width: 180px;
+    }
 }
 </style>
+
+<!-- Leaflet CSS & JS -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet-control-geocoder/2.4.0/Control.Geocoder.min.css" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet-control-geocoder/2.4.0/Control.Geocoder.min.js"></script>
+
+@endpush
+
+@push('scripts')
+<script>
+// Default location: Teluknaga, Tangerang
+const DEFAULT_LAT = -6.1753;
+const DEFAULT_LNG = 106.9749;
+
+let map;
+let marker;
+
+function initMap() {
+    // Initialize Leaflet map
+    map = L.map('map').setView([DEFAULT_LAT, DEFAULT_LNG], 15);
+
+    // Add OpenStreetMap tiles
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+        maxZoom: 19,
+    }).addTo(map);
+
+    // Get initial values from inputs
+    const initialLat = parseFloat(document.getElementById('latitude').value) || DEFAULT_LAT;
+    const initialLng = parseFloat(document.getElementById('longitude').value) || DEFAULT_LNG;
+
+    // Create initial marker
+    marker = L.marker([initialLat, initialLng], {
+        draggable: true,
+        title: 'Lokasi Usaha Anda - Drag untuk menggeser',
+    }).addTo(map);
+
+    // Update coordinates when marker is dragged
+    marker.on('dragend', function() {
+        const position = marker.getLatLng();
+        document.getElementById('latitude').value = position.lat.toFixed(6);
+        document.getElementById('longitude').value = position.lng.toFixed(6);
+    });
+
+    // Click on map to place marker
+    map.on('click', function(e) {
+        const position = e.latlng;
+        marker.setLatLng(position);
+        document.getElementById('latitude').value = position.lat.toFixed(6);
+        document.getElementById('longitude').value = position.lng.toFixed(6);
+    });
+
+    // Add search/geocoding control
+    const geocoder = L.Control.geocoder({
+        defaultMarkGeocode: false,
+        position: 'topleft',
+    })
+    .on('markgeocode', function(e) {
+        const bbox = e.geocode.bbox;
+        const center = [
+            (bbox.getSouthWest().lat + bbox.getNorthEast().lat) / 2,
+            (bbox.getSouthWest().lng + bbox.getNorthEast().lng) / 2
+        ];
+        
+        marker.setLatLng(center);
+        map.fitBounds(bbox);
+        
+        document.getElementById('latitude').value = center[0].toFixed(6);
+        document.getElementById('longitude').value = center[1].toFixed(6);
+    })
+    .addTo(map);
+
+    // Add attribution
+    L.control.attribution({
+        prefix: '<a href="https://leafletjs.com">Leaflet</a>'
+    }).addTo(map);
+
+    // Ensure map resizes properly
+    setTimeout(() => {
+        map.invalidateSize();
+    }, 100);
+}
+
+// Initialize map when page loads
+document.addEventListener('DOMContentLoaded', function() {
+    initMap();
+});
+
+// Form submission - ensure coordinates are set
+document.getElementById('umkmForm').addEventListener('submit', function(e) {
+    const latitude = document.getElementById('latitude').value;
+    const longitude = document.getElementById('longitude').value;
+    
+    if (!latitude || !longitude) {
+        e.preventDefault();
+        alert('⚠️ Silakan pilih lokasi di peta terlebih dahulu');
+    }
+});
+
+// Format Rupiah untuk Omzet Bulanan
+function formatRupiah(value) {
+    // Hapus karakter non-digit
+    value = value.replace(/\D/g, '');
+    
+    // Format dengan separator
+    value = value.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+    
+    return value;
+}
+
+const omzetDisplay = document.getElementById('omzet_display');
+const omzetActual = document.getElementById('omzet_actual');
+
+if (omzetDisplay) {
+    omzetDisplay.addEventListener('input', function() {
+        const formatted = formatRupiah(this.value);
+        this.value = formatted;
+        
+        // Simpan nilai asli (tanpa format) ke input hidden
+        omzetActual.value = this.value.replace(/\D/g, '');
+    });
+
+    // Set nilai awal jika ada
+    if (omzetDisplay.value) {
+        omzetActual.value = omzetDisplay.value.replace(/\D/g, '');
+    }
+}
+</script>
 @endpush

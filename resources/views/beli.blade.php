@@ -12,7 +12,7 @@
             <div class="col-lg-5">
                 <div style="height: 400px; border-radius: 20px; overflow: hidden; background: linear-gradient(45deg, #f8f9fa, #e9ecef);">
                     @if($product->image)
-                        <img src="{{ asset($product->image) }}" alt="{{ $product->nama_produk }}" class="w-100 h-100" style="object-fit: cover;">
+                        <img src="{{ asset('storage/' . $product->image) }}" alt="{{ $product->nama_produk }}" class="w-100 h-100" style="object-fit: cover;">
                     @else
                         <div class="d-flex align-items-center justify-content-center h-100">
                             <div class="text-center">

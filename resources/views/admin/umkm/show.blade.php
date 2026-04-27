@@ -58,7 +58,7 @@
                                 </tr>
                                 <tr>
                                     <th>Produk</th>
-                                    <td>{{ $umkm->products_count ?? 0 }} produk</td>
+                                    <td>{{ $umkm->products->count() ?? 0 }} produk</td>
                                 </tr>
                             </table>
                         </div>
@@ -84,6 +84,47 @@
                     @if($umkm->omzet_bulanan)
                         <p class="text-muted small mb-1">Omzet Bulanan</p>
                         <p class="mb-3">Rp {{ number_format($umkm->omzet_bulanan, 0, ',', '.') }}</p>
+                    @endif
+
+                    <!-- Rekening & E-Wallet Section -->
+                    @if($umkm->tipe_rekening || $umkm->no_rekening || $umkm->nama_pemilik_rekening)
+                        <hr class="my-4">
+                        <h5 class="mb-3"><i class="bi bi-wallet2 me-2"></i>Rekening / E-Wallet</h5>
+                        <div class="row">
+                            @if($umkm->tipe_rekening)
+                                <div class="col-md-6">
+                                    <p class="text-muted small mb-1">Tipe Rekening</p>
+                                    <p class="mb-3"><strong>{{ $umkm->tipe_rekening }}</strong></p>
+                                </div>
+                            @endif
+                            @if($umkm->no_rekening)
+                                <div class="col-md-6">
+                                    <p class="text-muted small mb-1">Nomor Rekening / E-Wallet</p>
+                                    <p class="mb-3"><code class="bg-light p-2 rounded">{{ $umkm->no_rekening }}</code></p>
+                                </div>
+                            @endif
+                        </div>
+                        @if($umkm->nama_pemilik_rekening)
+                            <p class="text-muted small mb-1">Nama Pemilik Rekening</p>
+                            <p class="mb-3">{{ $umkm->nama_pemilik_rekening }}</p>
+                        @endif
+                    @endif
+
+                    <!-- Lokasi Maps Section -->
+                    @if($umkm->latitude && $umkm->longitude)
+                        <hr class="my-4">
+                        <h5 class="mb-3"><i class="bi bi-geo-alt me-2"></i>Lokasi di Peta</h5>
+                        <div id="map" style="height: 400px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); margin-bottom: 20px;"></div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <p class="text-muted small mb-1">Latitude</p>
+                                <p class="mb-3"><code class="bg-light p-2 rounded">{{ $umkm->latitude }}</code></p>
+                            </div>
+                            <div class="col-md-6">
+                                <p class="text-muted small mb-1">Longitude</p>
+                                <p class="mb-3"><code class="bg-light p-2 rounded">{{ $umkm->longitude }}</code></p>
+                            </div>
+                        </div>
                     @endif
 
                     @if($umkm->deskripsi)
@@ -225,4 +266,56 @@
         <i class="bi bi-arrow-left me-2"></i>Kembali
     </a>
 </div>
+
+<!-- Leaflet CSS & JS untuk Maps -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Cek apakah ada map container
+    const mapElement = document.getElementById('map');
+    if (mapElement) {
+        const latitude = parseFloat(mapElement.dataset.latitude || {{ $umkm->latitude ?? 'null' }});
+        const longitude = parseFloat(mapElement.dataset.longitude || {{ $umkm->longitude ?? 'null' }});
+        
+        if (latitude && longitude && !isNaN(latitude) && !isNaN(longitude)) {
+            // Initialize Leaflet map
+            const map = L.map('map').setView([latitude, longitude], 15);
+
+            // Add OpenStreetMap tiles
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+                maxZoom: 19,
+            }).addTo(map);
+
+            // Add marker at the location
+            L.marker([latitude, longitude], {
+                title: 'Lokasi UMKM',
+            }).addTo(map).bindPopup(`<strong>{{ $umkm->nama_toko }}</strong><br>Lat: ${latitude.toFixed(6)}<br>Long: ${longitude.toFixed(6)}`);
+
+            // Ensure map resizes properly
+            setTimeout(() => {
+                map.invalidateSize();
+            }, 100);
+        }
+    }
+});
+</script>
+
+<style>
+    #map {
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    
+    code {
+        color: #d63384;
+        background-color: #f8f9fa !important;
+        padding: 0.25rem 0.5rem;
+        border-radius: 0.25rem;
+        font-family: 'Courier New', monospace;
+    }
+</style>
+
 @endsection

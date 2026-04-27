@@ -11,9 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('categories', function (Blueprint $table) {
-            $table->id();
-            $table->timestamps();
+        Schema::table('umkms', function (Blueprint $table) {
+            $table->decimal('latitude', 10, 6)->nullable()->after('alamat');
+            $table->decimal('longitude', 10, 6)->nullable()->after('latitude');
         });
     }
 
@@ -22,6 +22,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('categories');
+        Schema::table('umkms', function (Blueprint $table) {
+            $table->dropColumn(['latitude', 'longitude']);
+        });
     }
 };

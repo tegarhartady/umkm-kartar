@@ -77,7 +77,7 @@
 
                 <!-- CTA Buttons -->
                 <div class="d-flex gap-3">
-                    <a href="{{ route('checkout', $product->id) }}" class="btn btn-success btn-lg grow">
+                    <a href="{{ route('checkout.show', $product->id) }}" class="btn btn-success btn-lg grow">
                         <i class="bi bi-cart me-2"></i>Beli Sekarang
                     </a>
                     {{-- <a href="{{ route('katalog') }}" class="btn btn-outline-secondary btn-lg">
