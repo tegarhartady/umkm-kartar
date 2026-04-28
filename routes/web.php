@@ -90,44 +90,35 @@ Route::get('/login', function () {
 })->name('login');
 
 Route::post('/login', function (Illuminate\Http\Request $request) {
-    $role = $request->input('role');
     $credentials = $request->only('email', 'password');
 
-    if ($role === 'umkm') {
-        if (Auth::guard('umkm')->attempt($credentials)) {
-            $request->session()->regenerate();
-            $umkm = Auth::guard('umkm')->user();
-            
-            if ($umkm->status !== 'disetujui') {
-                Auth::guard('umkm')->logout();
-                return back()->withErrors(['umkm_error' => 'Akun Anda belum disetujui oleh admin.']);
-            }
-            
-            return redirect()->intended('/umkm/dashboard');
+    // Coba login sebagai UMKM
+    if (Auth::guard('umkm')->attempt($credentials)) {
+        $request->session()->regenerate();
+        $umkm = Auth::guard('umkm')->user();
+        
+        if ($umkm->status !== 'disetujui') {
+            Auth::guard('umkm')->logout();
+            return back()->withErrors(['email' => 'Akun UMKM Anda belum disetujui oleh admin.'])->onlyInput('email');
         }
-        return back()->withErrors(['umkm_error' => 'Email atau password salah.'])->onlyInput('email');
-    } elseif ($role === 'admin') {
-        if (Auth::attempt($credentials)) {
-            $request->session()->regenerate();
-            $user = Auth::user();
-            
-            if (!in_array($user->role, ['admin', 'superadmin'])) {
-                Auth::logout();
-                return back()->withErrors(['admin_error' => 'Anda bukan admin.']);
-            }
-            
-            return redirect()->intended(route('dashboard.admin'));
-        }
-        return back()->withErrors(['admin_error' => 'Email atau password salah.'])->onlyInput('email');
-    } elseif ($role === 'customer') {
-        if (Auth::attempt($credentials)) {
-            $request->session()->regenerate();
-            return redirect()->intended('/');
-        }
-        return back()->withErrors(['customer_error' => 'Email atau password salah.'])->onlyInput('email');
+        
+        return redirect()->intended('/umkm/dashboard');
     }
 
-    return back()->withErrors(['error' => 'Pilih role login terlebih dahulu.']);
+    // Coba login sebagai User (Admin / Superadmin / Pelanggan)
+    if (Auth::attempt($credentials)) {
+        $request->session()->regenerate();
+        $user = Auth::user();
+        
+        if (in_array($user->role, ['admin', 'superadmin'])) {
+            return redirect()->intended(route('dashboard.admin'));
+        }
+        
+        // Pelanggan biasa
+        return redirect()->intended('/');
+    }
+
+    return back()->withErrors(['email' => 'Email atau password salah.'])->onlyInput('email');
 })->name('login.authenticate');
 
 // Customer Registration

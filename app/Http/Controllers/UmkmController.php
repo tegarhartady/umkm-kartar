@@ -82,8 +82,9 @@ class UmkmController extends Controller
         return view('admin.umkm.edit', compact('umkm', 'desas'));
     }
 
-    public function update(Request $request, Umkm $umkm)
+    public function update(Request $request, $id)
     {
+        $umkm = Umkm::findOrFail($id);
         $validated = $request->validate([
             'nama_toko' => 'required|string|max:255',
             'pemilik' => 'required|string|max:255',
@@ -124,15 +125,32 @@ class UmkmController extends Controller
                 \Storage::disk('public')->delete($umkm->foto_ktp);
             }
             $validated['foto_ktp'] = $request->file('foto_ktp')->store('umkm/ktp', 'public');
+        } else {
+            unset($validated['foto_ktp']);
         }
 
         // Handle foto tempat upload
         if ($request->hasFile('foto_tempat')) {
             // Delete old file if exists
             if ($umkm->foto_tempat) {
-                Storage::disk('public')->delete($umkm->foto_tempat);
+                \Storage::disk('public')->delete($umkm->foto_tempat);
             }
             $validated['foto_tempat'] = $request->file('foto_tempat')->store('umkm/tempat', 'public');
+        } else {
+            unset($validated['foto_tempat']);
+        }
+
+        // Cek apakah kolom latitude dan longitude ada di tabel umkms
+        if (!\Illuminate\Support\Facades\Schema::hasColumn('umkms', 'latitude')) {
+            unset($validated['latitude']);
+            unset($validated['longitude']);
+        }
+
+        // Cek apakah kolom rekening ada di tabel umkms
+        if (!\Illuminate\Support\Facades\Schema::hasColumn('umkms', 'no_rekening')) {
+            unset($validated['no_rekening']);
+            unset($validated['tipe_rekening']);
+            unset($validated['nama_pemilik_rekening']);
         }
 
         $umkm->update($validated);
