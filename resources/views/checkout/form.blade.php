@@ -44,20 +44,31 @@
                                 <div class="col-md-6">
                                     <label class="form-label fw-bold">Jenis Pesanan <span class="text-danger">*</span></label>
                                     <div class="row g-2">
+                                        @if(!$product->metode_pemesanan || $product->metode_pemesanan == 'siap_jadi' || $product->metode_pemesanan == 'keduanya')
                                         <div class="col-6">
-                                            <input class="d-none custom-option-input" type="radio" name="order_type" id="order_instant" value="langsung" checked>
+                                            <input class="d-none custom-option-input" type="radio" name="order_type" id="order_instant" value="langsung" {{ (!$product->metode_pemesanan || $product->metode_pemesanan != 'po') ? 'checked' : '' }} onchange="togglePoDate()">
                                             <label class="custom-option text-center d-flex flex-column" for="order_instant">
                                                 <span class="fw-bold">Langsung Kirim</span>
                                                 <small class="text-muted">Stok tersedia</small>
                                             </label>
                                         </div>
+                                        @endif
+                                        
+                                        @if($product->metode_pemesanan == 'po' || $product->metode_pemesanan == 'keduanya')
                                         <div class="col-6">
-                                            <input class="d-none custom-option-input" type="radio" name="order_type" id="order_po" value="po">
+                                            <input class="d-none custom-option-input" type="radio" name="order_type" id="order_po" value="po" {{ $product->metode_pemesanan == 'po' ? 'checked' : '' }} onchange="togglePoDate()">
                                             <label class="custom-option text-center d-flex flex-column" for="order_po">
                                                 <span class="fw-bold">Pre-Order (PO)</span>
                                                 <small class="text-muted">Dibuat sesuai pesanan</small>
                                             </label>
                                         </div>
+                                        @endif
+                                    </div>
+                                    
+                                    <div id="po_date_container" class="mt-3" style="display: none;">
+                                        <label class="form-label fw-bold">Tanggal Target Selesai <span class="text-danger">*</span></label>
+                                        <input type="date" class="form-control" name="po_date" id="po_date" min="{{ date('Y-m-d', strtotime('+1 day')) }}">
+                                        <small class="text-muted">Kapan pesanan ini diharapkan selesai/diambil.</small>
                                     </div>
                                 </div>
 
@@ -501,10 +512,25 @@
         }).format(amount);
     }
 
+    function togglePoDate() {
+        const orderType = document.querySelector('input[name="order_type"]:checked')?.value;
+        const container = document.getElementById('po_date_container');
+        const input = document.getElementById('po_date');
+        
+        if (orderType === 'po') {
+            container.style.display = 'block';
+            input.required = true;
+        } else {
+            container.style.display = 'none';
+            input.required = false;
+        }
+    }
+
     // Initialize on page load
     document.addEventListener('DOMContentLoaded', () => {
         calculateTotal();
         togglePaymentDetails();
+        togglePoDate();
     });
 </script>
 @endpush

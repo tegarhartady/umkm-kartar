@@ -47,7 +47,7 @@ class UmkmAuthController extends Controller
 
         // Login
         Auth::guard('umkm')->login($umkm, $request->boolean('remember'));
-        
+
         return redirect()->intended(route('umkm.dashboard'));
     }
 
@@ -59,7 +59,7 @@ class UmkmAuthController extends Controller
         Auth::guard('umkm')->logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();
-        
-        return redirect('/umkm/login')->with('success', 'Logout berhasil');
+
+        return redirect('/login')->with('success', 'Logout berhasil');
     }
 }

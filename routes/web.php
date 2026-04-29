@@ -265,7 +265,7 @@ Route::post('/umkm/login', function (\Illuminate\Http\Request $request) {
 
     if (\Illuminate\Support\Facades\Auth::guard('umkm')->attempt($credentials, $request->filled('remember'))) {
         $request->session()->regenerate();
-        return redirect()->route('umkm.umkm.dashboard');
+        return redirect()->route('umkm.dashboard');
     }
 
     return back()->withErrors([
@@ -306,17 +306,8 @@ Route::middleware('auth:umkm')->prefix('umkm')->name('umkm.')->group(function ()
             'totalTransaksi', 
             'totalRevenue'
         ));
-    })->name('umkm.dashboard');
+    })->name('dashboard');
 
-    // Dashboard
-    Route::get('/dashboard', function () {
-        $umkm = Auth::guard('umkm')->user();
-        $products = $umkm->products()->latest()->paginate(10);
-        $totalProducts = $umkm->products()->count();
-        $activeProducts = $umkm->products()->where('status', 'aktif')->count();
-
-        return view('umkm.dashboard', compact('umkm', 'products', 'totalProducts', 'activeProducts'));
-    })->name('umkm.dashboard');
 
     // Products - Index
     Route::get('/products', function () {
@@ -329,6 +320,11 @@ Route::middleware('auth:umkm')->prefix('umkm')->name('umkm.')->group(function ()
     Route::get('/products/create', function () {
         return view('umkm.products.create');
     })->name('products.create');
+    
+    // Transactions
+    Route::get('/transactions', [\App\Http\Controllers\UmkmTransactionController::class, 'index'])->name('transactions.index');
+    Route::get('/pendapatan', [\App\Http\Controllers\UmkmTransactionController::class, 'income'])->name('transactions.income');
+    Route::post('/transactions/{transaction}/status', [\App\Http\Controllers\UmkmTransactionController::class, 'updateStatus'])->name('transactions.update_status');
 
     // Products - Store
     Route::post('/products', function (\Illuminate\Http\Request $request) {
@@ -339,6 +335,7 @@ Route::middleware('auth:umkm')->prefix('umkm')->name('umkm.')->group(function ()
             'harga' => 'required|numeric|min:0',
             'stok' => 'required|numeric|min:0',
             'satuan' => 'required|string',
+            'metode_pemesanan' => 'required|in:siap_jadi,po,keduanya',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
@@ -384,6 +381,7 @@ Route::middleware('auth:umkm')->prefix('umkm')->name('umkm.')->group(function ()
             'harga' => 'required|numeric|min:0',
             'stok' => 'required|numeric|min:0',
             'satuan' => 'required|string',
+            'metode_pemesanan' => 'required|in:siap_jadi,po,keduanya',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
@@ -425,5 +423,7 @@ Route::post('/order/{product}', [CatalogController::class, 'processOrder'])->nam
 Route::get('/payment/{order}', [CatalogController::class, 'payment'])->name('catalog.payment');
 Route::post('/payment/{order}/process', [CatalogController::class, 'processPayment'])->name('catalog.payment.process');
 Route::get('/order-success/{order}', [CatalogController::class, 'success'])->name('catalog.success');
+Route::post('/transaction/{transaction}/upload-proof', [App\Http\Controllers\CheckoutController::class, 'uploadProof'])->name('transaction.upload_proof');
+Route::post('/transaction/{transaction}/update-status', [App\Http\Controllers\CheckoutController::class, 'updateStatusUser'])->name('transaction.update_status_user');
 
 // Check routes

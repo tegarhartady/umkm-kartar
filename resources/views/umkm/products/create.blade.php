@@ -5,7 +5,7 @@
 @section('breadcrumb')
     <nav aria-label="breadcrumb">
         <ol class="breadcrumb mb-0">
-            <li class="breadcrumb-item"><a href="{{ route('umkm.umkm.dashboard') }}">Dashboard</a></li>
+            <li class="breadcrumb-item"><a href="{{ route('umkm.dashboard') }}">Dashboard</a></li>
             <li class="breadcrumb-item"><a href="{{ route('umkm.products.index') }}">Produk</a></li>
             <li class="breadcrumb-item active">Tambah Produk</li>
         </ol>

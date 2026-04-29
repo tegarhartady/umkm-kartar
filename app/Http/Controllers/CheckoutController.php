@@ -42,6 +42,7 @@ class CheckoutController extends Controller
                 'quantity' => 'required|integer|min:1',
                 'notes' => 'nullable|string',
                 'delivery_fee' => 'nullable|numeric|min:0',
+                'po_date' => 'required_if:order_type,po|nullable|date',
             ]);
 
             $product = Product::findOrFail($validated['product_id']);
@@ -61,6 +62,7 @@ class CheckoutController extends Controller
                 'total_price' => $totalHarga,
                 'payment_method' => $validated['payment_method'],
                 'order_type' => $validated['order_type'],
+                'po_date' => $validated['po_date'] ?? null,
                 'delivery_type' => $validated['delivery_type'],
                 'quantity' => $validated['quantity'],
                 'notes' => $validated['notes'],
@@ -151,9 +153,67 @@ class CheckoutController extends Controller
     /**
      * Success page
      */
-    public function success($transactionId)
+    public function success($id)
     {
-        $transaction = Transaction::findOrFail($transactionId);
+        $transaction = Transaction::with('product.umkm')->findOrFail($id);
         return view('checkout.success', compact('transaction'));
+    }
+
+    /**
+     * Upload payment proof
+     */
+    public function uploadProof(Request $request, $id)
+    {
+        $request->validate([
+            'payment_proof' => 'required|image|mimes:jpeg,png,jpg|max:2048',
+        ]);
+
+        $transaction = Transaction::findOrFail($id);
+
+        if ($request->hasFile('payment_proof')) {
+            // Delete old proof if exists
+            if ($transaction->payment_proof) {
+                \Illuminate\Support\Facades\Storage::disk('public')->delete($transaction->payment_proof);
+            }
+
+            $path = $request->file('payment_proof')->store('payment_proofs', 'public');
+            $transaction->update([
+                'payment_proof' => $path,
+                // We keep status as pending until admin approves
+            ]);
+        }
+
+        return back()->with('success', 'Bukti pembayaran berhasil diunggah. Menunggu verifikasi admin.');
+    }
+
+    /**
+     * Update status by User
+     */
+    public function updateStatusUser(Request $request, $id)
+    {
+        $transaction = Transaction::findOrFail($id);
+        
+        // Ensure this transaction belongs to the logged in user
+        if ($transaction->user_id !== auth()->id()) {
+            abort(403);
+        }
+
+        $validated = $request->validate([
+            'status' => 'required|string',
+            'delivery_status' => 'nullable|string',
+        ]);
+
+        $updateData = ['status' => $validated['status']];
+        if (isset($validated['delivery_status'])) {
+            $updateData['delivery_status'] = $validated['delivery_status'];
+        }
+
+        if ($validated['status'] === 'completed') {
+            $updateData['completed_at'] = now();
+        }
+
+        $transaction->update($updateData);
+
+        return back()->with('success', 'Terima kasih! Pesanan telah selesai.');
     }
 }

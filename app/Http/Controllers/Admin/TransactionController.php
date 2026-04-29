@@ -89,8 +89,9 @@ class TransactionController extends Controller
     public function update(Request $request, Transaction $transaction)
     {
         $validated = $request->validate([
-            'status' => 'required|in:pending,completed,cancelled,failed',
-            'payment_method' => 'nullable|in:transfer,ewallet,cod',
+            'status' => 'required|string',
+            'delivery_status' => 'nullable|string',
+            'payment_method' => 'nullable|in:transfer,ewallet,cod,midtrans,qris',
             'buyer_name' => 'required|string|max:255',
             'buyer_phone' => 'required|string|max:20',
             'buyer_address' => 'required|string',
@@ -103,6 +104,10 @@ class TransactionController extends Controller
             $validated['completed_at'] = now();
         }
 
+        if ($request->status === 'paid' && $transaction->status !== 'paid') {
+            $validated['paid_at'] = now();
+        }
+
         if ($request->status === 'pending' || $request->status === 'failed') {
             $validated['paid_at'] = null;
             $validated['completed_at'] = null;
@@ -110,7 +115,7 @@ class TransactionController extends Controller
 
         $transaction->update($validated);
 
-        return redirect()->route('admin.transactions.show', $transaction->id)
+        return redirect()->back()
             ->with('success', 'Transaksi berhasil diperbarui');
     }
 

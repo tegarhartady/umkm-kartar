@@ -1,240 +1,695 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@yield('title', 'Dashboard UMKM')</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css">
+    <title>@yield('title', 'Dashboard UMKM - Smart UMKM')</title>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+
+    <!-- AOS CSS -->
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+
+    <!-- Custom CSS Variables -->
+    <style>
+        :root {
+            --primary-color: #667eea;
+            --primary-dark: #764ba2;
+            --primary-light: #f3f0ff;
+            --secondary-color: #ffd700;
+            --accent-color: #ffa500;
+            --text-dark: #2d3748;
+            --text-muted: #718096;
+            --bg-light: #f7fafc;
+            --bg-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #667eea 100%);
+            --border-color: #e2e8f0;
+            --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.1);
+            --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.12);
+            --shadow-lg: 0 8px 16px rgba(0, 0, 0, 0.15);
+            --shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .sidebar {
+            background: #001f5c;
+        }
+
+        .sidebar .nav-link {
+            color: #000f3d !important;
+        }
+
+        .sidebar .nav-link:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: #000f3d !important;
+        }
+
+        .sidebar .nav-link.active {
+            background: #000f3d;
+            border-left: 3px solid 000f3d;
+        }
+
+        .navbar {
+            background: white;
+            box-shadow: 0 2px 8px rgba(0, 31, 92, 0.1);
+        }
+
+        .navbar-brand {
+            color: #001f5c !important;
+            font-weight: 700;
+        }
+
+        .nav-link {
+            color: #333 !important;
+        }
+
+        .nav-link:hover {
+            color: #001f5c !important;
+        }
+
+        .nav-link.active {
+            color: #ffffff !important;
+            border-bottom: 2px solid #001f5c;
+        }
+
+        .card {
+            border: 1px solid #e0e0e0;
+            border-radius: 12px;
+        }
+
+        .card-header {
+            background: white;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .badge-primary {
+            background: #001f5c;
+        }
+
+        .badge-success {
+            background: #28a745;
+        }
+
+        .badge-warning {
+            background: #ffc107;
+            color: #333;
+        }
+
+        .badge-danger {
+            background: #dc3545;
+        }
+    </style>
+
+    @stack('styles')
 </head>
-<body>
-<div class="dashboard-wrapper">
-    <div class="wrapper">
-        <!-- UMKM Sidebar -->
-        <aside class="sidebar">
+
+<body class="dashboard-layout">
+
+    <div class="sidebar" id="sidebar">
         <div class="sidebar-header">
-            <a href="{{ route('umkm.umkm.dashboard') }}" class="sidebar-brand">
-                <i class="bi bi-shop me-2"></i>
-                <span>{{ Auth::guard('umkm')->user()->nama_toko }}</span>
-            </a>
+            <div class="brand-logo">
+                <img src="{{ asset('images/smartumkm.svg') }}" alt="Smart UMKM Logo" style="height: 60px; width: auto;">
+                <div class="brand-text">
+                    <span class="brand-name">SMARTUMKM</span>
+                    <small class="brand-subtitle">Dashboard UMKM</small>
+                </div>
+            </div>
+            <button class="sidebar-toggle d-lg-none" id="sidebarToggle">
+                <i class="bi bi-x-lg"></i>
+            </button>
         </div>
-        <div class="sidebar-body">
-            <nav class="nav flex-column">
-                <a href="{{ route('umkm.umkm.dashboard') }}" class="nav-link {{ Route::is('umkm.umkm.dashboard') ? 'active' : '' }}">
-                    <i class="bi bi-house me-2"></i>
-                    <span>Dashboard</span>
-                </a>
-                
-                <div class="nav-divider my-2"></div>
-                <span class="nav-label">PRODUK</span>
-                
-                <a href="{{ route('umkm.products.index') }}" class="nav-link {{ Route::is('umkm.products.index') ? 'active' : '' }}">
-                    <i class="bi bi-box me-2"></i>
-                    <span>Daftar Produk</span>
-                </a>
-                <a href="{{ route('umkm.products.create') }}" class="nav-link {{ Route::is('umkm.products.create') ? 'active' : '' }}">
-                    <i class="bi bi-plus-circle me-2"></i>
-                    <span>Tambah Produk</span>
-                </a>
-                
-                @if(request()->route('product'))
-                    <a href="{{ route('umkm.products.edit', request()->route('product')->id) }}" class="nav-link {{ Route::is('umkm.products.edit') ? 'active' : '' }}">
-                        <i class="bi bi-pencil me-2"></i>
-                        <span>Edit Produk</span>
-                    </a>
-                @endif
+
+        <div class="sidebar-content">
+            <!-- User Info -->
+            <div class="user-info">
+                <div class="user-avatar">
+                    <i class="bi bi-shop"></i>
+                </div>
+                <div class="user-details">
+                    <h6 class="user-name">{{ Auth::guard('umkm')->user()->nama_toko }}</h6>
+                    <span class="user-role">Mitra UMKM</span>
+                </div>
+            </div>
+
+            <!-- Navigation -->
+            <nav class="sidebar-nav">
+                <div class="nav-section">
+                    <span class="nav-section-title">MENU UTAMA</span>
+                    <ul class="nav-list">
+                        <li class="nav-item">
+                            <a href="{{ route('umkm.dashboard') }}" class="nav-link {{ request()->routeIs('umkm.dashboard') ? 'active' : '' }}">
+                                <i class="nav-icon bi bi-speedometer2"></i>
+                                <span class="nav-text">Dashboard</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('umkm.products.index') }}" class="nav-link {{ request()->routeIs('umkm.products.*') ? 'active' : '' }}">
+                                <i class="nav-icon bi bi-box-seam"></i>
+                                <span class="nav-text">Kelola Produk</span>
+                                <i class="nav-arrow bi bi-chevron-right"></i>
+                            </a>
+                            <ul class="nav-submenu {{ request()->routeIs('umkm.products.*') ? 'show' : '' }}">
+                                <li><a href="{{ route('umkm.products.index') }}">Daftar Produk</a></li>
+                                <li><a href="{{ route('umkm.products.create') }}">Tambah Produk</a></li>
+                            </ul>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('umkm.transactions.index') }}" class="nav-link {{ request()->routeIs('umkm.transactions.index') ? 'active' : '' }}">
+                                <i class="nav-icon bi bi-receipt"></i>
+                                <span class="nav-text">Pesanan Masuk</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('umkm.transactions.income') }}" class="nav-link {{ request()->routeIs('umkm.transactions.income') ? 'active' : '' }}">
+                                <i class="nav-icon bi bi-wallet2"></i>
+                                <span class="nav-text">Pembukuan</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="nav-section">
+                    <span class="nav-section-title">LAINNYA</span>
+                    <ul class="nav-list">
+                        <li class="nav-item">
+                            <a href="{{ url('/') }}" class="nav-link" target="_blank">
+                                <i class="nav-icon bi bi-house"></i>
+                                <span class="nav-text">Website Utama</span>
+                                <i class="nav-external bi bi-box-arrow-up-right"></i>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <form method="POST" action="{{ route('umkm.logout') }}" class="nav-form">
+                                @csrf
+                                <button type="submit" class="nav-link logout-btn">
+                                    <i class="nav-icon bi bi-box-arrow-right"></i>
+                                    <span class="nav-text">Logout</span>
+                                </button>
+                            </form>
+                        </li>
+                    </ul>
+                </div>
             </nav>
         </div>
-        <div class="sidebar-footer">
-            <form action="{{ route('umkm.logout') }}" method="POST" style="width: 100%;">
-                @csrf
-                <button type="submit" class="nav-link w-100 text-start text-danger">
-                    <i class="bi bi-box-arrow-right me-2"></i>
-                    <span>Logout</span>
-                </button>
-            </form>
-        </div>
-    </aside>
+    </div>
 
-        <!-- Main Content Area -->
-        <div class="main-content">
-            <!-- Top Bar -->
-            <div class="topbar">
-                <div class="topbar-left">
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Top Header -->
+        <div class="top-header">
+            <div class="header-left">
+                <button class="sidebar-toggle d-lg-none" id="sidebarToggleMain">
+                    <i class="bi bi-list"></i>
+                </button>
+                <div class="page-breadcrumb">
                     @yield('breadcrumb')
                 </div>
-                <div class="topbar-right">
-                    <button class="btn btn-sm btn-light" id="toggleSidebar">
-                        <i class="bi bi-list"></i>
-                    </button>
+            </div>
+            <div class="header-right">
+                <div class="header-actions">
+                    <!-- Notifications -->
+                    <div class="dropdown">
+                        <button class="header-btn" data-bs-toggle="dropdown">
+                            <i class="bi bi-bell"></i>
+                            <span class="badge">0</span>
+                        </button>
+                        <div class="dropdown-menu dropdown-menu-end">
+                            <h6 class="dropdown-header">Notifikasi</h6>
+                            <a class="dropdown-item text-center" href="#">Belum ada notifikasi</a>
+                        </div>
+                    </div>
                 </div>
             </div>
+        </div>
 
-            <!-- Page Content -->
-            <div class="page-content">
-                @yield('content')
-            </div>
+        <!-- Page Content -->
+        <div class="page-content">
+            @yield('content')
         </div>
     </div>
-</div>
 
-<style>
-    * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-    }
+    <!-- Sidebar Overlay for Mobile -->
+    <div class="sidebar-overlay d-lg-none" id="sidebarOverlay"></div>
 
-    body {
-        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-        background: #f8f9fa;
-    }
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
-    .dashboard-wrapper {
-        display: flex;
-        min-height: 100vh;
-    }
-    
-    .wrapper {
-        display: flex;
-        width: 100%;
-    }
-    
-    .sidebar {
-        width: 250px;
-        background: #fff;
-        border-right: 1px solid #e9ecef;
-        display: flex;
-        flex-direction: column;
-        position: fixed;
-        height: 100vh;
-        left: 0;
-        top: 0;
-        overflow-y: auto;
-        z-index: 1000;
-        box-shadow: 2px 0 4px rgba(0,0,0,0.05);
-    }
-    
-    .main-content {
-        flex: 1;
-        margin-left: 250px;
-        display: flex;
-        flex-direction: column;
-        min-height: 100vh;
-    }
-    
-    .topbar {
-        background: #fff;
-        border-bottom: 1px solid #e9ecef;
-        padding: 1rem 1.5rem;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-    }
-    
-    .page-content {
-        flex: 1;
-        padding: 2rem 1.5rem;
-        background: #f8f9fa;
-    }
-    
-    .sidebar-header {
-        padding: 1.5rem;
-        border-bottom: 1px solid #e9ecef;
-    }
-    
-    .sidebar-brand {
-        display: flex;
-        align-items: center;
-        font-weight: 700;
-        color: #333;
-        text-decoration: none;
-        font-size: 1rem;
-    }
-    
-    .sidebar-body {
-        flex: 1;
-        padding: 1rem 0;
-        overflow-y: auto;
-    }
-    
-    .nav {
-        list-style: none;
-        padding: 0;
-        margin: 0;
-    }
-    
-    .nav-link {
-        display: flex;
-        align-items: center;
-        padding: 0.75rem 1.5rem;
-        color: #6c757d;
-        text-decoration: none;
-        transition: all 0.3s ease;
-        border-left: 3px solid transparent;
-        font-size: 0.95rem;
-    }
-    
-    .nav-link:hover {
-        background: #f8f9fa;
-        color: #667eea;
-        border-left-color: #667eea;
-    }
-    
-    .nav-link.active {
-        background: #f8f9fa;
-        color: #667eea;
-        border-left-color: #667eea;
-        font-weight: 600;
-    }
-    
-    .nav-divider {
-        height: 1px;
-        background: #e9ecef;
-        margin: 0.75rem 0;
-    }
-    
-    .nav-label {
-        display: block;
-        padding: 0.75rem 1.5rem;
-        font-size: 0.75rem;
-        font-weight: 700;
-        color: #adb5bd;
-        text-transform: uppercase;
-    }
-    
-    .sidebar-footer {
-        padding: 1rem;
-        border-top: 1px solid #e9ecef;
-    }
-    
-    @media (max-width: 768px) {
+    <!-- AOS JS -->
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+
+    <script>
+        // Initialize AOS
+        AOS.init();
+
+        // Sidebar Toggle
+        document.addEventListener('DOMContentLoaded', function() {
+            const sidebarToggleMain = document.getElementById('sidebarToggleMain');
+            const sidebarToggle = document.getElementById('sidebarToggle');
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebarOverlay');
+
+            // Toggle sidebar
+            function toggleSidebar() {
+                sidebar.classList.toggle('show');
+                overlay.classList.toggle('show');
+            }
+
+            // Event listeners
+            if (sidebarToggleMain) {
+                sidebarToggleMain.addEventListener('click', toggleSidebar);
+            }
+
+            if (sidebarToggle) {
+                sidebarToggle.addEventListener('click', toggleSidebar);
+            }
+
+            if (overlay) {
+                overlay.addEventListener('click', toggleSidebar);
+            }
+
+            // Submenu toggle
+            document.querySelectorAll('.nav-link').forEach(link => {
+                if (link.nextElementSibling && link.nextElementSibling.classList.contains('nav-submenu')) {
+                    link.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        const submenu = this.nextElementSibling;
+                        const arrow = this.querySelector('.nav-arrow');
+
+                        submenu.classList.toggle('show');
+                        arrow.classList.toggle('rotated');
+                    });
+                }
+            });
+        });
+    </script>
+
+    @stack('scripts')
+
+    <style>
+        /* Dashboard Layout Styles */
+        .dashboard-layout {
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #f7fafc 0%, #edf2f7 100%);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            min-height: 100vh;
+        }
+
+        /* Sidebar Styles */
         .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 280px;
+            height: 100vh;
+            background: white;
+            border-right: 1px solid #e9ecef;
+            z-index: 1050;
             transform: translateX(-100%);
             transition: transform 0.3s ease;
+            overflow-y: auto;
         }
-        
+
         .sidebar.show {
             transform: translateX(0);
         }
-        
-        .main-content {
-            margin-left: 0;
-        }
-    }
-</style>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
-<script>
-    const toggleSidebarBtn = document.getElementById('toggleSidebar');
-    const sidebar = document.querySelector('.sidebar');
-    
-    if (toggleSidebarBtn) {
-        toggleSidebarBtn.addEventListener('click', function() {
-            sidebar.classList.toggle('show');
-        });
-    }
-</script>
+        @media (min-width: 992px) {
+            .sidebar {
+                transform: translateX(0);
+            }
+
+            .main-content {
+                margin-left: 280px;
+            }
+        }
+
+        .sidebar-header {
+            padding: 24px;
+            border-bottom: 1px solid #f1f3f5;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .brand-logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .brand-logo img {
+            height: 60px;
+            width: auto;
+        }
+
+        .brand-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+            font-size: 14px;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        }
+
+        .brand-name {
+            font-weight: 700;
+            font-size: 16px;
+            color: var(--text-dark);
+            line-height: 1;
+        }
+
+        .brand-subtitle {
+            font-size: 11px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .sidebar-toggle {
+            background: none;
+            border: none;
+            font-size: 20px;
+            color: var(--text-muted);
+            padding: 8px;
+            border-radius: 8px;
+            transition: all 0.2s;
+        }
+
+        .sidebar-toggle:hover {
+            background: #f1f3f5;
+            color: var(--text-dark);
+        }
+
+        .sidebar-content {
+            padding: 0 24px 24px;
+        }
+
+        /* User Info */
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 16px;
+            background: #f8f9fa;
+            border-radius: 12px;
+            margin-bottom: 24px;
+        }
+
+        .user-avatar {
+            width: 44px;
+            height: 44px;
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary-color);
+            font-size: 20px;
+            border: 2px solid var(--primary-color);
+        }
+
+        .user-name {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-dark);
+            margin: 0;
+        }
+
+        .user-role {
+            font-size: 12px;
+            color: var(--text-muted);
+            background: white;
+            padding: 2px 8px;
+            border-radius: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* Navigation */
+        .nav-section {
+            margin-bottom: 32px;
+        }
+
+        .nav-section-title {
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 12px;
+            display: block;
+        }
+
+        .nav-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .nav-item {
+            margin-bottom: 4px;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            padding: 12px 16px;
+            color: var(--text-muted);
+            text-decoration: none;
+            border-radius: 10px;
+            transition: all 0.2s;
+            font-size: 14px;
+            font-weight: 500;
+            position: relative;
+        }
+
+        .nav-link:hover {
+            background: #f8f9fa;
+            color: var(--text-dark);
+        }
+
+        .nav-link.active {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.15), rgba(118, 75, 162, 0.15));
+            color: var(--primary-color);
+            border-left: 3px solid var(--primary-color);
+            padding-left: 13px;
+        }
+
+        .nav-icon {
+            width: 20px;
+            font-size: 16px;
+            margin-right: 12px;
+        }
+
+        .nav-text {
+            flex: 1;
+        }
+
+        .nav-arrow {
+            font-size: 12px;
+            transition: transform 0.2s;
+        }
+
+        .nav-arrow.rotated {
+            transform: rotate(90deg);
+        }
+
+        .nav-external {
+            font-size: 12px;
+            opacity: 0.5;
+        }
+
+        .nav-submenu {
+            list-style: none;
+            padding: 0;
+            margin: 8px 0 0 48px;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+
+        .nav-submenu.show {
+            max-height: 200px;
+        }
+
+        .nav-submenu li {
+            margin-bottom: 4px;
+        }
+
+        .nav-submenu a {
+            display: block;
+            padding: 8px 12px;
+            color: var(--text-muted);
+            text-decoration: none;
+            border-radius: 6px;
+            font-size: 13px;
+            transition: all 0.2s;
+        }
+
+        .nav-submenu a:hover {
+            background: #f1f3f5;
+            color: var(--text-dark);
+        }
+
+        .nav-form {
+            margin: 0;
+        }
+
+        .logout-btn {
+            background: none;
+            border: none;
+            width: 100%;
+            text-align: left;
+            font-family: inherit;
+        }
+
+        /* Main Content */
+        .main-content {
+            min-height: 100vh;
+            transition: margin-left 0.3s ease;
+        }
+
+        .top-header {
+            background: white;
+            border-bottom: 1px solid #e2e8f0;
+            padding: 16px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 1040;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .page-breadcrumb {
+            font-size: 14px;
+            color: var(--text-muted);
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .header-btn {
+            background: none;
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-muted);
+            transition: all 0.2s;
+            position: relative;
+        }
+
+        .header-btn:hover {
+            background: #f1f3f5;
+            color: var(--text-dark);
+        }
+
+        .header-btn .badge {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: #dc3545;
+            color: white;
+            font-size: 10px;
+            padding: 2px 6px;
+            border-radius: 10px;
+            min-width: 16px;
+            height: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .page-content {
+            padding: 24px;
+        }
+
+        /* Notification Dropdown */
+        .notification-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 8px 0;
+        }
+
+        .notification-item i {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #f8f9fa;
+        }
+
+        .notification-item div {
+            flex: 1;
+        }
+
+        .notification-item span {
+            display: block;
+            font-size: 13px;
+            font-weight: 500;
+            margin-bottom: 2px;
+        }
+
+        .notification-item small {
+            font-size: 11px;
+            color: var(--text-muted);
+        }
+
+        /* Sidebar Overlay */
+        .sidebar-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1049;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .sidebar-overlay.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* Responsive */
+        @media (max-width: 991.98px) {
+            .top-header {
+                padding: 12px 16px;
+            }
+
+            .page-content {
+                padding: 16px;
+            }
+        }
+    </style>
 </body>
 </html>

@@ -10,10 +10,10 @@
     </div>
 
     @if ($message = Session::get('success'))
-        <div class="alert alert-success alert-dismissible fade show" role="alert">
-            <i class="bi bi-check-circle"></i> {{ $message }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        </div>
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <i class="bi bi-check-circle"></i> {{ $message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
     @endif
 
     <div class="row">
@@ -34,13 +34,25 @@
                             <strong>Status:</strong>
                             <p>
                                 @if ($transaction->status === 'pending')
-                                    <span class="badge bg-warning text-dark">Menunggu</span>
+                                <span class="badge bg-warning text-dark">Menunggu</span>
                                 @elseif ($transaction->status === 'completed')
-                                    <span class="badge bg-success">Selesai</span>
+                                <span class="badge bg-success">Selesai</span>
                                 @elseif ($transaction->status === 'cancelled')
-                                    <span class="badge bg-secondary">Dibatalkan</span>
+                                <span class="badge bg-secondary">Dibatalkan</span>
+                                @elseif ($transaction->status === 'paid')
+                                <span class="badge bg-success">Dibayar</span>
+                                @elseif ($transaction->status === 'proses')
+                                <span class="badge bg-info">Dalam Pembuatan</span>
+                                @elseif ($transaction->status === 'ready')
+                                <span class="badge bg-info">Siap Dikirim/Diambil</span>
+                                @elseif ($transaction->status === 'shipping')
+                                <span class="badge bg-primary">Sudah di Pick Up</span>
+                                @elseif ($transaction->status === 'delivered')
+                                <span class="badge bg-success">Sampai Tujuan</span>
+                                @elseif ($transaction->status === 'selesai')
+                                <span class="badge bg-success">Selesai</span>
                                 @else
-                                    <span class="badge bg-danger">Gagal</span>
+                                <span class="badge bg-danger">Gagal</span>
                                 @endif
                             </p>
                         </div>
@@ -55,43 +67,43 @@
                             <strong>Metode Pembayaran:</strong>
                             <p class="text-muted">
                                 @if ($transaction->payment_method)
-                                    @if ($transaction->payment_method === 'transfer')
-                                        Transfer Bank
-                                    @elseif ($transaction->payment_method === 'ewallet')
-                                        E-Wallet
-                                    @else
-                                        COD (Bayar di Tempat)
-                                    @endif
+                                @if ($transaction->payment_method === 'transfer')
+                                Transfer Bank
+                                @elseif ($transaction->payment_method === 'ewallet')
+                                E-Wallet
                                 @else
-                                    Belum dipilih
+                                COD (Bayar di Tempat)
+                                @endif
+                                @else
+                                Belum dipilih
                                 @endif
                             </p>
                         </div>
                     </div>
 
                     @if ($transaction->paid_at)
-                        <div class="row mb-3">
-                            <div class="col-md-6">
-                                <strong>Tanggal Pembayaran:</strong>
-                                <p class="text-muted">{{ $transaction->paid_at->format('d M Y H:i:s') }}</p>
-                            </div>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <strong>Tanggal Pembayaran:</strong>
+                            <p class="text-muted">{{ $transaction->paid_at->format('d M Y H:i:s') }}</p>
                         </div>
+                    </div>
                     @endif
 
                     @if ($transaction->completed_at)
-                        <div class="row mb-3">
-                            <div class="col-md-6">
-                                <strong>Tanggal Selesai:</strong>
-                                <p class="text-muted">{{ $transaction->completed_at->format('d M Y H:i:s') }}</p>
-                            </div>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <strong>Tanggal Selesai:</strong>
+                            <p class="text-muted">{{ $transaction->completed_at->format('d M Y H:i:s') }}</p>
                         </div>
+                    </div>
                     @endif
 
                     @if ($transaction->notes)
-                        <div class="mb-3">
-                            <strong>Catatan:</strong>
-                            <p class="text-muted">{{ $transaction->notes }}</p>
-                        </div>
+                    <div class="mb-3">
+                        <strong>Catatan:</strong>
+                        <p class="text-muted">{{ $transaction->notes }}</p>
+                    </div>
                     @endif
                 </div>
             </div>
@@ -104,33 +116,33 @@
                 </div>
                 <div class="card-body">
                     @if ($transaction->product)
-                        <div class="row mb-3">
-                            <div class="col-md-6">
-                                <strong>Nama Produk:</strong>
-                                <p class="text-muted">{{ $transaction->product->nama_produk }}</p>
-                            </div>
-                            <div class="col-md-6">
-                                <strong>Harga Satuan:</strong>
-                                <p class="text-muted">Rp{{ number_format($transaction->price, 0, ',', '.') }}</p>
-                            </div>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <strong>Nama Produk:</strong>
+                            <p class="text-muted">{{ $transaction->product->nama_produk }}</p>
                         </div>
+                        <div class="col-md-6">
+                            <strong>Harga Satuan:</strong>
+                            <p class="text-muted">Rp{{ number_format($transaction->price, 0, ',', '.') }}</p>
+                        </div>
+                    </div>
 
-                        <div class="row mb-3">
-                            <div class="col-md-6">
-                                <strong>Jumlah:</strong>
-                                <p class="text-muted">{{ $transaction->quantity }} unit</p>
-                            </div>
-                            <div class="col-md-6">
-                                <strong>Total Harga:</strong>
-                                <p class="text-muted" style="font-size: 1.1rem; font-weight: 600; color: #28a745;">
-                                    Rp{{ number_format($transaction->total_price, 0, ',', '.') }}
-                                </p>
-                            </div>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <strong>Jumlah:</strong>
+                            <p class="text-muted">{{ $transaction->quantity }} unit</p>
                         </div>
+                        <div class="col-md-6">
+                            <strong>Total Harga:</strong>
+                            <p class="text-muted" style="font-size: 1.1rem; font-weight: 600; color: #28a745;">
+                                Rp{{ number_format($transaction->total_price, 0, ',', '.') }}
+                            </p>
+                        </div>
+                    </div>
                     @else
-                        <div class="alert alert-warning mb-0">
-                            <i class="bi bi-exclamation-triangle"></i> Produk telah dihapus
-                        </div>
+                    <div class="alert alert-warning mb-0">
+                        <i class="bi bi-exclamation-triangle"></i> Produk telah dihapus
+                    </div>
                     @endif
                 </div>
             </div>
@@ -169,10 +181,10 @@
                     </div>
 
                     @if ($transaction->buyer_postal_code)
-                        <div class="mb-3">
-                            <strong>Kode Pos:</strong>
-                            <p class="text-muted">{{ $transaction->buyer_postal_code }}</p>
-                        </div>
+                    <div class="mb-3">
+                        <strong>Kode Pos:</strong>
+                        <p class="text-muted">{{ $transaction->buyer_postal_code }}</p>
+                    </div>
                     @endif
                 </div>
             </div>
@@ -190,8 +202,8 @@
                     <form action="{{ route('admin.transactions.destroy', $transaction->id) }}" method="POST">
                         @csrf
                         @method('DELETE')
-                        <button type="submit" class="btn btn-danger w-100" 
-                                onclick="return confirm('Yakin ingin menghapus transaksi ini?')">
+                        <button type="submit" class="btn btn-danger w-100"
+                            onclick="return confirm('Yakin ingin menghapus transaksi ini?')">
                             <i class="bi bi-trash"></i> Hapus Transaksi
                         </button>
                     </form>

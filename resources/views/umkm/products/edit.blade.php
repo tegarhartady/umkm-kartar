@@ -5,7 +5,7 @@
 @section('breadcrumb')
     <nav aria-label="breadcrumb">
         <ol class="breadcrumb mb-0">
-            <li class="breadcrumb-item"><a href="{{ route('umkm.umkm.dashboard') }}">Dashboard</a></li>
+            <li class="breadcrumb-item"><a href="{{ route('umkm.dashboard') }}">Dashboard</a></li>
             <li class="breadcrumb-item"><a href="{{ route('umkm.products.index') }}">Produk</a></li>
             <li class="breadcrumb-item active">Edit Produk</li>
         </ol>
@@ -109,6 +109,17 @@
                                 </div>
                             </div>
                         </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label fw-600">Metode Pemesanan *</label>
+                            <select name="metode_pemesanan" class="form-select @error('metode_pemesanan') is-invalid @enderror" required>
+                                <option value="">-- Pilih Metode Pemesanan --</option>
+                                <option value="siap_jadi" {{ old('metode_pemesanan', $product->metode_pemesanan) == 'siap_jadi' ? 'selected' : '' }}>Siap Jadi</option>
+                                <option value="po" {{ old('metode_pemesanan', $product->metode_pemesanan) == 'po' ? 'selected' : '' }}>Pre-Order (PO)</option>
+                                <option value="keduanya" {{ old('metode_pemesanan', $product->metode_pemesanan) == 'keduanya' ? 'selected' : '' }}>Siap Jadi & PO</option>
+                            </select>
+                            @error('metode_pemesanan') <div class="invalid-feedback d-block">{{ $message }}</div> @enderror
+                        </div>
 
                         <div class="mb-4">
                             <label class="form-label">Foto Produk</label>
@@ -144,4 +155,59 @@
                     </form>
                 </div>
             </div>
-        </div
+        </div>
+    </div>
+</div>
+
+<script>
+    function previewImage() {
+        const file = document.getElementById('image').files[0];
+        if (!file) return;
+        
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const preview = document.getElementById('image-preview');
+            const uploadContent = document.getElementById('upload-content');
+            const previewContainer = document.getElementById('image-preview-container');
+            
+            preview.src = e.target.result;
+            uploadContent.style.display = 'none';
+            previewContainer.style.display = 'block';
+        };
+        reader.readAsDataURL(file);
+    }
+
+    // Drag and drop
+    const uploadZone = document.querySelector('.border-dashed');
+    if (uploadZone) {
+        uploadZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            uploadZone.style.background = '#f0f1ff';
+            uploadZone.style.borderColor = '#667eea';
+        });
+        
+        uploadZone.addEventListener('dragleave', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            uploadZone.style.background = 'transparent';
+            uploadZone.style.borderColor = '#dee2e6';
+        });
+        
+        uploadZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            uploadZone.style.background = 'transparent';
+            uploadZone.style.borderColor = '#dee2e6';
+            
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                const dt = new DataTransfer();
+                dt.items.add(files[0]);
+                document.getElementById('image').files = dt.files;
+                previewImage();
+            }
+        });
+    }
+</script>
+@endsection

@@ -22,9 +22,17 @@ class OrderController extends Controller
         if ($status) {
             if ($status === 'pending') {
                 $query->where('status', 'pending');
-            } elseif ($status === 'paid') {
-                $query->whereIn('status', ['paid', 'completed']);
-            } elseif ($status === 'failed') {
+            } elseif ($status === 'proses') {
+                $query->where('status', 'proses');
+            } elseif ($status === 'packing') {
+                $query->where('status', 'ready');
+            } elseif ($status === 'pengiriman') {
+                $query->where('status', 'shipping');
+            } elseif ($status === 'delivered') {
+                $query->where('status', 'delivered');
+            } elseif ($status === 'selesai') {
+                $query->where('status', 'completed');
+            } elseif ($status === 'gagal' || $status === 'failed') {
                 $query->whereIn('status', ['failed', 'cancelled']);
             }
         }

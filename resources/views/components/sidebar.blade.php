@@ -2,14 +2,14 @@
     <!-- UMKM Sidebar -->
     <aside class="sidebar">
         <div class="sidebar-header">
-            <a href="{{ route('umkm.umkm.dashboard') }}" class="sidebar-brand">
+            <a href="{{ route('umkm.dashboard') }}" class="sidebar-brand">
                 <i class="bi bi-shop me-2"></i>
                 <span>{{ Auth::guard('umkm')->user()->nama_toko }}</span>
             </a>
         </div>
         <div class="sidebar-body">
             <nav class="nav flex-column">
-                <a href="{{ route('umkm.umkm.dashboard') }}" class="nav-link {{ Route::is('umkm.umkm.dashboard') ? 'active' : '' }}">
+                <a href="{{ route('umkm.dashboard') }}" class="nav-link {{ Route::is('umkm.dashboard') ? 'active' : '' }}">
                     <i class="bi bi-house me-2"></i>
                     <span>Dashboard</span>
                 </a>
