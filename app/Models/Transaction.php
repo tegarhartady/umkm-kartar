@@ -28,6 +28,7 @@ class Transaction extends Model
         'notes',
         'snap_token',
         'payment_proof',
+        'order_photo',
         'paid_at',
         'completed_at',
         'umkm_id',
@@ -53,6 +54,11 @@ class Transaction extends Model
 
     public function umkm()
     {
-        return $this->product->umkm();
+        return $this->belongsTo(Umkm::class, 'umkm_id');
+    }
+
+    public function review()
+    {
+        return $this->hasOne(Review::class);
     }
 }

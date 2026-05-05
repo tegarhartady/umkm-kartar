@@ -177,6 +177,38 @@
                         </script>
                         @endif
 
+                        <!-- Upload Payment Proof -->
+                        @if(in_array($transaction->payment_method, ['transfer', 'qris']) && $transaction->status === 'pending')
+                        <div class="card border-warning mb-4 shadow-sm overflow-hidden">
+                            <div class="card-header bg-warning text-dark text-center py-3">
+                                <h6 class="fw-bold mb-0"><i class="bi bi-cloud-upload me-2"></i>Upload Bukti Pembayaran</h6>
+                            </div>
+                            <div class="card-body p-4">
+                                @if($transaction->payment_proof)
+                                    <div class="alert alert-success mb-3">
+                                        <i class="bi bi-check-circle-fill me-2"></i> Bukti pembayaran telah diunggah. 
+                                        <a href="{{ asset('storage/' . $transaction->payment_proof) }}" target="_blank" class="text-decoration-underline text-success fw-bold">Lihat Foto</a>
+                                    </div>
+                                    <p class="text-muted small mb-3">Anda dapat mengunggah ulang jika bukti sebelumnya salah atau kurang jelas.</p>
+                                @else
+                                    <p class="text-muted mb-4 small">Mohon unggah struk atau screenshot bukti transfer Anda untuk mempercepat proses verifikasi oleh admin.</p>
+                                @endif
+
+                                <form action="{{ route('transaction.upload_proof', $transaction->id) }}" method="POST" enctype="multipart/form-data">
+                                    @csrf
+                                    <div class="mb-3 text-start">
+                                        <label class="form-label small fw-bold">Pilih Foto Bukti Bayar</label>
+                                        <input type="file" name="payment_proof" class="form-control" accept="image/*" required>
+                                        <div class="form-text">Maksimal 2MB (JPG, PNG, JPEG)</div>
+                                    </div>
+                                    <button type="submit" class="btn btn-warning w-100 shadow-sm">
+                                        <i class="bi bi-upload me-2"></i> {{ $transaction->payment_proof ? 'Ganti Bukti Bayar' : 'Kirim Bukti Pembayaran' }}
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                        @endif
+
                         <!-- Buyer Info -->
                         <div class="card bg-light border-0 mb-4 shadow-sm">
                             <div class="card-body">

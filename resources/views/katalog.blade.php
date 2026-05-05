@@ -84,23 +84,45 @@
                 @foreach($products as $product)
                 <div class="col-lg-3 col-md-6" data-aos="fade-up">
                     <div class="product-card" data-category="{{ $product->kategori }}" data-desa="{{ $product->umkm->desa ?? '' }}" data-title="{{ strtolower($product->nama_produk) }}">
-                        <div class="product-image">
-                            @if($product->image)
-                                <img src="{{ '/storage/' . $product->image }}" alt="{{ $product->nama_produk }}" class="img-fluid" onerror="this.src='https://via.placeholder.com/400x300?text={{ urlencode($product->nama_produk) }}'">
-                            @else
-                                <img src="https://via.placeholder.com/400x300?text={{ urlencode($product->nama_produk) }}" alt="{{ $product->nama_produk }}" class="img-fluid">
+                        <div class="product-image position-relative">
+                            @php
+                                $foto = $product->image;
+                                if (!$foto && $product->foto_produk) {
+                                    $foto_array = json_decode($product->foto_produk);
+                                    $foto = (is_array($foto_array) && count($foto_array) > 0) ? $foto_array[0] : $product->foto_produk;
+                                }
+                                $foto_url = $foto ? asset('storage/' . $foto) : 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=400';
+                            @endphp
+                            <img src="{{ $foto_url }}" alt="{{ $product->nama_produk }}" class="img-fluid" style="height: 200px; width: 100%; object-fit: cover;" onerror="this.src='https://via.placeholder.com/400x300?text={{ urlencode($product->nama_produk) }}'">
+                            
+                            @if($product->is_best_seller)
+                                <span class="badge bg-warning text-dark position-absolute top-0 start-0 m-2 px-2 py-1 rounded-pill shadow-sm fw-bold" style="font-size: 0.7rem; z-index: 10;">
+                                    <i class="bi bi-fire me-1"></i> Best Seller
+                                </span>
                             @endif
-                            @if($product->stok < 5)
-                            <span class="product-badge bg-danger">Stok Terbatas</span>
+
+                            @if($product->stok < 5 && $product->stok > 0)
+                                <span class="product-badge bg-danger">Stok Terbatas</span>
+                            @elseif($product->stok <= 0)
+                                <span class="product-badge bg-secondary">Habis</span>
                             @endif
                         </div>
                         <div class="product-body">
-                            <span class="product-category">{{ $product->kategori }}</span>
-                            <h5 class="product-title">{{ $product->nama_produk }}</h5>
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <span class="product-category">{{ $product->kategori }}</span>
+                                <div class="text-warning small">
+                                    @php $rating = $product->averageRating(); @endphp
+                                    @for($i = 1; $i <= 5; $i++)
+                                        <i class="bi bi-star{{ $i <= round($rating) ? '-fill' : '' }}"></i>
+                                    @endfor
+                                    <span class="text-muted ms-1" style="font-size: 0.7rem;">({{ $product->reviews->count() }})</span>
+                                </div>
+                            </div>
+                            <h5 class="product-title">{{ Str::limit($product->nama_produk, 30) }}</h5>
                             <p class="product-seller"><i class="bi bi-shop me-1"></i> {{ $product->umkm->nama_toko ?? 'UMKM' }} &middot; <small class="text-muted">{{ $product->umkm->desa ?? '' }}</small></p>
-                            <div class="product-footer d-flex justify-content-between align-items-center">
-                                <span class="product-price">Rp {{ number_format($product->harga, 0, ',', '.') }}</span>
-                                <a href="{{ route('catalog.show', $product->id) }}" class="btn btn-sm btn-primary rounded-pill">Detail</a>
+                            <div class="product-footer d-flex justify-content-between align-items-center mt-3">
+                                <span class="product-price fw-bold text-primary">Rp {{ number_format($product->harga, 0, ',', '.') }}</span>
+                                <a href="{{ route('catalog.show', $product->id) }}" class="btn btn-sm btn-primary rounded-pill px-3">Detail</a>
                             </div>
                         </div>
                     </div>

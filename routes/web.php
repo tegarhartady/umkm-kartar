@@ -2,7 +2,6 @@
 
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Hash;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\UmkmController;
 use App\Http\Controllers\ProductController;
@@ -20,18 +19,34 @@ use App\Http\Controllers\Auth\UmkmAuthController;
 use App\Http\Controllers\PaymentCallbackController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ProfileController;
-use App\Models\Desa;
+use App\Http\Controllers\HomeController;
+use App\Http\Controllers\PagesController;
+use App\Http\Controllers\Auth\UnifiedAuthController;
+use App\Http\Controllers\Umkm\UmkmDashboardController;
+use App\Http\Controllers\Umkm\UmkmProductController;
+use App\Http\Controllers\UmkmTransactionController;
+use App\Http\Controllers\ReviewController;
+use App\Http\Controllers\Admin\CategoryController;
+use App\Http\Controllers\Admin\UnitController;
+
+use Illuminate\Support\Facades\Artisan;
+
+Route::get('/run-migrate', function() {
+    try {
+        Artisan::call('migrate', [
+            '--path' => 'database/migrations/2026_05_05_000001_create_units_table.php',
+            '--force' => true
+        ]);
+        return "Migration finished: " . Artisan::output();
+    } catch (\Exception $e) {
+        return "Migration failed: " . $e->getMessage();
+    }
+});
 
 Route::post('payment/callback', [PaymentCallbackController::class, 'callback'])->name('payment.callback');
 
 // Main Routes
-Route::get('/', function () {
-    $recommendedProducts = \App\Models\Product::where('status', 'aktif')
-        ->limit(4)
-        ->get();
-    return view('index', compact('recommendedProducts'));
-})->name('home');
-
+Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/katalog', [CatalogController::class, 'indexProducts'])->name('katalog');
 
 // Checkout routes (Protected)
@@ -47,110 +62,31 @@ Route::middleware(['auth'])->group(function () {
     // Orders
     Route::get('/orders', [OrderController::class, 'index'])->name('orders.index');
     Route::get('/orders/{id}', [OrderController::class, 'show'])->name('orders.show');
+    
+    // Reviews
+    Route::post('/reviews', [ReviewController::class, 'store'])->name('reviews.store');
 });
 
 // Detail produk
-Route::get('/beli/{id}', function ($id) {
-    $product = \App\Models\Product::findOrFail($id);
-    $umkm = $product->umkm;
-    $relatedProducts = \App\Models\Product::where('umkm_id', $umkm->id)
-        ->where('id', '!=', $id)
-        ->limit(4)
-        ->get();
-    
-    return view('beli', compact('product', 'umkm', 'relatedProducts'));
-})->name('beli');
+Route::get('/beli/{id}', [HomeController::class, 'showProduct'])->name('beli');
 
-Route::get('/desa-mitra', function () {
-    return view('pages.desa-mitra');
-})->name('desa-mitra');
-
-Route::get('/csr-pik2', function () {
-    return view('pages.csr-pik2');
-})->name('csr-pik2');
-
-Route::get('/tentang', function () {
-    return view('pages.tentang');
-})->name('tentang');
+// Static Pages
+Route::get('/desa-mitra', [PagesController::class, 'desaMitra'])->name('desa-mitra');
+Route::get('/csr-pik2', [PagesController::class, 'csrPik2'])->name('csr-pik2');
+Route::get('/tentang', [PagesController::class, 'tentang'])->name('tentang');
 
 // ✨ PUBLIC REGISTRATION FORM
-Route::get('/daftar-umkm', function () {
-    $desas = Desa::all();
-    $categories = ['Hasil Laut', 'Makanan Olahan', 'Bumbu Dapur', 'Kerajinan', 'Kuliner'];
-    return view('pages.daftar-umkm', compact('desas', 'categories'));
-})->name('daftar-umkm');
-//     return view('pages.daftar-umkm');
-// })->name('daftar-umkm');
-
+Route::get('/daftar-umkm', [PagesController::class, 'daftarUmkm'])->name('daftar-umkm');
 Route::post('/daftar-umkm', [UmkmController::class, 'registerFromPublic'])->name('umkm.register.store');
 
-// Auth routes - Unified Login
-Route::get('/login', function () {
-    return view('auth.login-unified');
-})->name('login');
+// Unified Auth routes
+Route::get('/login', [UnifiedAuthController::class, 'showLogin'])->name('login');
+Route::post('/login', [UnifiedAuthController::class, 'authenticate'])->name('login.authenticate');
 
-Route::post('/login', function (Illuminate\Http\Request $request) {
-    $credentials = $request->only('email', 'password');
+Route::get('/register', [UnifiedAuthController::class, 'showRegister'])->name('register.customer');
+Route::post('/register', [UnifiedAuthController::class, 'register'])->name('register.customer.store');
 
-    // Coba login sebagai UMKM
-    if (Auth::guard('umkm')->attempt($credentials)) {
-        $request->session()->regenerate();
-        $umkm = Auth::guard('umkm')->user();
-        
-        if ($umkm->status !== 'disetujui') {
-            Auth::guard('umkm')->logout();
-            return back()->withErrors(['email' => 'Akun UMKM Anda belum disetujui oleh admin.'])->onlyInput('email');
-        }
-        
-        return redirect()->intended('/umkm/dashboard');
-    }
-
-    // Coba login sebagai User (Admin / Superadmin / Pelanggan)
-    if (Auth::attempt($credentials)) {
-        $request->session()->regenerate();
-        $user = Auth::user();
-        
-        if (in_array($user->role, ['admin', 'superadmin'])) {
-            return redirect()->intended(route('dashboard.admin'));
-        }
-        
-        // Pelanggan biasa
-        return redirect()->intended('/');
-    }
-
-    return back()->withErrors(['email' => 'Email atau password salah.'])->onlyInput('email');
-})->name('login.authenticate');
-
-// Customer Registration
-Route::get('/register', function () {
-    return view('auth.register-customer');
-})->name('register.customer');
-
-Route::post('/register', function (Illuminate\Http\Request $request) {
-    $validated = $request->validate([
-        'name' => 'required|string|max:255',
-        'email' => 'required|string|email|max:255|unique:users',
-        'password' => 'required|string|min:8|confirmed',
-    ]);
-
-    $user = \App\Models\User::create([
-        'name' => $validated['name'],
-        'email' => $validated['email'],
-        'password' => Hash::make($validated['password']),
-        'role' => 'user', // Default customer role
-    ]);
-
-    Auth::login($user);
-
-    return redirect('/')->with('success', 'Pendaftaran berhasil! Selamat datang.');
-})->name('register.customer.store');
-
-Route::post('/logout', function (Illuminate\Http\Request $request) {
-    auth()->logout();
-    $request->session()->invalidate();
-    $request->session()->regenerateToken();
-    return redirect('/');
-})->name('logout');
+Route::post('/logout', [UnifiedAuthController::class, 'logout'])->name('logout');
 
 // Admin routes
 Route::middleware(['auth', 'admin.superadmin'])->group(function () {
@@ -164,34 +100,25 @@ Route::middleware(['auth', 'admin.superadmin'])->group(function () {
     Route::post('admin/umkm/{umkm}/reset-password', [UmkmController::class, 'resetPassword'])->name('admin.umkm.resetPassword');
     
     // Product Management
-    Route::get('admin/products', function () {
-        $products = \App\Models\Product::paginate(15);
-        return view('admin.products.index', compact('products'));
-    })->name('admin.products.index');
-    Route::get('admin/products/create', function () {
-        $umkms = \App\Models\Umkm::where('status', 'disetujui')->get();
-        return view('admin.products.create', compact('umkms'));
-    })->name('admin.products.create');
+    Route::get('admin/products', [ProductController::class, 'index'])->name('admin.products.index');
+    Route::get('admin/products/create', [ProductController::class, 'create'])->name('admin.products.create');
     Route::post('admin/products', [ProductController::class, 'store'])->name('admin.products.store');
-    Route::get('admin/products/{product}/edit', function ($id) {
-        $product = \App\Models\Product::findOrFail($id);
-        return view('admin.products.edit', compact('product'));
-    })->name('admin.products.edit');
+    Route::get('admin/products/{product}/edit', [ProductController::class, 'edit'])->name('admin.products.edit');
     Route::put('admin/products/{product}', [ProductController::class, 'update'])->name('admin.products.update');
     Route::delete('admin/products/{product}', [ProductController::class, 'destroy'])->name('admin.products.destroy');
-    Route::get('admin/products/{product}', function ($id) {
-        $product = \App\Models\Product::findOrFail($id);
-        return view('admin.products.show', compact('product'));
-    })->name('admin.products.show');
-    Route::get('admin/products-moderasi', function () {
-        return view('admin.products.moderasi');
-    })->name('admin.products.moderasi');
+    Route::get('admin/products/{product}', [ProductController::class, 'show'])->name('admin.products.show');
+    Route::get('admin/products-moderasi', [ProductController::class, 'moderasi'])->name('admin.products.moderasi');
+    Route::patch('admin/products/{product}/status', [ProductController::class, 'updateStatus'])->name('admin.products.updateStatus');
     
     // Desa Management
     Route::resource('admin/desa', DesaController::class, ['as' => 'admin']);
     
     // Reports
     Route::get('admin/laporan', [LaporanController::class, 'index'])->name('admin.laporan.index');
+
+    // Master Data
+    Route::resource('admin/master/categories', CategoryController::class, ['as' => 'admin.master']);
+    Route::resource('admin/master/units', UnitController::class, ['as' => 'admin.master']);
     Route::get('admin/laporan/export/pdf', [LaporanController::class, 'exportPdf'])->name('admin.laporan.export.pdf');
     Route::get('admin/laporan/export/excel', [LaporanController::class, 'exportExcel'])->name('admin.laporan.export.excel');
     
@@ -227,194 +154,30 @@ Route::middleware(['auth', 'role:superadmin'])->group(function () {
     Route::post('/superadmin/settings', [SuperAdminController::class, 'updateSettings'])->name('superadmin.settings.update');
 });
 
-// Admin Login - Link tersembunyi (secret URL)
-Route::get('/admin-login-secret-xyz', function () {
-    return view('auth.admin-login');
-})->name('admin.login');
+// Admin Login - Secret URL
+Route::get('/admin-login-secret-xyz', [UnifiedAuthController::class, 'showAdminLogin'])->name('admin.login');
+Route::post('/admin-login-secret-xyz', [UnifiedAuthController::class, 'authenticateAdmin'])->name('admin.authenticate');
 
-Route::post('/admin-login-secret-xyz', function (Illuminate\Http\Request $request) {
-    $credentials = $request->only('email', 'password');
-    
-    if (auth()->attempt($credentials)) {
-        $request->session()->regenerate();
-        
-        // Cek apakah user adalah admin/superadmin
-        $user = auth()->user();
-        if (in_array($user->role, ['admin', 'superadmin'])) {
-            return redirect()->intended('/dashboard/admin');
-        } else {
-            // Bukan admin, logout
-            auth()->logout();
-            return back()->withErrors([
-                'email' => 'Akses ditolak. Anda bukan admin.',
-            ]);
-        }
-    }
-    
-    return back()->withErrors([
-        'email' => 'Email atau password salah.',
-    ])->onlyInput('email');
-})->name('admin.authenticate');
-
-// ===== UMKM LOGIN =====
-Route::post('/umkm/login', function (\Illuminate\Http\Request $request) {
-    $credentials = $request->validate([
-        'email' => 'required|email',
-        'password' => 'required',
-    ]);
-
-    if (\Illuminate\Support\Facades\Auth::guard('umkm')->attempt($credentials, $request->filled('remember'))) {
-        $request->session()->regenerate();
-        return redirect()->route('umkm.dashboard');
-    }
-
-    return back()->withErrors([
-        'email' => 'Email atau password salah.',
-    ])->onlyInput('email');
-})->name('umkm.authenticate')->middleware('guest:umkm');
-
-// ===== UMKM Protected Routes (Setelah Login) =====
+// ===== UMKM Protected Routes =====
 Route::middleware('auth:umkm')->prefix('umkm')->name('umkm.')->group(function () {
-    Route::post('/logout', [UmkmAuthController::class, 'logout'])->name('logout');
+    Route::post('/logout', [UnifiedAuthController::class, 'logout'])->name('logout');
 
     // Dashboard
-    Route::get('/dashboard', function () {
-        $umkm = Auth::guard('umkm')->user();
-        $products = $umkm->products()->latest()->paginate(10);
-        $totalProducts = $umkm->products()->count();
-        $activeProducts = $umkm->products()->where('status', 'aktif')->count();
-        
-        // Fetch transactions for this UMKM
-        $umkmProductIds = $umkm->products()->pluck('id');
-        $recentTransactions = \App\Models\Transaction::whereIn('product_id', $umkmProductIds)
-            ->with('product')
-            ->orderByDesc('created_at')
-            ->limit(10)
-            ->get();
-            
-        $totalTransaksi = \App\Models\Transaction::whereIn('product_id', $umkmProductIds)->count();
-        $totalRevenue = \App\Models\Transaction::whereIn('product_id', $umkmProductIds)
-            ->where('status', 'completed')
-            ->sum('total_price');
+    Route::get('/dashboard', [UmkmDashboardController::class, 'index'])->name('dashboard');
 
-        return view('umkm.dashboard', compact(
-            'umkm', 
-            'products', 
-            'totalProducts', 
-            'activeProducts', 
-            'recentTransactions', 
-            'totalTransaksi', 
-            'totalRevenue'
-        ));
-    })->name('dashboard');
-
-
-    // Products - Index
-    Route::get('/products', function () {
-        $umkm = Auth::guard('umkm')->user();
-        $products = $umkm->products()->latest()->paginate(10);
-        return view('umkm.products.index', compact('products'));
-    })->name('products.index');
-
-    // Products - Create
-    Route::get('/products/create', function () {
-        return view('umkm.products.create');
-    })->name('products.create');
+    // Products
+    Route::get('/products', [UmkmProductController::class, 'index'])->name('products.index');
+    Route::get('/products/create', [UmkmProductController::class, 'create'])->name('products.create');
+    Route::post('/products', [UmkmProductController::class, 'store'])->name('products.store');
+    Route::get('/products/{product}/edit', [UmkmProductController::class, 'edit'])->name('products.edit');
+    Route::put('/products/{product}', [UmkmProductController::class, 'update'])->name('products.update');
+    Route::delete('/products/{product}', [UmkmProductController::class, 'destroy'])->name('products.destroy');
     
     // Transactions
-    Route::get('/transactions', [\App\Http\Controllers\UmkmTransactionController::class, 'index'])->name('transactions.index');
-    Route::get('/pendapatan', [\App\Http\Controllers\UmkmTransactionController::class, 'income'])->name('transactions.income');
-    Route::post('/transactions/{transaction}/status', [\App\Http\Controllers\UmkmTransactionController::class, 'updateStatus'])->name('transactions.update_status');
-
-    // Products - Store
-    Route::post('/products', function (\Illuminate\Http\Request $request) {
-        $validated = $request->validate([
-            'nama_produk' => 'required|string|max:255',
-            'kategori' => 'required|string',
-            'deskripsi' => 'required|string',
-            'harga' => 'required|numeric|min:0',
-            'stok' => 'required|numeric|min:0',
-            'satuan' => 'required|string',
-            'metode_pemesanan' => 'required|in:siap_jadi,po,keduanya',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-        ]);
-
-        $umkm = Auth::guard('umkm')->user();
-        $validated['umkm_id'] = $umkm->id;
-        $validated['status'] = 'aktif';
-
-        if ($request->hasFile('image')) {
-            $path = $request->file('image')->store('products', 'public');
-            $validated['image'] = $path;
-        }
-
-        \App\Models\Product::create($validated);
-
-        return redirect()->route('umkm.products.index')->with('success', 'Produk berhasil ditambahkan');
-    })->name('products.store');
-
-    // Products - Edit
-    Route::get('/products/{product}/edit', function ($id) {
-        $product = \App\Models\Product::findOrFail($id);
-        $umkm = Auth::guard('umkm')->user();
-        
-        if ($product->umkm_id !== $umkm->id) {
-            abort(403);
-        }
-
-        return view('umkm.products.edit', compact('product'));
-    })->name('products.edit');
-
-    // Products - Update
-    Route::put('/products/{product}', function (\Illuminate\Http\Request $request, $id) {
-        $product = \App\Models\Product::findOrFail($id);
-        $umkm = Auth::guard('umkm')->user();
-        
-        if ($product->umkm_id !== $umkm->id) {
-            abort(403);
-        }
-
-        $validated = $request->validate([
-            'nama_produk' => 'required|string|max:255',
-            'kategori' => 'required|string',
-            'deskripsi' => 'required|string',
-            'harga' => 'required|numeric|min:0',
-            'stok' => 'required|numeric|min:0',
-            'satuan' => 'required|string',
-            'metode_pemesanan' => 'required|in:siap_jadi,po,keduanya',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-        ]);
-
-        if ($request->hasFile('image')) {
-            if ($product->image) {
-                \Illuminate\Support\Facades\Storage::disk('public')->delete($product->image);
-            }
-            $path = $request->file('image')->store('products', 'public');
-            $validated['image'] = $path;
-        }
-
-        $product->update($validated);
-
-        return redirect()->route('umkm.products.index')->with('success', 'Produk berhasil diperbarui');
-    })->name('products.update');
-
-    // Products - Delete
-    Route::delete('/products/{product}', function ($id) {
-        $product = \App\Models\Product::findOrFail($id);
-        $umkm = Auth::guard('umkm')->user();
-        
-        if ($product->umkm_id !== $umkm->id) {
-            abort(403);
-        }
-
-        if ($product->image) {
-            \Illuminate\Support\Facades\Storage::disk('public')->delete($product->image);
-        }
-
-        $product->delete();
-
-        return redirect()->route('umkm.products.index')->with('success', 'Produk berhasil dihapus');
-    })->name('products.destroy');
+    Route::get('/transactions', [UmkmTransactionController::class, 'index'])->name('transactions.index');
+    Route::get('/pendapatan', [UmkmTransactionController::class, 'income'])->name('transactions.income');
+    Route::post('/transactions/{transaction}/status', [UmkmTransactionController::class, 'updateStatus'])->name('transactions.update_status');
+    Route::post('/transactions/{transaction}/upload-order-photo', [UmkmTransactionController::class, 'uploadOrderPhoto'])->name('transactions.upload_order_photo');
 });
 
 // Checkout & Order routes
@@ -423,7 +186,5 @@ Route::post('/order/{product}', [CatalogController::class, 'processOrder'])->nam
 Route::get('/payment/{order}', [CatalogController::class, 'payment'])->name('catalog.payment');
 Route::post('/payment/{order}/process', [CatalogController::class, 'processPayment'])->name('catalog.payment.process');
 Route::get('/order-success/{order}', [CatalogController::class, 'success'])->name('catalog.success');
-Route::post('/transaction/{transaction}/upload-proof', [App\Http\Controllers\CheckoutController::class, 'uploadProof'])->name('transaction.upload_proof');
-Route::post('/transaction/{transaction}/update-status', [App\Http\Controllers\CheckoutController::class, 'updateStatusUser'])->name('transaction.update_status_user');
-
-// Check routes
+Route::post('/transaction/{transaction}/upload-proof', [CheckoutController::class, 'uploadProof'])->name('transaction.upload_proof');
+Route::post('/transaction/{transaction}/update-status', [CheckoutController::class, 'updateStatusUser'])->name('transaction.update_status_user');

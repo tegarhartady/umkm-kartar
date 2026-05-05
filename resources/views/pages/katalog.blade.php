@@ -150,12 +150,26 @@
                                     @else
                                         <img src="https://via.placeholder.com/400x300?text={{ urlencode($product->nama_produk) }}" alt="{{ $product->nama_produk }}" class="img-fluid">
                                     @endif
+                                    @if($product->is_best_seller)
+                                        <span class="product-badge bg-warning text-dark position-absolute top-0 start-0 m-2 px-2 py-1 rounded-pill shadow-sm fw-bold" style="font-size: 0.75rem;">
+                                            <i class="bi bi-fire me-1"></i> Best Seller
+                                        </span>
+                                    @endif
                                     @if($product->stok < 5)
-                                    <span class="product-badge bg-danger">Stok Terbatas</span>
+                                    <span class="product-badge bg-danger position-absolute top-0 end-0 m-2 px-2 py-1 rounded-pill" style="font-size: 0.75rem;">Stok Terbatas</span>
                                     @endif
                                 </div>
                                 <div class="product-body">
-                                    <span class="product-category">{{ $product->kategori }}</span>
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <span class="product-category m-0">{{ $product->kategori }}</span>
+                                        <div class="text-warning small" style="font-size: 0.8rem;">
+                                            @php $rating = $product->reviews_avg_rating ?? 0; @endphp
+                                            @for($i = 1; $i <= 5; $i++)
+                                                <i class="bi bi-star{{ $i <= round($rating) ? '-fill' : '' }}"></i>
+                                            @endfor
+                                            <span class="text-muted ms-1">({{ $product->reviews_count ?? 0 }})</span>
+                                        </div>
+                                    </div>
                                     <h5 class="product-title">{{ $product->nama_produk }}</h5>
                                     <p class="product-seller"><i class="bi bi-shop me-1"></i> {{ $product->umkm->nama_toko ?? 'UMKM' }} &middot; <small class="text-muted">{{ $product->umkm->desa ?? '' }}</small></p>
                                     <div class="product-footer d-flex justify-content-between align-items-center">

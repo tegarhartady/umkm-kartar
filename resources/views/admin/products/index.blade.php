@@ -139,7 +139,12 @@
         <div class="card product-card h-100">
             <div class="card-header d-flex justify-content-between align-items-center">
                 <div>
-                    <h6 class="mb-0">{{ $product->nama_produk }}</h6>
+                    <h6 class="mb-0">
+                        {{ $product->nama_produk }}
+                        @if($product->is_best_seller)
+                            <span class="badge bg-warning text-dark ms-1" title="Best Seller"><i class="bi bi-fire"></i></span>
+                        @endif
+                    </h6>
                     <small class="text-muted">{{ $product->umkm->nama_toko }}</small>
                 </div>
                 <div class="dropdown">
@@ -178,6 +183,18 @@
                             </div>
                         </div>
                     @endif
+                </div>
+
+                <!-- Rating -->
+                <div class="mb-3 d-flex align-items-center">
+                    <div class="text-warning me-2" style="font-size: 0.8rem;">
+                        @php $rating = $product->reviews_avg_rating ?? 0; @endphp
+                        @for($i = 1; $i <= 5; $i++)
+                            <i class="bi bi-star{{ $i <= round($rating) ? '-fill' : '' }}"></i>
+                        @endfor
+                    </div>
+                    <span class="small fw-bold">{{ number_format($rating, 1) }}</span>
+                    <span class="text-muted small ms-1">({{ $product->reviews_count }})</span>
                 </div>
 
                 <div class="row">

@@ -12,13 +12,13 @@
             <div class="col-lg-5">
                 <div style="height: 400px; border-radius: 20px; overflow: hidden; background: linear-gradient(45deg, #f8f9fa, #e9ecef);">
                     @if($product->image)
-                        <img src="{{ asset('storage/' . $product->image) }}" alt="{{ $product->nama_produk }}" class="w-100 h-100" style="object-fit: cover;">
+                    <img src="{{ asset('storage/' . $product->image) }}" alt="{{ $product->nama_produk }}" class="w-100 h-100" style="object-fit: cover;">
                     @else
-                        <div class="d-flex align-items-center justify-content-center h-100">
-                            <div class="text-center">
-                                <i class="bi bi-image" style="font-size: 4rem; color: #6c757d; opacity: 0.5;"></i>
-                            </div>
+                    <div class="d-flex align-items-center justify-content-center h-100">
+                        <div class="text-center">
+                            <i class="bi bi-image" style="font-size: 4rem; color: #6c757d; opacity: 0.5;"></i>
                         </div>
+                    </div>
                     @endif
                 </div>
             </div>
@@ -26,10 +26,27 @@
             <!-- Product Info -->
             <div class="col-lg-7">
                 <!-- Category Badge -->
-                <span class="badge bg-success mb-3">{{ $product->kategori }}</span>
+                <div class="d-flex align-items-center mb-3">
+                    <span class="badge bg-success me-2">{{ $product->kategori }}</span>
+                    @if($product->is_best_seller)
+                        <span class="badge bg-warning text-dark fw-bold"><i class="bi bi-fire me-1"></i>Best Seller</span>
+                    @endif
+                </div>
 
                 <!-- Title -->
-                <h1 class="fw-bold mb-3">{{ $product->nama_produk }}</h1>
+                <h1 class="fw-bold mb-2">{{ $product->nama_produk }}</h1>
+
+                <!-- Rating Summary -->
+                <div class="d-flex align-items-center mb-4">
+                    <div class="text-warning me-2">
+                        @php $rating = $product->reviews_avg_rating ?? 0; @endphp
+                        @for($i = 1; $i <= 5; $i++)
+                            <i class="bi bi-star{{ $i <= round($rating) ? '-fill' : '' }}"></i>
+                        @endfor
+                    </div>
+                    <span class="fw-bold me-1">{{ number_format($rating, 1) }}</span>
+                    <span class="text-muted">({{ $product->reviews_count }} Ulasan)</span>
+                </div>
 
                 <!-- UMKM Info -->
                 <div class="d-flex align-items-center mb-4 pb-4 border-bottom">
@@ -52,64 +69,75 @@
                         <i class="bi bi-box-seam me-2 text-success"></i>
                         <strong>Stok: {{ $product->stok }} {{ $product->satuan ?? 'pcs' }}</strong>
                     </p>
-                    @if($product->stok < 5)
-                        <div class="alert alert-warning d-flex align-items-center" role="alert">
+                    @if($product->stok < 5 && $product->stok > 0)
+                        <div class="alert alert-warning d-flex align-items-center py-2" role="alert">
                             <i class="bi bi-exclamation-triangle me-2"></i>
-                            <div>Stok terbatas! Segera pesan sebelum kehabisan.</div>
+                            <div class="small">Stok terbatas! Segera pesan sebelum kehabisan.</div>
                         </div>
                     @endif
                 </div>
 
-                <!-- Description -->
-                <div class="mb-5">
-                    <h6 class="fw-bold mb-3">Deskripsi Produk</h6>
-                    <p class="text-muted lh-lg">{{ $product->deskripsi }}</p>
-                </div>
+            <!-- Description -->
+            <div class="mb-5">
+                <h6 class="fw-bold mb-3">Deskripsi Produk</h6>
+                <p class="text-muted lh-lg">{{ $product->deskripsi }}</p>
+            </div>
 
-                <!-- CTA Buttons -->
-                <div class="d-flex gap-3">
-                    <a href="/checkout/{{ $product->id }}" class="btn btn-success btn-lg grow">
-                        <i class="bi bi-cart me-2"></i>Beli Sekarang
-                    </a>
-                    <a href="/katalog" class="btn btn-outline-secondary btn-lg">
-                        <i class="bi bi-arrow-left me-2"></i>Kembali
-                    </a>
-                </div>
+            <!-- CTA Buttons -->
+            <div class="d-flex gap-3">
+                <a href="/checkout/{{ $product->id }}" class="btn btn-success btn-lg grow">
+                    <i class="bi bi-cart me-2"></i>Beli Sekarang
+                </a>
+                <a href="/katalog" class="btn btn-outline-secondary btn-lg">
+                    <i class="bi bi-arrow-left me-2"></i>Kembali
+                </a>
             </div>
         </div>
+    </div>
 
-        <!-- Related Products -->
-        @if($relatedProducts->count() > 0)
-            <div class="row mt-5 pt-5">
-                <div class="col-12">
-                    <h3 class="fw-bold mb-4">Produk Terkait</h3>
-                </div>
-                <div class="row row-cols-1 row-cols-md-3 row-cols-lg-4 g-4">
-                    @foreach($relatedProducts as $related)
-                        <div class="col">
-                            <a href="/beli/{{ $related->id }}" class="text-decoration-none">
-                                <div class="card h-100 border-0 shadow-sm hover-shadow">
-                                    <div style="height: 200px; overflow: hidden; background: linear-gradient(45deg, #f8f9fa, #e9ecef);">
-                                        @if($related->image)
-                                            <img src="{{ asset($related->image) }}" alt="{{ $related->nama_produk }}" class="w-100 h-100" style="object-fit: cover;">
-                                        @else
-                                            <div class="d-flex align-items-center justify-content-center h-100">
-                                                <i class="bi bi-image text-muted"></i>
-                                            </div>
-                                        @endif
-                                    </div>
-                                    <div class="card-body">
-                                        <h6 class="card-title fw-bold text-dark">{{ Str::limit($related->nama_produk, 30) }}</h6>
-                                        <p class="card-text text-muted small mb-2">{{ $related->umkm->nama_toko ?? 'UMKM' }}</p>
-                                        <p class="card-text fw-bold text-success">Rp {{ number_format($related->harga, 0, ',', '.') }}</p>
-                                    </div>
-                                </div>
-                            </a>
+    <!-- Related Products -->
+    @if($relatedProducts->count() > 0)
+    <div class="row mt-5 pt-5">
+        <div class="col-12">
+            <h3 class="fw-bold mb-4">Produk Terkait</h3>
+        </div>
+        <div class="row row-cols-1 row-cols-md-3 row-cols-lg-4 g-4">
+            @foreach($relatedProducts as $related)
+            <div class="col">
+                <a href="/beli/{{ $related->id }}" class="text-decoration-none">
+                    <div class="card h-100 border-0 shadow-sm hover-shadow">
+                        <div class="position-relative" style="height: 200px; overflow: hidden; background: linear-gradient(45deg, #f8f9fa, #e9ecef);">
+                            @if($related->image)
+                            <img src="{{ asset('storage/' . $related->image) }}" alt="{{ $related->nama_produk }}" class="w-100 h-100" style="object-fit: cover;">
+                            @else
+                            <div class="d-flex align-items-center justify-content-center h-100">
+                                <i class="bi bi-image text-muted"></i>
+                            </div>
+                            @endif
+                            
+                            @if($related->is_best_seller)
+                                <span class="badge bg-warning text-dark position-absolute top-0 start-0 m-2 fw-bold" style="font-size: 0.7rem;"><i class="bi bi-fire"></i> Best Seller</span>
+                            @endif
                         </div>
-                    @endforeach
-                </div>
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <small class="text-muted">{{ $related->kategori }}</small>
+                                <div class="text-warning small">
+                                    <i class="bi bi-star-fill"></i>
+                                    <span class="text-dark fw-bold">{{ number_format($related->reviews_avg_rating ?? 0, 1) }}</span>
+                                </div>
+                            </div>
+                            <h6 class="card-title fw-bold text-dark">{{ Str::limit($related->nama_produk, 30) }}</h6>
+                            <p class="card-text text-muted small mb-2">{{ $related->umkm->nama_toko ?? 'UMKM' }}</p>
+                            <p class="card-text fw-bold text-success mb-0">Rp {{ number_format($related->harga, 0, ',', '.') }}</p>
+                        </div>
+                    </div>
+                </a>
             </div>
-        @endif
+            @endforeach
+        </div>
+    </div>
+    @endif
     </div>
 </section>
 
@@ -120,12 +148,12 @@
     .hover-shadow {
         transition: all 0.3s ease;
     }
-    
+
     .hover-shadow:hover {
         transform: translateY(-5px);
         box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15) !important;
     }
-    
+
     .badge {
         padding: 0.5rem 1rem;
         font-size: 0.85rem;

@@ -12,6 +12,8 @@ class CatalogController extends Controller
     {
         // Base query - accept both 'published' and 'aktif' status
         $query = Product::with('umkm')
+            ->withAvg('reviews', 'rating')
+            ->withCount('reviews')
             ->whereIn('status', ['published', 'aktif']);
 
         // Search by product name

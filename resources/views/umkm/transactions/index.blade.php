@@ -43,6 +43,7 @@
                                         <th>Harga Total</th>
                                         <th>Status Bayar</th>
                                         <th>Status Pengiriman</th>
+                                        <th>Rating</th>
                                         <th>Aksi</th>
                                     </tr>
                                 </thead>
@@ -90,6 +91,20 @@
                                                 @endif
                                             </td>
                                             <td>
+                                                @if($t->review)
+                                                    <div class="text-warning small mb-1">
+                                                        @for($i = 1; $i <= 5; $i++)
+                                                            <i class="bi bi-star{{ $i <= $t->review->rating ? '-fill' : '' }}"></i>
+                                                        @endfor
+                                                    </div>
+                                                    <small class="text-muted d-block" style="max-width: 150px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                                                        "{{ $t->review->comment }}"
+                                                    </small>
+                                                @else
+                                                    <span class="text-muted small">Belum ada</span>
+                                                @endif
+                                            </td>
+                                            <td>
                                                 <div class="d-flex gap-1">
                                                     @if($t->status == 'paid')
                                                         <form action="{{ route('umkm.transactions.update_status', $t->id) }}" method="POST">
@@ -113,6 +128,16 @@
                                                         </form>
                                                     @endif
                                                     <button type="button" class="btn btn-sm btn-outline-info" data-bs-toggle="modal" data-bs-target="#detailModal{{ $t->id }}">Detail</button>
+                                                    @if($t->status != 'pending')
+                                                        <button type="button" class="btn btn-sm {{ !$t->order_photo && in_array($t->status, ['ready', 'shipping']) ? 'btn-primary' : 'btn-outline-primary' }} position-relative" data-bs-toggle="modal" data-bs-target="#uploadPhotoModal{{ $t->id }}">
+                                                            <i class="bi bi-camera me-1"></i> {{ $t->order_photo ? 'Update Foto' : 'Upload Foto' }}
+                                                            @if(!$t->order_photo && in_array($t->status, ['ready', 'shipping']))
+                                                                <span class="position-absolute top-0 start-100 translate-middle p-1 bg-danger border border-light rounded-circle">
+                                                                    <span class="visually-hidden">Unggah foto</span>
+                                                                </span>
+                                                            @endif
+                                                        </button>
+                                                    @endif
                                                 </div>
                                             </td>
                                         </tr>
@@ -162,7 +187,10 @@
                                                     <h6 class="fw-bold mb-3">Bukti Pembayaran</h6>
                                                     @if($t->payment_proof)
                                                         <a href="{{ asset('storage/' . $t->payment_proof) }}" target="_blank">
-                                                            <img src="{{ asset('storage/' . $t->payment_proof) }}" class="img-fluid rounded border shadow-sm" style="max-height: 200px;">
+                                                            <img src="{{ asset('storage/' . $t->payment_proof) }}" 
+                                                                 class="img-fluid rounded border shadow-sm" 
+                                                                 style="max-height: 200px;"
+                                                                 onerror="this.src='https://ui-avatars.com/api/?name=Bukti+Bayar&background=f8f9fa&color=6c757d&size=200&text=Gagal+Muat'">
                                                         </a>
                                                         <div class="mt-2 text-center">
                                                             <small class="text-muted">Klik gambar untuk memperbesar</small>
@@ -174,13 +202,43 @@
                                                         </div>
                                                     @endif
                                                 </div>
+                                                <div class="col-12 mt-3">
+                                                    <h6 class="fw-bold mb-3">Foto Pesanan Siap (Oleh UMKM)</h6>
+                                                    @if($t->order_photo)
+                                                        <a href="{{ asset('storage/' . $t->order_photo) }}" target="_blank">
+                                                            <img src="{{ asset('storage/' . $t->order_photo) }}" 
+                                                                 class="img-fluid rounded border shadow-sm" 
+                                                                 style="max-height: 200px;"
+                                                                 onerror="this.src='https://ui-avatars.com/api/?name=Foto+Pesanan&background=f8f9fa&color=6c757d&size=200&text=Gagal+Muat'">
+                                                        </a>
+                                                    @else
+                                                        <div class="alert alert-light border text-center py-4 mb-0">
+                                                            <i class="bi bi-camera text-muted d-block fs-2 mb-2"></i>
+                                                            <span class="text-muted small">UMKM belum mengunggah foto pesanan</span>
+                                                        </div>
+                                                    @endif
+                                                </div>
                                                 <div class="col-12">
                                                     <hr class="my-2 opacity-50">
                                                     <h6 class="fw-bold mb-3">Rincian Produk</h6>
                                                     <div class="d-flex align-items-center mb-3">
                                                         <div class="flex-shrink-0 me-3">
-                                                            @php $foto = $t->product->foto_produk ? json_decode($t->product->foto_produk)[0] : 'default.jpg'; @endphp
-                                                            <img src="{{ asset('storage/' . $foto) }}" class="rounded shadow-sm" style="width: 60px; height: 60px; object-fit: cover;">
+                                                            @php
+                                                                $foto = $t->product->image;
+                                                                if (!$foto && $t->product->foto_produk) {
+                                                                    $foto_array = json_decode($t->product->foto_produk);
+                                                                    $foto = (is_array($foto_array) && count($foto_array) > 0) ? $foto_array[0] : $t->product->foto_produk;
+                                                                }
+                                                                
+                                                                if (!$foto) {
+                                                                    $foto_url = asset('storage/default.jpg');
+                                                                } else {
+                                                                    // Jika path sudah ada prefix 'products/', gunakan asset('storage/' . $foto)
+                                                                    // Jika tidak, tambahkan prefix 'products/' (opsional, tergantung cara simpan)
+                                                                    $foto_url = (strpos($foto, 'products/') === 0) ? asset('storage/' . $foto) : asset('storage/products/' . $foto);
+                                                                }
+                                                            @endphp
+                                                            <img src="{{ $foto_url }}" class="rounded shadow-sm" style="width: 60px; height: 60px; object-fit: cover;" onerror="this.src='https://ui-avatars.com/api/?name={{ urlencode($t->product->nama_produk ?? 'P') }}&background=random&color=fff&size=60'">
                                                         </div>
                                                         <div class="flex-grow-1">
                                                             <div class="fw-bold">{{ $t->product->nama_produk }}</div>
@@ -202,6 +260,38 @@
                                         <div class="modal-footer border-0">
                                             <button type="button" class="btn btn-secondary rounded-pill px-4" data-bs-dismiss="modal">Tutup</button>
                                         </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Modal Upload Foto Pesanan -->
+                            <div class="modal fade" id="uploadPhotoModal{{ $t->id }}" tabindex="-1" aria-hidden="true">
+                                <div class="modal-dialog modal-dialog-centered">
+                                    <div class="modal-content border-0 shadow-lg rounded-4">
+                                        <div class="modal-header border-0 pb-0">
+                                            <h5 class="modal-title fw-bold">Upload Foto Pesanan</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                        </div>
+                                        <form action="{{ route('umkm.transactions.upload_order_photo', $t->id) }}" method="POST" enctype="multipart/form-data">
+                                            @csrf
+                                            <div class="modal-body py-4">
+                                                @if($t->order_photo)
+                                                    <div class="text-center mb-3">
+                                                        <img src="{{ asset('storage/' . $t->order_photo) }}" class="img-fluid rounded border shadow-sm" style="max-height: 200px;">
+                                                        <p class="text-muted small mt-2">Foto saat ini</p>
+                                                    </div>
+                                                @endif
+                                                <div class="mb-3">
+                                                    <label class="form-label fw-bold small">Pilih Foto (Hasil Jadi/Siap Kirim)</label>
+                                                    <input type="file" name="order_photo" class="form-control" accept="image/*" required>
+                                                    <div class="form-text">Maksimal 2MB (JPG, PNG, JPEG)</div>
+                                                </div>
+                                            </div>
+                                            <div class="modal-footer border-0">
+                                                <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Batal</button>
+                                                <button type="submit" class="btn btn-primary rounded-pill px-4">Upload Foto</button>
+                                            </div>
+                                        </form>
                                     </div>
                                 </div>
                             </div>

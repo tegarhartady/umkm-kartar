@@ -561,20 +561,31 @@
         <div class="row g-4">
             @forelse($recommendedProducts as $index => $product)
                 <div class="col-lg-3 col-md-6" data-aos="fade-up" data-aos-delay="{{ ($index + 1) * 100 }}">
-                    <div class="product-card">
+                    <div class="product-card position-relative">
                         <div class="product-image">
-                            <img src="{{ $product->image ? asset('storage/' . $product->image) : 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=400' }}" alt="{{ $product->nama_produk }}" class="img-fluid" style="height: 200px; object-fit: cover;">
-                            @if($index === 0)
-                                <span class="product-badge">Bestseller</span>
+                            <img src="{{ $product->image ? asset('storage/' . $product->image) : 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=400' }}" alt="{{ $product->nama_produk }}" class="img-fluid" style="height: 200px; width: 100%; object-fit: cover;">
+                            @if($product->is_best_seller)
+                                <span class="badge bg-warning text-dark position-absolute top-0 start-0 m-3 px-3 py-2 rounded-pill shadow-sm fw-bold">
+                                    <i class="bi bi-fire me-1"></i> Best Seller
+                                </span>
                             @endif
                         </div>
                         <div class="product-body">
-                            <span class="product-category">{{ $product->kategori }}</span>
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <span class="product-category">{{ $product->kategori }}</span>
+                                <div class="text-warning small">
+                                    @php $rating = $product->averageRating(); @endphp
+                                    @for($i = 1; $i <= 5; $i++)
+                                        <i class="bi bi-star{{ $i <= round($rating) ? '-fill' : '' }}"></i>
+                                    @endfor
+                                    <span class="text-muted ms-1">({{ $product->reviews->count() }})</span>
+                                </div>
+                            </div>
                             <h5 class="product-title">{{ Str::limit($product->nama_produk, 30) }}</h5>
-                            <p class="product-seller"><i class="bi bi-shop me-1"></i> {{ $product->umkm->nama_umkm ?? 'Unknown UMKM' }}</p>
-                            <div class="product-footer d-flex justify-content-between align-items-center">
-                                <span class="product-price">Rp {{ number_format($product->harga, 0, ',', '.') }}</span>
-                                <a href="{{ route('beli', $product->id) }}" class="btn btn-sm btn-primary rounded-pill">Detail</a>
+                            <p class="product-seller text-muted small mb-3"><i class="bi bi-shop me-1"></i> {{ $product->umkm->nama_toko ?? 'UMKM Pesisir' }}</p>
+                            <div class="product-footer d-flex justify-content-between align-items-center mt-auto">
+                                <span class="product-price fw-bold text-primary">Rp {{ number_format($product->harga, 0, ',', '.') }}</span>
+                                <a href="{{ route('beli', $product->id) }}" class="btn btn-sm btn-primary rounded-pill px-3">Detail</a>
                             </div>
                         </div>
                     </div>

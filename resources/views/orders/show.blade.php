@@ -13,8 +13,22 @@
                     <h3 class="fw-bold mb-0">Detail Pesanan <span class="text-primary">#{{ $transaction->transaction_code }}</span></h3>
                 </div>
                 <div class="text-end">
-                    <span class="badge {{ $transaction->status === 'completed' ? 'bg-success' : 'bg-warning' }} bg-opacity-10 {{ $transaction->status === 'completed' ? 'text-success' : 'text-warning' }} px-3 py-2 rounded-pill">
-                        {{ strtoupper($transaction->status == 'completed' ? 'Selesai' : ($transaction->status == 'pending' ? 'Belum Bayar' : 'Berhasil')) }}
+                    @php
+                        $status_labels = [
+                            'pending' => ['label' => 'Belum Bayar', 'class' => 'bg-warning'],
+                            'paid' => ['label' => 'Sudah Bayar', 'class' => 'bg-info'],
+                            'proses' => ['label' => 'Diproses', 'class' => 'bg-primary'],
+                            'ready' => ['label' => 'Siap Dikirim', 'class' => 'bg-primary'],
+                            'shipping' => ['label' => 'Dalam Pengiriman', 'class' => 'bg-primary'],
+                            'delivered' => ['label' => 'Sudah Sampai', 'class' => 'bg-success'],
+                            'completed' => ['label' => 'Selesai', 'class' => 'bg-success'],
+                            'failed' => ['label' => 'Gagal', 'class' => 'bg-danger'],
+                            'cancelled' => ['label' => 'Dibatalkan', 'class' => 'bg-secondary'],
+                        ];
+                        $curr_status = $status_labels[$transaction->status] ?? ['label' => strtoupper($transaction->status), 'class' => 'bg-secondary'];
+                    @endphp
+                    <span class="badge {{ $curr_status['class'] }} bg-opacity-10 text-{{ str_replace('bg-', '', $curr_status['class']) }} px-3 py-2 rounded-pill">
+                        {{ strtoupper($curr_status['label']) }}
                     </span>
                 </div>
             </div>
@@ -108,6 +122,43 @@
                                 </div>
                             </div>
 
+                            @if($transaction->status === 'completed' && !$transaction->review)
+                                <div class="mt-4 pt-4 border-top">
+                                    <h6 class="fw-bold mb-3"><i class="bi bi-star-fill text-warning me-2"></i>Berikan Ulasan Anda</h6>
+                                    <form action="{{ route('reviews.store') }}" method="POST">
+                                        @csrf
+                                        <input type="hidden" name="transaction_id" value="{{ $transaction->id }}">
+                                        
+                                        <div class="mb-3">
+                                            <label class="form-label small text-muted">Rating</label>
+                                            <div class="star-rating d-flex gap-2 fs-3 text-warning">
+                                                @for($i = 1; $i <= 5; $i++)
+                                                    <input type="radio" name="rating" id="star{{ $i }}" value="{{ $i }}" class="d-none" {{ $i == 5 ? 'checked' : '' }}>
+                                                    <label for="star{{ $i }}" class="bi bi-star pointer" data-rating="{{ $i }}"></label>
+                                                @endfor
+                                            </div>
+                                        </div>
+
+                                        <div class="mb-3">
+                                            <label for="comment" class="form-label small text-muted">Komentar (Opsional)</label>
+                                            <textarea name="comment" id="comment" rows="3" class="form-control rounded-3" placeholder="Bagaimana pengalaman Anda dengan produk ini?"></textarea>
+                                        </div>
+
+                                        <button type="submit" class="btn btn-primary w-100 rounded-pill py-2">Kirim Ulasan</button>
+                                    </form>
+                                </div>
+                            @elseif($transaction->review)
+                                <div class="mt-4 pt-4 border-top">
+                                    <h6 class="fw-bold mb-2">Ulasan Anda:</h6>
+                                    <div class="text-warning mb-2">
+                                        @for($i = 1; $i <= 5; $i++)
+                                            <i class="bi bi-star{{ $i <= $transaction->review->rating ? '-fill' : '' }}"></i>
+                                        @endfor
+                                    </div>
+                                    <p class="text-muted small italic">"{{ $transaction->review->comment ?? 'Tidak ada komentar.' }}"</p>
+                                </div>
+                            @endif
+
                             @if(($transaction->status === 'ready' || $transaction->delivery_status === 'shipping') && $transaction->status !== 'completed')
                                 <div class="mt-4 pt-3 border-top">
                                     <form action="{{ route('transaction.update_status_user', $transaction->id) }}" method="POST">
@@ -126,37 +177,67 @@
 
                 <!-- Order Details -->
                 <div class="col-md-7">
+                    @if($transaction->order_photo)
+                        <div class="card border-0 shadow-sm rounded-4 mb-4 overflow-hidden">
+                            <div class="card-header bg-primary bg-opacity-10 border-0 py-3">
+                                <h5 class="fw-bold mb-0 text-primary"><i class="bi bi-camera me-2"></i>Foto Pesanan</h5>
+                            </div>
+                            <div class="card-body p-0">
+                                <a href="{{ asset('storage/' . $transaction->order_photo) }}" target="_blank">
+                                    <img src="{{ asset('storage/' . $transaction->order_photo) }}" class="img-fluid w-100" style="max-height: 400px; object-fit: cover;">
+                                </a>
+                                <div class="p-3 bg-light">
+                                    <p class="text-muted small mb-0"><i class="bi bi-info-circle me-1"></i>Ini adalah foto pesanan Anda yang disiapkan oleh UMKM.</p>
+                                </div>
+                            </div>
+                        </div>
+                    @elseif(in_array($transaction->status, ['ready', 'shipping', 'delivered', 'completed']))
+                         <div class="card border-0 shadow-sm rounded-4 mb-4">
+                            <div class="card-body p-4 text-center">
+                                <i class="bi bi-camera text-muted fs-1 mb-2 d-block"></i>
+                                <h6 class="fw-bold mb-1">Foto Belum Tersedia</h6>
+                                <p class="text-muted small mb-0">UMKM belum mengunggah foto pesanan ini.</p>
+                            </div>
+                        </div>
+                    @endif
+
                     <div class="card border-0 shadow-sm rounded-4 mb-4">
                         <div class="card-body p-4">
                             <h5 class="fw-bold mb-4">Detail Produk</h5>
-                            <div class="d-flex align-items-center mb-4">
-                                <div class="flex-shrink-0 me-3">
-                                    @php
-                                        // Cek field 'image' dulu (biasanya path lengkap: products/xxx.jpg)
-                                        // Jika kosong, cek 'foto_produk' (biasanya JSON array)
-                                        $foto = $transaction->product->image;
-                                        
-                                        if (!$foto && $transaction->product->foto_produk) {
-                                            $foto_array = json_decode($transaction->product->foto_produk);
-                                            $foto = (is_array($foto_array) && count($foto_array) > 0) ? $foto_array[0] : $transaction->product->foto_produk;
-                                        }
-                                        
-                                        if (!$foto) {
-                                            $foto_url = asset('storage/default.jpg');
-                                        } else {
-                                            // Jika path sudah ada prefix 'products/', gunakan asset('storage/' . $foto)
-                                            // Jika tidak, tambahkan prefix 'products/'
-                                            $foto_url = (strpos($foto, 'products/') === 0) ? asset('storage/' . $foto) : asset('storage/products/' . $foto);
-                                        }
-                                    @endphp
-                                    <img src="{{ $foto_url }}" class="rounded-3 shadow-sm" style="width: 100px; height: 100px; object-fit: cover;" onerror="this.src='https://ui-avatars.com/api/?name={{ urlencode($transaction->product->nama_produk) }}&background=random&color=fff&size=100'">
+                            @if($transaction->product)
+                                <div class="d-flex align-items-center mb-4">
+                                    <div class="flex-shrink-0 me-3">
+                                        @php
+                                            // Cek field 'image' dulu (biasanya path lengkap: products/xxx.jpg)
+                                            // Jika kosong, cek 'foto_produk' (biasanya JSON array)
+                                            $foto = $transaction->product->image;
+                                            
+                                            if (!$foto && $transaction->product->foto_produk) {
+                                                $foto_array = json_decode($transaction->product->foto_produk);
+                                                $foto = (is_array($foto_array) && count($foto_array) > 0) ? $foto_array[0] : $transaction->product->foto_produk;
+                                            }
+                                            
+                                            if (!$foto) {
+                                                $foto_url = asset('storage/default.jpg');
+                                            } else {
+                                                // Jika path sudah ada prefix 'products/', gunakan asset('storage/' . $foto)
+                                                // Jika tidak, tambahkan prefix 'products/'
+                                                $foto_url = (strpos($foto, 'products/') === 0) ? asset('storage/' . $foto) : asset('storage/products/' . $foto);
+                                            }
+                                        @endphp
+                                        <img src="{{ $foto_url }}" class="rounded-3 shadow-sm" style="width: 100px; height: 100px; object-fit: cover;" onerror="this.src='https://ui-avatars.com/api/?name={{ urlencode($transaction->product->nama_produk) }}&background=random&color=fff&size=100'">
+                                    </div>
+                                    <div class="flex-grow-1">
+                                        <h6 class="fw-bold mb-1">{{ $transaction->product->nama_produk }}</h6>
+                                        <p class="text-primary fw-bold mb-0">Rp{{ number_format($transaction->price, 0, ',', '.') }}</p>
+                                        <small class="text-muted">Jumlah: {{ $transaction->quantity }} {{ $transaction->product->satuan ?? 'pcs' }}</small>
+                                    </div>
                                 </div>
-                                <div class="flex-grow-1">
-                                    <h6 class="fw-bold mb-1">{{ $transaction->product->nama_produk }}</h6>
-                                    <p class="text-primary fw-bold mb-0">Rp{{ number_format($transaction->price, 0, ',', '.') }}</p>
-                                    <small class="text-muted">Jumlah: {{ $transaction->quantity }} {{ $transaction->product->satuan ?? 'pcs' }}</small>
+                            @else
+                                <div class="alert alert-warning">
+                                    Produk ini sudah tidak tersedia lagi.
                                 </div>
-                            </div>
+                            @endif
 
                             <hr class="my-4 opacity-50">
 
@@ -164,23 +245,23 @@
                             <div class="row g-3">
                                 <div class="col-6">
                                     <p class="text-muted small mb-1">Nama Penerima</p>
-                                    <p class="fw-bold mb-0">{{ $transaction->buyer_name }}</p>
+                                    <p class="fw-bold mb-0">{{ $transaction->buyer_name ?? '-' }}</p>
                                 </div>
                                 <div class="col-6">
                                     <p class="text-muted small mb-1">Nomor Telepon</p>
-                                    <p class="fw-bold mb-0">{{ $transaction->buyer_phone }}</p>
+                                    <p class="fw-bold mb-0">{{ $transaction->buyer_phone ?? '-' }}</p>
                                 </div>
                                 <div class="col-12">
                                     <p class="text-muted small mb-1">Alamat Lengkap</p>
-                                    <p class="mb-0">{{ $transaction->buyer_address }}, {{ $transaction->buyer_city }} {{ $transaction->buyer_postal_code }}</p>
+                                    <p class="mb-0">{{ $transaction->buyer_address ?? '-' }}, {{ $transaction->buyer_city ?? '-' }} {{ $transaction->buyer_postal_code ?? '-' }}</p>
                                 </div>
                                 <div class="col-6">
                                     <p class="text-muted small mb-1">Metode Pengiriman</p>
-                                    <p class="fw-bold mb-0 text-capitalize">{{ $transaction->delivery_type == 'delivery' ? 'Diantar' : 'Ambil Sendiri' }}</p>
+                                    <p class="fw-bold mb-0 text-capitalize">{{ ($transaction->delivery_type ?? 'delivery') == 'delivery' ? 'Diantar' : 'Ambil Sendiri' }}</p>
                                 </div>
                                 <div class="col-6">
                                     <p class="text-muted small mb-1">Metode Pembayaran</p>
-                                    <p class="fw-bold mb-0 text-uppercase">{{ $transaction->payment_method }}</p>
+                                    <p class="fw-bold mb-0 text-uppercase">{{ $transaction->payment_method ?? '-' }}</p>
                                 </div>
                             </div>
 
@@ -291,5 +372,40 @@
     .timeline-item:last-child::before {
         display: none;
     }
+
+    .pointer {
+        cursor: pointer;
+    }
+
+    .star-rating label:hover,
+    .star-rating label:hover ~ label {
+        color: #ffc107;
+    }
 </style>
+
+<script>
+    document.querySelectorAll('.star-rating label').forEach(label => {
+        label.addEventListener('click', function() {
+            const rating = this.getAttribute('data-rating');
+            const parent = this.parentElement;
+            
+            // Update icons
+            parent.querySelectorAll('label').forEach(l => {
+                const r = l.getAttribute('data-rating');
+                if (r <= rating) {
+                    l.classList.remove('bi-star');
+                    l.classList.add('bi-star-fill');
+                } else {
+                    l.classList.remove('bi-star-fill');
+                    l.classList.add('bi-star');
+                }
+            });
+        });
+        
+        // Initial state for checked radio (default 5)
+        if (label.previousElementSibling.checked) {
+            label.click();
+        }
+    });
+</script>
 @endsection

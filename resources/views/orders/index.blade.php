@@ -58,18 +58,26 @@
                         <div class="d-flex align-items-center">
                             <span class="badge bg-light text-dark border me-2"><i class="bi bi-bag me-1"></i> Belanja</span>
                             <span class="text-muted small me-2">{{ $order->created_at->format('d M Y') }}</span>
-                            <span class="badge {{ $order->status === 'paid' || $order->status === 'completed' ? 'bg-success bg-opacity-10 text-success' : ($order->status === 'pending' ? 'bg-warning bg-opacity-10 text-warning' : 'bg-danger bg-opacity-10 text-danger') }}">
-                                @if($order->status === 'paid' || $order->status === 'completed')
-                                BERHASIL
-                                @elseif($order->status === 'pending')
-                                BELUM BAYAR
-                                @else
-                                GAGAL
-                                @endif
+                            @php
+                                $status_labels = [
+                                    'pending' => ['label' => 'Belum Bayar', 'class' => 'bg-warning'],
+                                    'paid' => ['label' => 'Sudah Bayar', 'class' => 'bg-info'],
+                                    'proses' => ['label' => 'Diproses', 'class' => 'bg-primary'],
+                                    'ready' => ['label' => 'Siap Dikirim', 'class' => 'bg-primary'],
+                                    'shipping' => ['label' => 'Dikirim', 'class' => 'bg-primary'],
+                                    'delivered' => ['label' => 'Tiba di Tujuan', 'class' => 'bg-success'],
+                                    'completed' => ['label' => 'Selesai', 'class' => 'bg-success'],
+                                    'failed' => ['label' => 'Gagal', 'class' => 'bg-danger'],
+                                    'cancelled' => ['label' => 'Dibatalkan', 'class' => 'bg-secondary'],
+                                ];
+                                $curr_status = $status_labels[$order->status] ?? ['label' => strtoupper($order->status), 'class' => 'bg-secondary'];
+                            @endphp
+                            <span class="badge {{ $curr_status['class'] }} bg-opacity-10 text-{{ str_replace('bg-', '', $curr_status['class']) }}">
+                                {{ strtoupper($curr_status['label']) }}
                             </span>
                             <span class="ms-2 text-muted small d-none d-md-inline">/ {{ $order->transaction_code }}</span>
                         </div>
-                        <div class="text-primary fw-bold">{{ $order->product->umkm->nama_umkm ?? 'Toko UMKM' }}</div>
+                        <div class="text-primary fw-bold">{{ $order->product->umkm->nama_toko ?? 'Toko UMKM' }}</div>
                     </div>
                 </div>
                 <div class="card-body p-4">
@@ -77,28 +85,39 @@
                         <div class="col-md-8">
                             <div class="d-flex align-items-center">
                                 <div class="flex-shrink-0 me-3">
-                                    @php
-                                        $foto = $order->product->image;
-                                        if (!$foto && $order->product->foto_produk) {
-                                            $foto_array = json_decode($order->product->foto_produk);
-                                            $foto = (is_array($foto_array) && count($foto_array) > 0) ? $foto_array[0] : $order->product->foto_produk;
-                                        }
-                                        
-                                        if (!$foto) {
-                                            $foto_url = asset('storage/default.jpg');
-                                        } else {
-                                            $foto_url = (strpos($foto, 'products/') === 0) ? asset('storage/' . $foto) : asset('storage/products/' . $foto);
-                                        }
-                                    @endphp
-                                    <img src="{{ $foto_url }}" class="rounded-3 shadow-sm" style="width: 80px; height: 80px; object-fit: cover;" onerror="this.src='https://ui-avatars.com/api/?name={{ urlencode($order->product->nama_produk) }}&background=random&color=fff&size=80'">
+                                    @if($order->product)
+                                        @php
+                                            $foto = $order->product->image;
+                                            if (!$foto && $order->product->foto_produk) {
+                                                $foto_array = json_decode($order->product->foto_produk);
+                                                $foto = (is_array($foto_array) && count($foto_array) > 0) ? $foto_array[0] : $order->product->foto_produk;
+                                            }
+                                            
+                                            if (!$foto) {
+                                                $foto_url = asset('storage/default.jpg');
+                                            } else {
+                                                $foto_url = (strpos($foto, 'products/') === 0) ? asset('storage/' . $foto) : asset('storage/products/' . $foto);
+                                            }
+                                        @endphp
+                                        <img src="{{ $foto_url }}" class="rounded-3 shadow-sm" style="width: 80px; height: 80px; object-fit: cover;" onerror="this.src='https://ui-avatars.com/api/?name={{ urlencode($order->product->nama_produk) }}&background=random&color=fff&size=80'">
+                                    @else
+                                        <div class="rounded-3 bg-light d-flex align-items-center justify-content-center shadow-sm" style="width: 80px; height: 80px;">
+                                            <i class="bi bi-box text-muted"></i>
+                                        </div>
+                                    @endif
                                 </div>
                                 <div class="flex-grow-1">
-                                    <h6 class="fw-bold mb-1">{{ $order->product->nama_produk }}</h6>
-                                    <p class="text-muted small mb-1">{{ $order->quantity }} x Rp{{ number_format($order->price, 0, ',', '.') }}</p>
-                                    @if($order->order_type == 'po')
-                                    <span class="badge bg-warning bg-opacity-10 text-warning border-warning border-opacity-25 x-small">
-                                        <i class="bi bi-clock-history me-1"></i> Pre-Order (Target Selesai: {{ \Carbon\Carbon::parse($order->po_date)->format('d M Y') }})
-                                    </span>
+                                    @if($order->product)
+                                        <h6 class="fw-bold mb-1">{{ $order->product->nama_produk }}</h6>
+                                        <p class="text-muted small mb-1">{{ $order->quantity }} x Rp{{ number_format($order->price, 0, ',', '.') }}</p>
+                                        @if($order->order_type == 'po')
+                                        <span class="badge bg-warning bg-opacity-10 text-warning border-warning border-opacity-25 x-small">
+                                            <i class="bi bi-clock-history me-1"></i> Pre-Order (Target Selesai: {{ $order->po_date ? \Carbon\Carbon::parse($order->po_date)->format('d M Y') : '-' }})
+                                        </span>
+                                        @endif
+                                    @else
+                                        <h6 class="fw-bold mb-1 text-muted">Produk tidak tersedia</h6>
+                                        <p class="text-muted small mb-1">{{ $order->quantity }} item</p>
                                     @endif
                                     @if($order->quantity > 1)
                                     <small class="text-muted">+ {{ $order->quantity - 1 }} produk lainnya</small>
@@ -140,39 +159,6 @@
                 </div>
             </div>
 
-            <!-- Modal Upload Bukti Moved Outside Card -->
-            <div class="modal fade" id="uploadProofModal{{ $order->id }}" tabindex="-1" aria-hidden="true">
-                <div class="modal-dialog modal-dialog-centered">
-                    <div class="modal-content border-0 shadow-lg rounded-4">
-                        <div class="modal-header border-0 pb-0">
-                            <h5 class="modal-title fw-bold">Upload Bukti Pembayaran</h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                        </div>
-                        <form action="{{ route('transaction.upload_proof', $order->id) }}" method="POST" enctype="multipart/form-data">
-                            @csrf
-                            <div class="modal-body">
-                                <p class="text-muted small mb-3">Silakan upload foto bukti transfer Anda untuk diverifikasi oleh admin.</p>
-
-                                @if($order->payment_proof)
-                                <div class="mb-3">
-                                    <p class="small fw-bold mb-1">Bukti Saat Ini:</p>
-                                    <img src="{{ asset('storage/' . $order->payment_proof) }}" class="img-fluid rounded border" style="max-height: 200px;">
-                                </div>
-                                @endif
-
-                                <div class="mb-3">
-                                    <label class="form-label small fw-bold">Pilih Foto Bukti</label>
-                                    <input type="file" name="payment_proof" class="form-control" accept="image/*" required>
-                                </div>
-                            </div>
-                            <div class="modal-footer border-0 pt-0">
-                                <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Batal</button>
-                                <button type="submit" class="btn btn-primary rounded-pill px-4">Upload Sekarang</button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            </div>
             @empty
             <div class="text-center py-5 bg-white rounded-4 shadow-sm">
                 <img src="https://illustrations.popsy.co/blue/shopping-cart.svg" alt="Empty" style="width: 200px;" class="mb-4">
@@ -181,6 +167,44 @@
                 <a href="/katalog" class="btn btn-primary px-5 rounded-pill mt-2">Belanja Sekarang</a>
             </div>
             @endforelse
+
+            <!-- All Modals (Moved Outside Main Loop) -->
+            @foreach ($transactions as $order)
+                @if($order->status === 'pending' && ($order->payment_method === 'transfer' || $order->payment_method === 'qris'))
+                <div class="modal fade" id="uploadProofModal{{ $order->id }}" tabindex="-1" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content border-0 shadow-lg rounded-4">
+                            <div class="modal-header border-0 pb-0">
+                                <h5 class="modal-title fw-bold">Upload Bukti Pembayaran</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <form action="{{ route('transaction.upload_proof', $order->id) }}" method="POST" enctype="multipart/form-data">
+                                @csrf
+                                <div class="modal-body">
+                                    <p class="text-muted small mb-3">Silakan upload foto bukti transfer Anda untuk diverifikasi oleh admin.</p>
+
+                                    @if($order->payment_proof)
+                                    <div class="mb-3">
+                                        <p class="small fw-bold mb-1">Bukti Saat Ini:</p>
+                                        <img src="{{ asset('storage/' . $order->payment_proof) }}" class="img-fluid rounded border" style="max-height: 200px;">
+                                    </div>
+                                    @endif
+
+                                    <div class="mb-3">
+                                        <label class="form-label small fw-bold">Pilih Foto Bukti</label>
+                                        <input type="file" name="payment_proof" class="form-control" accept="image/*" required>
+                                    </div>
+                                </div>
+                                <div class="modal-footer border-0 pt-0">
+                                    <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Batal</button>
+                                    <button type="submit" class="btn btn-primary rounded-pill px-4">Upload Sekarang</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                @endif
+            @endforeach
 
             <div class="mt-4 d-flex justify-content-center">
                 {{ $transactions->links() }}

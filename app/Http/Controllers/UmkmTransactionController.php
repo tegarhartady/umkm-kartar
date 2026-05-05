@@ -15,7 +15,7 @@ class UmkmTransactionController extends Controller
         $umkmProductIds = $umkm->products()->pluck('id');
         
         $transactions = Transaction::whereIn('product_id', $umkmProductIds)
-            ->with(['product'])
+            ->with(['product', 'review'])
             ->orderByDesc('created_at')
             ->paginate(15);
             
@@ -36,7 +36,7 @@ class UmkmTransactionController extends Controller
             ->whereMonth('created_at', $month)
             ->whereYear('created_at', $year);
             
-        $transactions = $query->with('product')->orderBy('created_at', 'desc')->get();
+        $transactions = $query->with(['product', 'review'])->orderBy('created_at', 'desc')->get();
         
         // Hitung total pendapatan dari harga * qty agar terpisah dari ongkir (jika ongkir masuk total_price)
         // Atau kita gunakan total_price sesuai dengan dashboard
@@ -82,6 +82,17 @@ class UmkmTransactionController extends Controller
             'delivery_status' => 'nullable|string',
         ]);
 
+        // Logic: Jika status berubah menjadi 'proses' (diterima oleh UMKM)
+        // Maka kurangi stok produk sesuai quantity pesanan
+        if ($validated['status'] === 'proses' && $transaction->status !== 'proses') {
+            $product = $transaction->product;
+            if ($product) {
+                // Pastikan stok tidak menjadi negatif (opsional, tergantung kebijakan bisnis)
+                $newStock = max(0, $product->stok - $transaction->quantity);
+                $product->update(['stok' => $newStock]);
+            }
+        }
+
         $updateData = ['status' => $validated['status']];
         if (isset($validated['delivery_status'])) {
             $updateData['delivery_status'] = $validated['delivery_status'];
@@ -89,6 +100,33 @@ class UmkmTransactionController extends Controller
 
         $transaction->update($updateData);
 
-        return back()->with('success', 'Status transaksi berhasil diperbarui.');
+        return back()->with('success', 'Status transaksi berhasil diperbarui dan stok telah disesuaikan.');
+    }
+
+    public function uploadOrderPhoto(Request $request, $id)
+    {
+        $transaction = Transaction::findOrFail($id);
+        $umkm = Auth::guard('umkm')->user();
+        
+        // Ensure this transaction belongs to this UMKM
+        if ($transaction->product->umkm_id !== $umkm->id) {
+            abort(403);
+        }
+
+        $request->validate([
+            'order_photo' => 'required|image|mimes:jpeg,png,jpg|max:2048',
+        ]);
+
+        if ($request->hasFile('order_photo')) {
+            // Delete old photo if exists
+            if ($transaction->order_photo) {
+                \Illuminate\Support\Facades\Storage::disk('public')->delete($transaction->order_photo);
+            }
+
+            $path = $request->file('order_photo')->store('order_photos', 'public');
+            $transaction->update(['order_photo' => $path]);
+        }
+
+        return back()->with('success', 'Foto pesanan berhasil diunggah.');
     }
 }

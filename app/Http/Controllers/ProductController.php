@@ -4,41 +4,36 @@ namespace App\Http\Controllers;
 
 use App\Models\Product;
 use App\Models\Umkm;
+use App\Models\Category;
+use App\Models\Unit;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 
 class ProductController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * Display a listing of the resource for admin.
      */
     public function index()
     {
-        $user = auth()->user();
-        
-        // Admin bisa lihat semua produk
-        if ($user && ($user->role === 'admin' || $user->role === 'super_admin')) {
-            $products = Product::latest()->paginate(10);
-            return view('admin.products.index', compact('products'));
-        }
-        
-        // UMKM lihat produk miliknya saja
-        if ($user && method_exists($user, 'products')) {
-            $products = $user->products()->latest()->paginate(10);
-            return view('umkm.products.index', compact('products'));
-        }
-        
-        abort(403, 'Unauthorized');
+        $products = Product::with(['umkm'])
+            ->withAvg('reviews', 'rating')
+            ->withCount('reviews')
+            ->latest()
+            ->paginate(15);
+            
+        return view('admin.products.index', compact('products'));
     }
 
     /**
-     * Show the form for creating a new resource.
+     * Show the form for creating a new resource for admin.
      */
     public function create()
     {
-        $umkms = Umkm::all();
-        return view('admin.products.create', compact('umkms'));
+        $umkms = Umkm::where('status', 'disetujui')->get();
+        $categories = Category::orderBy('nama_kategori')->get();
+        $units = Unit::orderBy('nama_satuan')->get();
+        return view('admin.products.create', compact('umkms', 'categories', 'units'));
     }
 
     /**
@@ -71,30 +66,34 @@ class ProductController extends Controller
     }
 
     /**
-     * Display the specified resource.
+     * Display the specified resource for admin.
      */
-    public function show(Product $product)
+    public function show($id)
     {
-        $this->authorize('view', $product);
-        return view('umkm.products.show', compact('product'));
+        $product = Product::findOrFail($id);
+        return view('admin.products.show', compact('product'));
     }
 
     /**
-     * Show the form for editing the specified resource.
+     * Show the form for editing the specified resource for admin.
      */
-    public function edit(Product $product)
+    public function edit($id)
     {
-        $this->authorize('update', $product);
-        return view('umkm.products.edit', compact('product'));
+        $product = Product::withAvg('reviews', 'rating')
+            ->withCount('reviews')
+            ->findOrFail($id);
+        $umkms = Umkm::where('status', 'disetujui')->get();
+        $categories = Category::orderBy('nama_kategori')->get();
+        $units = Unit::orderBy('nama_satuan')->get();
+        return view('admin.products.edit', compact('product', 'umkms', 'categories', 'units'));
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Product $product)
+    public function update(Request $request, $id)
     {
-        $this->authorize('update', $product);
-
+        $product = Product::findOrFail($id);
         $validated = $request->validate([
             'nama_produk' => 'required|string|max:255',
             'deskripsi' => 'required|string',
@@ -102,39 +101,64 @@ class ProductController extends Controller
             'stok' => 'required|integer|min:0',
             'satuan' => 'required|string|max:50',
             'kategori' => 'nullable|string|max:100',
-            'foto' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
-        // Handle foto update
-        if ($request->hasFile('foto')) {
-            if ($product->foto) {
-                Storage::disk('public')->delete($product->foto);
+        if ($request->hasFile('image')) {
+            if ($product->image) {
+                Storage::disk('public')->delete($product->image);
             }
-            $validated['foto'] = $request->file('foto')->store('products', 'public');
+            $validated['image'] = $request->file('image')->store('products', 'public');
         }
 
         $product->update($validated);
 
         return redirect()
-            ->route('umkm.products.index')
+            ->route('admin.products.index')
             ->with('success', '✅ Produk berhasil diperbarui!');
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Product $product)
+    public function destroy($id)
     {
-        $this->authorize('delete', $product);
-
-        if ($product->foto) {
-            Storage::disk('public')->delete($product->foto);
+        $product = Product::findOrFail($id);
+        if ($product->image) {
+            Storage::disk('public')->delete($product->image);
         }
 
         $product->delete();
 
         return redirect()
-            ->route('umkm.products.index')
+            ->route('admin.products.index')
             ->with('success', '✅ Produk berhasil dihapus!');
+    }
+
+    /**
+     * Display products moderation page.
+     */
+    public function moderasi()
+    {
+        $products = Product::with(['umkm'])
+            ->withAvg('reviews', 'rating')
+            ->withCount('reviews')
+            ->latest()
+            ->paginate(15);
+            
+        return view('admin.products.moderasi', compact('products'));
+    }
+
+    /**
+     * Update product status.
+     */
+    public function updateStatus(Request $request, $id)
+    {
+        $product = Product::findOrFail($id);
+        $product->update([
+            'status' => $request->status
+        ]);
+
+        return back()->with('success', "Status produk '{$product->nama_produk}' berhasil diperbarui ke {$request->status}.");
     }
 }

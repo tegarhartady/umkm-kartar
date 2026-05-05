@@ -41,11 +41,22 @@
                 <h1 class="fw-bold mb-3">{{ $product->nama_produk }}</h1>
 
                 <!-- UMKM Info -->
-                <div class="d-flex align-items-center mb-4 pb-4 border-bottom">
-                    <i class="bi bi-shop text-success me-3" style="font-size: 1.5rem;"></i>
-                    <div>
-                        <h6 class="mb-0">{{ $product->umkm->nama_toko ?? 'UMKM' }}</h6>
-                        <small class="text-muted">{{ $product->umkm->desa ?? '' }}</small>
+                <div class="d-flex align-items-center mb-4 pb-4 border-bottom justify-content-between">
+                    <div class="d-flex align-items-center">
+                        <i class="bi bi-shop text-success me-3" style="font-size: 1.5rem;"></i>
+                        <div>
+                            <h6 class="mb-0">{{ $product->umkm->nama_toko ?? 'UMKM' }}</h6>
+                            <small class="text-muted">{{ $product->umkm->desa ?? '' }}</small>
+                        </div>
+                    </div>
+                    <div class="text-end">
+                        <div class="text-warning h5 mb-0">
+                            @php $rating = $product->averageRating(); @endphp
+                            @for($i = 1; $i <= 5; $i++)
+                                <i class="bi bi-star{{ $i <= round($rating) ? '-fill' : '' }}"></i>
+                            @endfor
+                        </div>
+                        <small class="text-muted">{{ $product->reviews->count() }} Penilaian</small>
                     </div>
                 </div>
 
@@ -61,10 +72,15 @@
                         <i class="bi bi-box-seam me-2 text-success"></i>
                         <strong>Stok: {{ $product->stok }} {{ $product->satuan ?? 'pcs' }}</strong>
                     </p>
-                    @if($product->stok < 5)
+                    @if($product->stok < 5 && $product->stok > 0)
                         <div class="alert alert-warning d-flex align-items-center" role="alert">
                             <i class="bi bi-exclamation-triangle me-2"></i>
                             <div>Stok terbatas! Segera pesan sebelum kehabisan.</div>
+                        </div>
+                    @elseif($product->stok <= 0)
+                        <div class="alert alert-danger d-flex align-items-center" role="alert">
+                            <i class="bi bi-x-circle me-2"></i>
+                            <div>Stok habis. Hubungi penjual untuk info ketersediaan.</div>
                         </div>
                     @endif
                 </div>
@@ -77,13 +93,45 @@
 
                 <!-- CTA Buttons -->
                 <div class="d-flex gap-3">
-                    <a href="{{ route('checkout.show', $product->id) }}" class="btn btn-success btn-lg grow">
-                        <i class="bi bi-cart me-2"></i>Beli Sekarang
+                    <a href="{{ route('checkout.show', $product->id) }}" class="btn btn-success btn-lg grow px-5 rounded-pill shadow-sm {{ $product->stok <= 0 ? 'disabled' : '' }}">
+                        <i class="bi bi-cart-check me-2"></i>Beli Sekarang
                     </a>
-                    {{-- <a href="{{ route('katalog') }}" class="btn btn-outline-secondary btn-lg">
-                        <i class="bi bi-arrow-left me-2"></i>Kembali
-                    </a> --}}
                 </div>
+            </div>
+        </div>
+
+        <!-- Reviews Section -->
+        <div class="row mt-5 pt-4">
+            <div class="col-lg-8">
+                <h4 class="fw-bold mb-4">Penilaian Produk</h4>
+                @forelse($product->reviews()->with('user')->latest()->get() as $review)
+                    <div class="card border-0 shadow-sm rounded-4 mb-3">
+                        <div class="card-body p-4">
+                            <div class="d-flex justify-content-between mb-2">
+                                <div class="d-flex align-items-center">
+                                    <div class="avatar-sm bg-light text-primary rounded-circle d-flex align-items-center justify-content-center fw-bold me-3" style="width: 40px; height: 40px;">
+                                        {{ strtoupper(substr($review->user->name ?? 'A', 0, 1)) }}
+                                    </div>
+                                    <div>
+                                        <h6 class="mb-0 fw-bold">{{ $review->user->name ?? 'Anonim' }}</h6>
+                                        <div class="text-warning x-small">
+                                            @for($i = 1; $i <= 5; $i++)
+                                                <i class="bi bi-star{{ $i <= $review->rating ? '-fill' : '' }}"></i>
+                                            @endfor
+                                        </div>
+                                    </div>
+                                </div>
+                                <small class="text-muted">{{ $review->created_at->format('d M Y') }}</small>
+                            </div>
+                            <p class="text-muted mb-0 mt-3 fst-italic">"{{ $review->comment }}"</p>
+                        </div>
+                    </div>
+                @empty
+                    <div class="alert alert-light border text-center py-5 rounded-4">
+                        <i class="bi bi-chat-dots fs-1 text-muted opacity-25 d-block mb-3"></i>
+                        <p class="text-muted mb-0">Belum ada penilaian untuk produk ini.</p>
+                    </div>
+                @endforelse
             </div>
         </div>
 
@@ -97,20 +145,28 @@
                     @foreach($relatedProducts as $related)
                         <div class="col">
                             <a href="/beli/{{ $related->id }}" class="text-decoration-none">
-                                <div class="card h-100 border-0 shadow-sm hover-shadow">
+                                <div class="card h-100 border-0 shadow-sm hover-shadow rounded-4 overflow-hidden">
                                     <div style="height: 200px; overflow: hidden; background: linear-gradient(45deg, #f8f9fa, #e9ecef);">
                                         @if($related->image)
-                                            <img src="{{ asset($related->image) }}" alt="{{ $related->nama_produk }}" class="w-100 h-100" style="object-fit: cover;">
+                                            <img src="{{ asset('storage/' . $related->image) }}" alt="{{ $related->nama_produk }}" class="w-100 h-100" style="object-fit: cover;">
                                         @else
                                             <div class="d-flex align-items-center justify-content-center h-100">
-                                                <i class="bi bi-image text-muted"></i>
+                                                <i class="bi bi-image text-muted opacity-50 fs-1"></i>
                                             </div>
                                         @endif
                                     </div>
-                                    <div class="card-body">
-                                        <h6 class="card-title fw-bold text-dark">{{ Str::limit($related->nama_produk, 30) }}</h6>
-                                        <p class="card-text text-muted small mb-2">{{ $related->umkm->nama_toko ?? 'UMKM' }}</p>
-                                        <p class="card-text fw-bold text-success">Rp {{ number_format($related->harga, 0, ',', '.') }}</p>
+                                    <div class="card-body p-3">
+                                        <div class="d-flex justify-content-between align-items-start mb-1">
+                                            <h6 class="card-title fw-bold text-dark mb-0">{{ Str::limit($related->nama_produk, 25) }}</h6>
+                                        </div>
+                                        <p class="card-text text-muted x-small mb-2">{{ $related->umkm->nama_toko ?? 'UMKM' }}</p>
+                                        <div class="text-warning x-small mb-2">
+                                            @php $relRating = $related->averageRating(); @endphp
+                                            @for($i = 1; $i <= 5; $i++)
+                                                <i class="bi bi-star{{ $i <= round($relRating) ? '-fill' : '' }}"></i>
+                                            @endfor
+                                        </div>
+                                        <p class="card-text fw-bold text-success mb-0">Rp {{ number_format($related->harga, 0, ',', '.') }}</p>
                                     </div>
                                 </div>
                             </a>

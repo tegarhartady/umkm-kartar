@@ -200,6 +200,18 @@
                     <span class="nav-section-title">MASTER DATA</span>
                     <ul class="nav-list">
                         <li class="nav-item">
+                            <a href="{{ route('admin.master.categories.index') }}" class="nav-link {{ request()->routeIs('admin.master.categories.*') ? 'active' : '' }}">
+                                <i class="nav-icon bi bi-grid"></i>
+                                <span class="nav-text">Master Kategori</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('admin.master.units.index') }}" class="nav-link {{ request()->routeIs('admin.master.units.*') ? 'active' : '' }}">
+                                <i class="nav-icon bi bi-layers"></i>
+                                <span class="nav-text">Master Satuan</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
                             <a href="{{ route('admin.settings.payment') }}" class="nav-link {{ request()->routeIs('admin.settings.payment') ? 'active' : '' }}">
                                 <i class="nav-icon bi bi-wallet2"></i>
                                 <span class="nav-text">Master Pembayaran</span>

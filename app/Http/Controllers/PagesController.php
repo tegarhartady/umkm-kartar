@@ -7,8 +7,6 @@ use Illuminate\Http\Request;
 
 class PagesController extends Controller
 {
-    // ...existing methods...
-
     public function daftarUmkm()
     {
         $desas = Desa::all();
@@ -16,5 +14,18 @@ class PagesController extends Controller
         return view('pages.daftar-umkm', compact('desas', 'categories'));
     }
 
-    // ...existing methods...
+    public function desaMitra()
+    {
+        return view('pages.desa-mitra');
+    }
+
+    public function csrPik2()
+    {
+        return view('pages.csr-pik2');
+    }
+
+    public function tentang()
+    {
+        return view('pages.tentang');
+    }
 }

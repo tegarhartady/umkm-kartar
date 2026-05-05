@@ -22,15 +22,28 @@ class Product extends Model
         'stok',
         'image',
         'status',
+        'is_best_seller',
+        'kategori',
     ];
 
     protected $casts = [
         'harga' => 'float',
         'stok' => 'integer',
+        'is_best_seller' => 'boolean',
     ];
 
     public function umkm()
     {
         return $this->belongsTo(Umkm::class, 'umkm_id');
+    }
+
+    public function reviews()
+    {
+        return $this->hasMany(Review::class);
+    }
+
+    public function averageRating()
+    {
+        return $this->reviews()->avg('rating') ?: 0;
     }
 }

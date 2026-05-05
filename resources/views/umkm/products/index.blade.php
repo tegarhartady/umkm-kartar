@@ -42,10 +42,12 @@
                                 <thead class="table-light">
                                     <tr>
                                         <th style="width: 50px;">No</th>
+                                        <th>Foto</th>
                                         <th>Nama Produk</th>
                                         <th>Kategori</th>
                                         <th>Harga</th>
                                         <th>Stok</th>
+                                        <th>Rating</th>
                                         <th>Status</th>
                                         <th style="width: 150px;">Aksi</th>
                                     </tr>
@@ -55,7 +57,28 @@
                                         <tr>
                                             <td><span class="badge bg-light text-dark">{{ $loop->iteration }}</span></td>
                                             <td>
-                                                <div class="fw-bold">{{ $product->nama_produk }}</div>
+                                                @php
+                                                    $foto = $product->image;
+                                                    if (!$foto && $product->foto_produk) {
+                                                        $foto_array = json_decode($product->foto_produk);
+                                                        $foto = (is_array($foto_array) && count($foto_array) > 0) ? $foto_array[0] : $product->foto_produk;
+                                                    }
+                                                    
+                                                    if (!$foto) {
+                                                        $foto_url = asset('storage/default.jpg');
+                                                    } else {
+                                                        $foto_url = (strpos($foto, 'products/') === 0) ? asset('storage/' . $foto) : asset('storage/products/' . $foto);
+                                                    }
+                                                @endphp
+                                                <img src="{{ $foto_url }}" alt="Produk" class="rounded shadow-sm" style="width: 50px; height: 50px; object-fit: cover;" onerror="this.src='https://ui-avatars.com/api/?name={{ urlencode($product->nama_produk) }}&background=random&color=fff&size=50'">
+                                            </td>
+                                            <td>
+                                                <div class="fw-bold">
+                                                    {{ $product->nama_produk }}
+                                                    @if($product->is_best_seller)
+                                                        <span class="badge bg-warning text-dark ms-1" title="Best Seller"><i class="bi bi-fire me-1"></i>Best Seller</span>
+                                                    @endif
+                                                </div>
                                                 <small class="text-muted">{{ Str::limit($product->deskripsi, 50) }}</small>
                                             </td>
                                             <td>{{ $product->kategori }}</td>
@@ -66,6 +89,15 @@
                                                 </span>
                                             </td>
                                             <td>
+                                                <div class="d-flex align-items-center">
+                                                    <span class="text-warning me-1">
+                                                        <i class="bi bi-star-fill"></i>
+                                                    </span>
+                                                    <span class="fw-bold me-1">{{ number_format($product->reviews_avg_rating ?? 0, 1) }}</span>
+                                                    <span class="text-muted small">({{ $product->reviews_count }})</span>
+                                                </div>
+                                            </td>
+                                            <td>
                                                 @if($product->status === 'aktif')
                                                     <span class="badge bg-success">Aktif</span>
                                                 @else
@@ -73,13 +105,13 @@
                                                 @endif
                                             </td>
                                             <td>
-                                                <a href="{{ route('umkm.products.edit', $product->id) }}" class="btn btn-sm btn-warning">
+                                                <a href="{{ route('umkm.products.edit', $product->id) }}" class="btn btn-sm btn-outline-warning" title="Edit">
                                                     <i class="bi bi-pencil"></i>
                                                 </a>
                                                 <form action="{{ route('umkm.products.destroy', $product->id) }}" method="POST" style="display:inline;">
                                                     @csrf
                                                     @method('DELETE')
-                                                    <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Hapus produk ini?')">
+                                                    <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('Hapus produk ini?')" title="Hapus">
                                                         <i class="bi bi-trash"></i>
                                                     </button>
                                                 </form>
