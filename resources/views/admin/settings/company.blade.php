@@ -229,11 +229,18 @@
                                    value="{{ $settings['company_name']->value ?? 'Karang Taruna Teluknaga' }}" required>
                         </div>
                         <div class="form-group">
+                            <label class="form-label">Nama Singkat (Header/Footer)</label>
+                            <input type="text" name="company_name_short" class="form-control-custom" 
+                                   value="{{ $settings['company_name_short']->value ?? 'SEDAYU MART' }}" required>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
                             <label class="form-label">Email Perusahaan</label>
                             <input type="email" name="company_email" class="form-control-custom" 
                                    value="{{ $settings['company_email']->value ?? '' }}" required>
                         </div>
-                    </div>
 
                     <div class="form-row">
                         <div class="form-group">
@@ -293,14 +300,33 @@
 
                     <div class="form-row">
                         <div class="form-group">
-                            <label class="form-label">Judul Hero Section</label>
-                            <input type="text" name="company_hero_title" class="form-control-custom" 
-                                   value="{{ $settings['company_hero_title']->value ?? '' }}">
+                            <label class="form-label">Badge Hero Section</label>
+                            <input type="text" name="company_hero_badge" class="form-control-custom" 
+                                   value="{{ $settings['company_hero_badge']->value ?? '' }}" placeholder="Contoh: AKSELERASI UMKM Binaan CSR PIK2">
                         </div>
                         <div class="form-group">
+                            <label class="form-label">Judul Hero Section (HTML diperbolehkan)</label>
+                            <input type="text" name="company_hero_title" class="form-control-custom" 
+                                   value="{{ $settings['company_hero_title']->value ?? '' }}" placeholder="Contoh: Dukung<br>Produk Lokal<br>Pesisir.">
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group" style="grid-column: span 2;">
                             <label class="form-label">Subtitle Hero Section</label>
-                            <input type="text" name="company_hero_subtitle" class="form-control-custom" 
-                                   value="{{ $settings['company_hero_subtitle']->value ?? '' }}">
+                            <textarea name="company_hero_subtitle" class="form-control-custom" rows="2">{{ $settings['company_hero_subtitle']->value ?? '' }}</textarea>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Judul Bagian "Tentang Kami"</label>
+                            <input type="text" name="about_heading" class="form-control-custom" 
+                                   value="{{ $settings['about_heading']->value ?? '' }}" placeholder="Contoh: Manfaat UMKM">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Teks Bagian "Tentang Kami"</label>
+                            <textarea name="about_text" class="form-control-custom" rows="3">{{ $settings['about_text']->value ?? '' }}</textarea>
                         </div>
                     </div>
 

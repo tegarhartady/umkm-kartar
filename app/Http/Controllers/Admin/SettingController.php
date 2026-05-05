@@ -24,6 +24,7 @@ class SettingController extends Controller
     {
         $validated = $request->validate([
             'company_name' => 'required|string|max:255',
+            'company_name_short' => 'required|string|max:255',
             'company_description' => 'required|string',
             'company_email' => 'required|email',
             'company_phone' => 'required|string|max:20',
@@ -33,6 +34,9 @@ class SettingController extends Controller
             'company_logo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'company_hero_title' => 'nullable|string|max:255',
             'company_hero_subtitle' => 'nullable|string|max:500',
+            'company_hero_badge' => 'nullable|string|max:255',
+            'about_heading' => 'nullable|string|max:255',
+            'about_text' => 'nullable|string',
             'company_footer_text' => 'nullable|string',
             'seo_title' => 'nullable|string|max:255',
             'seo_description' => 'nullable|string|max:500',

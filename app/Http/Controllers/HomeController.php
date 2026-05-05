@@ -11,6 +11,7 @@ class HomeController extends Controller
     {
         $recommendedProducts = Product::where('status', 'aktif')
             ->withAvg('reviews', 'rating')
+            ->orderByDesc('is_best_seller')
             ->orderByDesc('reviews_avg_rating')
             ->limit(4)
             ->get();

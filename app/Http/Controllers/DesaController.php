@@ -13,6 +13,14 @@ class DesaController extends Controller
         return view('admin.desa.index', compact('desas'));
     }
 
+    public function show($id)
+    {
+        $desa = Desa::findOrFail($id);
+        // Fetch UMKM in this village (assuming 'desa' column in 'umkms' table matches 'nama_desa')
+        $umkms = \App\Models\Umkm::where('desa', $desa->nama_desa)->paginate(10);
+        return view('admin.desa.show', compact('desa', 'umkms'));
+    }
+
     public function create()
     {
         return view('admin.desa.create');

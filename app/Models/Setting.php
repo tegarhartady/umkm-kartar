@@ -8,4 +8,9 @@ class Setting extends Model
 {
     protected $fillable = ['key', 'value', 'group'];
     protected $table = 'settings';
+    public static function get($key, $default = null)
+    {
+        $setting = self::where('key', $key)->first();
+        return $setting ? $setting->value : $default;
+    }
 }

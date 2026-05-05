@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Karang Taruna Teluknaga - Dukung Produk Lokal Pesisir')
+@section('title', 'Sedayumart UMKM - Akselerasi UMKM Dampingan CSR PIK2')
 
 @section('content')
 
@@ -21,9 +21,12 @@
     }
 
     @keyframes gradientShift {
-        0%, 100% {
+
+        0%,
+        100% {
             background-position: 0% 50%;
         }
+
         50% {
             background-position: 100% 50%;
         }
@@ -57,30 +60,40 @@
     }
 
     @keyframes float1 {
-        0%, 100% {
+
+        0%,
+        100% {
             transform: translateY(0px) translateX(0px);
         }
+
         25% {
             transform: translateY(-30px) translateX(20px);
         }
+
         50% {
             transform: translateY(-50px) translateX(0px);
         }
+
         75% {
             transform: translateY(-30px) translateX(-20px);
         }
     }
 
     @keyframes float2 {
-        0%, 100% {
+
+        0%,
+        100% {
             transform: translateY(0px) translateX(0px);
         }
+
         25% {
             transform: translateY(30px) translateX(-20px);
         }
+
         50% {
             transform: translateY(50px) translateX(0px);
         }
+
         75% {
             transform: translateY(30px) translateX(20px);
         }
@@ -112,6 +125,7 @@
             opacity: 0;
             transform: translateY(20px);
         }
+
         to {
             opacity: 1;
             transform: translateY(0);
@@ -133,6 +147,7 @@
             opacity: 0;
             transform: translateY(-50px);
         }
+
         to {
             opacity: 1;
             transform: translateY(0);
@@ -154,6 +169,7 @@
             opacity: 0;
             transform: translateY(30px);
         }
+
         to {
             opacity: 1;
             transform: translateY(0);
@@ -169,6 +185,7 @@
             opacity: 0;
             transform: translateY(40px);
         }
+
         to {
             opacity: 1;
             transform: translateY(0);
@@ -231,6 +248,7 @@
         0% {
             transform: translateX(0);
         }
+
         100% {
             transform: translateX(100px);
         }
@@ -241,9 +259,12 @@
     }
 
     @keyframes wavePath {
-        0%, 100% {
+
+        0%,
+        100% {
             d: path('M0 120L60 105C120 90 240 60 360 45C480 30 600 30 720 37.5C840 45 960 60 1080 67.5C1200 75 1320 75 1380 75L1440 75V120H1380C1320 120 1200 120 1080 120C960 120 840 120 720 120C600 120 480 120 360 120C240 120 120 120 60 120H0Z');
         }
+
         50% {
             d: path('M0 110L60 95C120 80 240 50 360 55C480 60 600 40 720 45C840 50 960 70 1080 75C1200 80 1320 80 1380 80L1440 80V120H1380C1320 120 1200 120 1080 120C960 120 840 120 720 120C600 120 480 120 360 120C240 120 120 120 60 120H0Z');
         }
@@ -293,18 +314,24 @@
     }
 
     @keyframes walk1 {
-        0%, 100% {
+
+        0%,
+        100% {
             transform: translateX(0) scaleX(-1);
         }
+
         50% {
             transform: translateX(40px) scaleX(-1);
         }
     }
 
     @keyframes walk2 {
-        0%, 100% {
+
+        0%,
+        100% {
             transform: translateX(0);
         }
+
         50% {
             transform: translateX(-50px);
         }
@@ -317,9 +344,12 @@
     }
 
     @keyframes swing {
-        0%, 100% {
+
+        0%,
+        100% {
             transform: rotate(-15deg);
         }
+
         50% {
             transform: rotate(15deg);
         }
@@ -379,60 +409,60 @@
         <!-- Shopper 1 -->
         <svg class="illustration-shopper illustration-shopper-1" viewBox="0 0 100 150" width="120" height="150">
             <!-- Head -->
-            <circle cx="50" cy="25" r="12" fill="#fff"/>
+            <circle cx="50" cy="25" r="12" fill="#fff" />
             <!-- Body -->
-            <rect x="45" y="40" width="10" height="30" fill="#fff"/>
+            <rect x="45" y="40" width="10" height="30" fill="#fff" />
             <!-- Arms -->
-            <line x1="45" y1="45" x2="30" y2="60" stroke="#fff" stroke-width="3" stroke-linecap="round"/>
-            <line x1="55" y1="45" x2="75" y2="50" stroke="#fff" stroke-width="3" stroke-linecap="round"/>
+            <line x1="45" y1="45" x2="30" y2="60" stroke="#fff" stroke-width="3" stroke-linecap="round" />
+            <line x1="55" y1="45" x2="75" y2="50" stroke="#fff" stroke-width="3" stroke-linecap="round" />
             <!-- Legs -->
-            <line x1="48" y1="70" x2="45" y2="100" stroke="#fff" stroke-width="3" stroke-linecap="round"/>
-            <line x1="52" y1="70" x2="55" y2="100" stroke="#fff" stroke-width="3" stroke-linecap="round"/>
+            <line x1="48" y1="70" x2="45" y2="100" stroke="#fff" stroke-width="3" stroke-linecap="round" />
+            <line x1="52" y1="70" x2="55" y2="100" stroke="#fff" stroke-width="3" stroke-linecap="round" />
             <!-- Shopping Bag -->
             <g class="shopper-bag">
-                <rect x="70" y="55" width="18" height="25" fill="#ffd700" stroke="#fff" stroke-width="1.5" rx="2"/>
-                <path d="M 75 55 Q 78 48 79 55" stroke="#fff" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+                <rect x="70" y="55" width="18" height="25" fill="#ffd700" stroke="#fff" stroke-width="1.5" rx="2" />
+                <path d="M 75 55 Q 78 48 79 55" stroke="#fff" stroke-width="1.5" fill="none" stroke-linecap="round" />
             </g>
         </svg>
 
         <!-- Shopper 2 -->
         <svg class="illustration-shopper illustration-shopper-2" viewBox="0 0 100 150" width="100" height="140">
             <!-- Head -->
-            <circle cx="50" cy="28" r="10" fill="#fff"/>
+            <circle cx="50" cy="28" r="10" fill="#fff" />
             <!-- Body -->
-            <path d="M 45 40 Q 50 45 55 40 L 54 65 L 46 65 Z" fill="#fff"/>
+            <path d="M 45 40 Q 50 45 55 40 L 54 65 L 46 65 Z" fill="#fff" />
             <!-- Left Arm -->
-            <line x1="46" y1="43" x2="25" y2="55" stroke="#fff" stroke-width="2.5" stroke-linecap="round"/>
+            <line x1="46" y1="43" x2="25" y2="55" stroke="#fff" stroke-width="2.5" stroke-linecap="round" />
             <!-- Right Arm with Basket -->
-            <line x1="54" y1="43" x2="72" y2="45" stroke="#fff" stroke-width="2.5" stroke-linecap="round"/>
+            <line x1="54" y1="43" x2="72" y2="45" stroke="#fff" stroke-width="2.5" stroke-linecap="round" />
             <!-- Legs -->
-            <line x1="48" y1="65" x2="46" y2="95" stroke="#fff" stroke-width="2.5" stroke-linecap="round"/>
-            <line x1="52" y1="65" x2="54" y2="95" stroke="#fff" stroke-width="2.5" stroke-linecap="round"/>
+            <line x1="48" y1="65" x2="46" y2="95" stroke="#fff" stroke-width="2.5" stroke-linecap="round" />
+            <line x1="52" y1="65" x2="54" y2="95" stroke="#fff" stroke-width="2.5" stroke-linecap="round" />
             <!-- Basket -->
             <g class="shopper-bag">
-                <rect x="68" y="40" width="16" height="20" fill="#764ba2" stroke="#fff" stroke-width="1.5" rx="1"/>
-                <path d="M 72 40 L 68 35 M 76 40 L 80 35 M 80 40 L 84 35" stroke="#fff" stroke-width="1" stroke-linecap="round"/>
-                <path d="M 68 45 L 84 45 M 68 50 L 84 50" stroke="#fff" stroke-width="0.8" opacity="0.6"/>
+                <rect x="68" y="40" width="16" height="20" fill="#764ba2" stroke="#fff" stroke-width="1.5" rx="1" />
+                <path d="M 72 40 L 68 35 M 76 40 L 80 35 M 80 40 L 84 35" stroke="#fff" stroke-width="1" stroke-linecap="round" />
+                <path d="M 68 45 L 84 45 M 68 50 L 84 50" stroke="#fff" stroke-width="0.8" opacity="0.6" />
             </g>
         </svg>
 
         <!-- Shopper 3 (coming from right) -->
         <svg class="illustration-shopper" viewBox="0 0 100 150" width="110" height="160" style="left: 85%; top: 15%; animation: walk3 9s ease-in-out infinite;">
             <!-- Head -->
-            <circle cx="50" cy="22" r="11" fill="#fff"/>
+            <circle cx="50" cy="22" r="11" fill="#fff" />
             <!-- Body -->
-            <ellipse cx="50" cy="42" rx="8" ry="20" fill="#fff"/>
+            <ellipse cx="50" cy="42" rx="8" ry="20" fill="#fff" />
             <!-- Left Arm -->
-            <line x1="42" y1="40" x2="20" y2="50" stroke="#fff" stroke-width="2.5" stroke-linecap="round"/>
+            <line x1="42" y1="40" x2="20" y2="50" stroke="#fff" stroke-width="2.5" stroke-linecap="round" />
             <!-- Right Arm with Bag -->
-            <line x1="58" y1="40" x2="78" y2="35" stroke="#fff" stroke-width="2.5" stroke-linecap="round"/>
+            <line x1="58" y1="40" x2="78" y2="35" stroke="#fff" stroke-width="2.5" stroke-linecap="round" />
             <!-- Legs (walking pose) -->
-            <line x1="47" y1="62" x2="44" y2="100" stroke="#fff" stroke-width="2.5" stroke-linecap="round"/>
-            <line x1="53" y1="62" x2="57" y2="100" stroke="#fff" stroke-width="2.5" stroke-linecap="round"/>
+            <line x1="47" y1="62" x2="44" y2="100" stroke="#fff" stroke-width="2.5" stroke-linecap="round" />
+            <line x1="53" y1="62" x2="57" y2="100" stroke="#fff" stroke-width="2.5" stroke-linecap="round" />
             <!-- Paper Bag -->
             <g class="shopper-bag">
-                <rect x="75" y="25" width="14" height="22" fill="#ffa500" stroke="#fff" stroke-width="1.5" rx="1"/>
-                <path d="M 78 25 L 75 18 M 82 25 L 82 18" stroke="#fff" stroke-width="1.5" stroke-linecap="round"/>
+                <rect x="75" y="25" width="14" height="22" fill="#ffa500" stroke="#fff" stroke-width="1.5" rx="1" />
+                <path d="M 78 25 L 75 18 M 82 25 L 82 18" stroke="#fff" stroke-width="1.5" stroke-linecap="round" />
             </g>
         </svg>
     </div>
@@ -444,19 +474,19 @@
                 <div class="hero-badge mb-4" data-aos="fade-up">
                     <span>KOLABORASI KARANG TARUNA & CSR PIK2</span>
                 </div>
-                
+
                 <!-- Main Heading -->
                 <h1 class="hero-title" data-aos="fade-up" data-aos-delay="100">
                     Dukung<br>
                     <span class="text-primary">Produk Lokal</span><br>
                     Pesisir<span class="text-dark">.</span>
                 </h1>
-                
+
                 <!-- Subtitle -->
                 <p class="hero-subtitle" data-aos="fade-up" data-aos-delay="200">
                     "Membangun ekonomi desa Teluknaga melalui digitalisasi UMKM."
                 </p>
-                
+
                 <!-- CTA Buttons -->
                 <div class="hero-buttons d-flex justify-content-center gap-3 flex-wrap" data-aos="fade-up" data-aos-delay="300">
                     <a href="{{ url('/katalog') }}" class="btn btn-primary btn-lg px-5 rounded-pill">
@@ -469,11 +499,11 @@
             </div>
         </div>
     </div>
-    
+
     <!-- Hero Wave -->
     <div class="hero-wave">
         <svg viewBox="0 0 1440 120" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M0 120L60 105C120 90 240 60 360 45C480 30 600 30 720 37.5C840 45 960 60 1080 67.5C1200 75 1320 75 1380 75L1440 75V120H1380C1320 120 1200 120 1080 120C960 120 840 120 720 120C600 120 480 120 360 120C240 120 120 120 60 120H0Z" fill="#f8f9fa"/>
+            <path d="M0 120L60 105C120 90 240 60 360 45C480 30 600 30 720 37.5C840 45 960 60 1080 67.5C1200 75 1320 75 1380 75L1440 75V120H1380C1320 120 1200 120 1080 120C960 120 840 120 720 120C600 120 480 120 360 120C240 120 120 120 60 120H0Z" fill="#f8f9fa" />
         </svg>
     </div>
 </section>
@@ -491,7 +521,7 @@
                 Lihat Semua <i class="bi bi-arrow-right ms-1"></i>
             </a>
         </div>
-        
+
         <div class="row g-4">
             <!-- Product Card 1 -->
             <div class="col-lg-3 col-md-6" data-aos="fade-up" data-aos-delay="100">
@@ -511,7 +541,7 @@
                     </div>
                 </div>
             </div>
-            
+
             <!-- Product Card 2 -->
             <div class="col-lg-3 col-md-6" data-aos="fade-up" data-aos-delay="200">
                 <div class="product-card">
@@ -529,7 +559,7 @@
                     </div>
                 </div>
             </div>
-            
+
             <!-- Product Card 3 -->
             <div class="col-lg-3 col-md-6" data-aos="fade-up" data-aos-delay="300">
                 <div class="product-card">
@@ -548,7 +578,7 @@
                     </div>
                 </div>
             </div>
-            
+
             <!-- Product Card 4 -->
             <div class="col-lg-3 col-md-6" data-aos="fade-up" data-aos-delay="400">
                 <div class="product-card">
@@ -673,7 +703,7 @@
                 Jelajahi <span class="text-primary">Kategori</span> Kami
             </h2>
         </div>
-        
+
         <div class="row g-4">
             <div class="col-lg-3 col-md-6" data-aos="fade-up" data-aos-delay="100">
                 <a href="#" class="category-card">
@@ -724,7 +754,7 @@
                 Didukung Oleh
             </h2>
         </div>
-        
+
         <div class="row align-items-center justify-content-center g-4">
             <div class="col-6 col-md-4 col-lg-2" data-aos="fade-up" data-aos-delay="100">
                 <div class="partner-logo">
@@ -778,7 +808,7 @@
                 Apa Kata <span class="text-primary">Mereka</span>
             </h2>
         </div>
-        
+
         <div class="row g-4">
             <div class="col-lg-4" data-aos="fade-up" data-aos-delay="100">
                 <div class="testimonial-card">
@@ -851,7 +881,7 @@
                     Ada <span class="text-primary">Pertanyaan?</span>
                 </h2>
                 <p class="text-muted mb-5">Jangan ragu untuk menghubungi kami. Tim kami siap membantu Anda.</p>
-                
+
                 <div class="contact-info">
                     <div class="contact-item d-flex mb-4">
                         <div class="contact-icon me-4">

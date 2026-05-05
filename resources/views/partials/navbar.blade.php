@@ -2,7 +2,7 @@
     <div class="container">
         <!-- Brand Logo -->
         <a class="navbar-brand" href="{{ url('/') }}" style="padding: 0; margin: 0;">
-            <img src="{{ asset('images/smartumkm.svg') }}" alt="Smart UMKM Logo" style="height: 80px; width: auto;">
+            <img src="{{ App\Models\Setting::get('company_logo') ? asset(App\Models\Setting::get('company_logo')) : asset('images/smartumkm.svg') }}" alt="{{ App\Models\Setting::get('company_name', 'Smart UMKM') }}" style="height: 80px; width: auto;">
         </a>
         
 

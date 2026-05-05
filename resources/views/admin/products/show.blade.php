@@ -3,13 +3,13 @@
 @section('title', 'Detail Produk')
 
 @section('breadcrumb')
-    <nav aria-label="breadcrumb">
-        <ol class="breadcrumb mb-0">
-            <li class="breadcrumb-item"><a href="{{ route('dashboard.admin') }}"><i class="bi bi-house me-1"></i>Dashboard</a></li>
-            <li class="breadcrumb-item"><a href="{{ route('admin.products.index') }}">Produk</a></li>
-            <li class="breadcrumb-item active">{{ $product->nama_produk }}</li>
-        </ol>
-    </nav>
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb mb-0">
+        <li class="breadcrumb-item"><a href="{{ route('dashboard.admin') }}"><i class="bi bi-house me-1"></i>Dashboard</a></li>
+        <li class="breadcrumb-item"><a href="{{ route('admin.products.index') }}">Produk</a></li>
+        <li class="breadcrumb-item active">{{ $product->nama_produk }}</li>
+    </ol>
+</nav>
 @endsection
 
 @section('content')
@@ -23,21 +23,21 @@
                 <div class="card-body">
                     <div class="row mb-4">
                         <div class="col-md-4">
-                            @if($product->image && file_exists(public_path($product->image)))
-                                <img src="{{ asset('storage/' . $product->image) }}" alt="{{ $product->nama_produk }}" class="img-fluid rounded shadow-sm">
+                            @if($product->image)
+                            <img src="{{ asset('storage/' . $product->image) }}" alt="{{ $product->nama_produk }}" class="img-fluid rounded shadow-sm">
                             @else
-                                <div class="bg-light rounded d-flex align-items-center justify-content-center" style="height: 300px;">
-                                    <div class="text-center">
-                                        <i class="bi bi-image" style="font-size: 4rem; color: #ccc;"></i>
-                                        <p class="text-muted mt-2">Tidak ada gambar</p>
-                                    </div>
+                            <div class="bg-light rounded d-flex align-items-center justify-content-center" style="height: 300px;">
+                                <div class="text-center">
+                                    <i class="bi bi-image" style="font-size: 4rem; color: #ccc;"></i>
+                                    <p class="text-muted mt-2">Tidak ada gambar</p>
                                 </div>
+                            </div>
                             @endif
                         </div>
                         <div class="col-md-8">
                             <h3 class="mb-2">{{ $product->nama_produk }}</h3>
                             <p class="text-muted mb-3">{{ $product->kategori }}</p>
-                            
+
                             <table class="table table-borderless">
                                 <tr>
                                     <th width="40%">SKU</th>
@@ -51,13 +51,13 @@
                                     <th>Status</th>
                                     <td>
                                         @if($product->status == 'draft')
-                                            <span class="badge bg-warning">Draft</span>
+                                        <span class="badge bg-warning">Draft</span>
                                         @elseif($product->status == 'published')
-                                            <span class="badge bg-success">Terbit</span>
+                                        <span class="badge bg-success">Terbit</span>
                                         @elseif($product->status == 'pending')
-                                            <span class="badge bg-info">Menunggu Review</span>
+                                        <span class="badge bg-info">Menunggu Review</span>
                                         @else
-                                            <span class="badge bg-secondary">{{ $product->status }}</span>
+                                        <span class="badge bg-secondary">{{ $product->status }}</span>
                                         @endif
                                     </td>
                                 </tr>

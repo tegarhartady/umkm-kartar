@@ -51,6 +51,7 @@ class ProductController extends Controller
             'image' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
             'harga' => 'required|numeric|min:0',
             'stok' => 'required|integer|min:0',
+            'is_best_seller' => 'nullable|boolean',
         ]);
 
         if ($request->hasFile('image')) {
@@ -58,6 +59,7 @@ class ProductController extends Controller
         }
 
         $validated['status'] = 'aktif';
+        $validated['is_best_seller'] = $request->has('is_best_seller');
         
         Product::create($validated);
 
@@ -95,12 +97,15 @@ class ProductController extends Controller
     {
         $product = Product::findOrFail($id);
         $validated = $request->validate([
+            'umkm_id' => 'required|exists:umkms,id',
             'nama_produk' => 'required|string|max:255',
             'deskripsi' => 'required|string',
             'harga' => 'required|numeric|min:0',
             'stok' => 'required|integer|min:0',
             'satuan' => 'required|string|max:50',
             'kategori' => 'nullable|string|max:100',
+            'metode_pemesanan' => 'required|in:siap_jadi,po,keduanya',
+            'status' => 'required|in:aktif,nonaktif',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
@@ -110,6 +115,8 @@ class ProductController extends Controller
             }
             $validated['image'] = $request->file('image')->store('products', 'public');
         }
+
+        $validated['is_best_seller'] = $request->has('is_best_seller');
 
         $product->update($validated);
 

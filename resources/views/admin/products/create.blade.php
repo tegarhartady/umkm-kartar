@@ -120,6 +120,15 @@
                             @error('image') <div class="text-danger small mt-2">{{ $message }}</div> @enderror
                         </div>
 
+                        <!-- Best Seller & Status -->
+                        <div class="mb-4">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" name="is_best_seller" id="is_best_seller" value="1" {{ old('is_best_seller') ? 'checked' : '' }}>
+                                <label class="form-check-label fw-600" for="is_best_seller">Jadikan Produk Best Seller</label>
+                            </div>
+                            <small class="text-muted">Produk akan muncul dengan lencana khusus di katalog.</small>
+                        </div>
+
                         <!-- Harga & Stok -->
                         <div class="row mb-4">
                             <div class="col-md-6">

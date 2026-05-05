@@ -286,7 +286,9 @@
         </div>
     </div>
 </div>
+@endsection
 
+@push('styles')
 <style>
 .form-label.fw-600 {
     font-weight: 600;
@@ -385,7 +387,9 @@
     }
 }
 </style>
+@endpush
 
+@push('scripts')
 <!-- Leaflet CSS & JS -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" />
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet-control-geocoder/2.4.0/Control.Geocoder.min.css" />
@@ -500,5 +504,6 @@ if (omzetDisplayAdmin) {
     }
 }
 </script>
+@endpush
             
             

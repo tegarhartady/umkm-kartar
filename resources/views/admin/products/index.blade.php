@@ -12,97 +12,7 @@
     </nav>
 @endsection
 
-@section('styles')
-<style>
-.product-card {
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-    border-radius: 15px;
-    overflow: hidden;
-    border: none;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-}
-.product-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
-}
-.product-image {
-    position: relative;
-    height: 200px;
-    overflow: hidden;
-    background: #f8f9fa;
-}
-.product-image img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    transition: transform 0.3s ease;
-}
-.product-card:hover .product-image img {
-    transform: scale(1.05);
-}
-.no-image {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    height: 100%;
-    color: #6c757d;
-    background: linear-gradient(45deg, #f8f9fa, #e9ecef);
-}
-.no-image i {
-    font-size: 3rem;
-    margin-bottom: 0.5rem;
-    opacity: 0.5;
-}
-.product-overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, 0.7);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    opacity: 0;
-    transition: opacity 0.3s ease;
-}
-.product-card:hover .product-overlay {
-    opacity: 1;
-}
-.product-actions {
-    display: flex;
-    gap: 0.5rem;
-}
-.product-title {
-    font-weight: 600;
-    margin-bottom: 0.5rem;
-    color: #333;
-}
-.product-description {
-    font-size: 0.875rem;
-    color: #6c757d;
-    margin-bottom: 1rem;
-}
-.product-meta {
-    display: flex;
-    justify-content: between;
-    align-items: center;
-    margin-bottom: 0.75rem;
-}
-.price {
-    color: #28a745;
-    font-size: 1.1rem;
-}
-.stock {
-    margin-left: auto;
-}
-.umkm-info {
-    border-top: 1px solid #e9ecef;
-    padding-top: 0.75rem;
-}
-</style>
-@endsection
+
 
 @section('content')
 
@@ -151,7 +61,7 @@
                     <button class="btn btn-sm btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown">
                         <i class="bi bi-three-dots"></i>
                     </button>
-                    <ul class="dropdown-menu">
+                    <ul class="dropdown-menu dropdown-menu-end">
                         <li><a class="dropdown-item" href="{{ route('admin.products.show', $product) }}">
                             <i class="bi bi-eye me-2"></i>Lihat Detail</a></li>
                         <li><a class="dropdown-item" href="{{ route('admin.products.edit', $product) }}">
@@ -305,12 +215,93 @@
 @push('styles')
 <style>
 .product-card {
-    transition: all 0.2s ease;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    border-radius: 15px;
+    border: none;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    position: relative;
+    z-index: 1;
 }
-
-.product-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+.product-card:hover, .product-card:focus-within {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+    z-index: 10;
+}
+.product-image {
+    position: relative;
+    height: 200px;
+    overflow: hidden;
+    background: #f8f9fa;
+}
+.product-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+.product-card:hover .product-image img {
+    transform: scale(1.05);
+}
+.no-image {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    color: #6c757d;
+    background: linear-gradient(45deg, #f8f9fa, #e9ecef);
+}
+.no-image i {
+    font-size: 3rem;
+    margin-bottom: 0.5rem;
+    opacity: 0.5;
+}
+.product-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+.product-card:hover .product-overlay {
+    opacity: 1;
+}
+.product-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+.product-title {
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    color: #333;
+}
+.product-description {
+    font-size: 0.875rem;
+    color: #6c757d;
+    margin-bottom: 1rem;
+}
+.product-meta {
+    display: flex;
+    justify-content: between;
+    align-items: center;
+    margin-bottom: 0.75rem;
+}
+.price {
+    color: #28a745;
+    font-size: 1.1rem;
+}
+.stock {
+    margin-left: auto;
+}
+.umkm-info {
+    border-top: 1px solid #e9ecef;
+    padding-top: 0.75rem;
 }
 
 .pagination {

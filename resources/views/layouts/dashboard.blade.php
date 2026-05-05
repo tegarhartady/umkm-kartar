@@ -212,13 +212,13 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="{{ route('admin.settings.payment') }}" class="nav-link {{ request()->routeIs('admin.settings.payment') ? 'active' : '' }}">
+                            <a href="{{ route('admin.settings.payment') }}" class="nav-link {{ request()->route('admin.settings.payment') ? 'active' : '' }}">
                                 <i class="nav-icon bi bi-wallet2"></i>
                                 <span class="nav-text">Master Pembayaran</span>
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="{{ route('admin.settings.delivery') }}" class="nav-link {{ request()->routeIs('admin.settings.delivery') ? 'active' : '' }}">
+                            <a href="{{ route('admin.settings.delivery') }}" class="nav-link {{ request()->route('admin.settings.delivery') ? 'active' : '' }}">
                                 <i class="nav-icon bi bi-truck"></i>
                                 <span class="nav-text">Master Pengiriman</span>
                             </a>

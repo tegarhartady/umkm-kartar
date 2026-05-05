@@ -4,18 +4,18 @@
             <!-- Brand Section -->
             <div class="col-lg-4 col-md-6">
                 <a class="d-flex align-items-center mb-4 text-decoration-none" href="{{ url('/') }}">
-                    <img src="{{ asset('images/smartumkm.svg') }}" alt="Smart UMKM Logo" style="height: 60px; width: auto; margin-right: 12px;">
+                    <img src="{{ App\Models\Setting::get('company_logo') ? asset(App\Models\Setting::get('company_logo')) : asset('images/smartumkm.svg') }}" alt="{{ App\Models\Setting::get('company_name', 'Smart UMKM Logo') }}" style="height: 60px; width: auto; margin-right: 12px;">
                     <div>
-                        <small class="text-white-50 d-block" style="font-size: 10px; line-height: 1;">SEDAYU MART</small>
+                        <small class="text-white-50 d-block" style="font-size: 10px; line-height: 1;">{{ App\Models\Setting::get('company_name_short', 'SEDAYU MART') }}</small>
                         <span class="fw-bold text-white" style="font-size: 18px; line-height: 1.2;">UMKM<span class="text-primary">.</span></span>
                     </div>
                 </a>
-                <p class="text-white-50 mb-4">Membangun ekonomi desa Teluknaga melalui digitalisasi UMKM. Kolaborasi antara Karang Taruna dan CSR PIK2.</p>
+                <p class="text-white-50 mb-4">{{ App\Models\Setting::get('company_description', 'Membangun ekonomi desa Teluknaga melalui digitalisasi UMKM. Kolaborasi antara Karang Taruna dan CSR PIK2.') }}</p>
                 <div class="social-links d-flex gap-3">
-                    <a href="#" class="social-icon"><i class="bi bi-facebook"></i></a>
-                    <a href="#" class="social-icon"><i class="bi bi-instagram"></i></a>
-                    <a href="#" class="social-icon"><i class="bi bi-twitter-x"></i></a>
-                    <a href="#" class="social-icon"><i class="bi bi-youtube"></i></a>
+                    <a href="{{ App\Models\Setting::get('social_facebook', '#') }}" class="social-icon"><i class="bi bi-facebook"></i></a>
+                    <a href="{{ App\Models\Setting::get('social_instagram', '#') }}" class="social-icon"><i class="bi bi-instagram"></i></a>
+                    <a href="{{ App\Models\Setting::get('social_twitter', '#') }}" class="social-icon"><i class="bi bi-twitter-x"></i></a>
+                    <a href="{{ App\Models\Setting::get('social_youtube', '#') }}" class="social-icon"><i class="bi bi-youtube"></i></a>
                 </div>
             </div>
             
@@ -47,15 +47,15 @@
                 <ul class="list-unstyled footer-contact">
                     <li class="d-flex mb-3">
                         <i class="bi bi-geo-alt me-3 text-primary"></i>
-                        <span class="text-white-50">Desa Teluknaga, Kec. Teluknaga, Kabupaten Tangerang, Banten</span>
+                        <span class="text-white-50">{{ App\Models\Setting::get('company_address', 'Desa Teluknaga, Kec. Teluknaga, Kabupaten Tangerang, Banten') }}</span>
                     </li>
                     <li class="d-flex mb-3">
                         <i class="bi bi-envelope me-3 text-primary"></i>
-                        <span class="text-white-50">info@kartarteluknaga.id</span>
+                        <span class="text-white-50">{{ App\Models\Setting::get('company_email', 'info@kartarteluknaga.id') }}</span>
                     </li>
                     <li class="d-flex mb-3">
                         <i class="bi bi-telephone me-3 text-primary"></i>
-                        <span class="text-white-50">+62 812 3456 7890</span>
+                        <span class="text-white-50">{{ App\Models\Setting::get('company_phone', '+62 812 3456 7890') }}</span>
                     </li>
                 </ul>
             </div>
