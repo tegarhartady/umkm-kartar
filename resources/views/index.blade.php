@@ -13,7 +13,7 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        padding: 60px 0;
+        padding: 120px 0 80px 0;
         overflow: hidden;
         background: linear-gradient(135deg, #001f5c 0%, #000f3d 50%, #001f5c 100%);
         background-size: 200% 200%;
@@ -432,14 +432,19 @@
 
     /* Responsive */
     @media (max-width: 768px) {
+        .navbar-brand img {
+            height: 60px !important;
+        }
+
         .hero-section {
-            min-height: 80vh;
-            padding: 40px 0;
+            min-height: 100vh; /* Keep full height on mobile */
+            padding: 100px 0 60px 0;
         }
 
         .hero-title {
-            font-size: 2.5rem;
-            margin: 1rem 0;
+            font-size: 2.2rem;
+            margin: 1.5rem 0;
+            line-height: 1.2;
         }
 
         .hero-subtitle {
