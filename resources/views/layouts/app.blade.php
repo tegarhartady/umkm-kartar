@@ -125,6 +125,12 @@
         .stat-number {
             color: #001f5c;
         }
+
+        html, body {
+            overflow-x: hidden;
+            width: 100%;
+            position: relative;
+        }
     </style>
 </head>
 <body>

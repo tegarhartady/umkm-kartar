@@ -433,33 +433,36 @@
     /* Responsive */
     @media (max-width: 768px) {
         .navbar-brand img {
-            height: 60px !important;
+            height: 45px !important;
         }
 
         .hero-section {
-            min-height: 100vh; /* Keep full height on mobile */
-            padding: 100px 0 60px 0;
+            min-height: auto;
+            padding: 130px 0 60px 0;
         }
 
         .hero-title {
-            font-size: 2.2rem;
-            margin: 1.5rem 0;
-            line-height: 1.2;
+            font-size: 1.85rem;
+            margin: 1rem 0;
+            line-height: 1.3;
         }
 
         .hero-subtitle {
-            font-size: 1rem;
+            font-size: 0.95rem;
+            margin-bottom: 1.5rem;
         }
 
         .hero-buttons {
             flex-direction: column;
             width: 100%;
+            padding: 0 15px;
         }
 
         .hero-buttons .btn {
             width: 100%;
-            max-width: 300px;
-            margin: 0 auto;
+            margin-bottom: 10px;
+            padding: 12px 20px;
+            font-size: 1rem;
         }
 
         .hero-wave {
@@ -467,8 +470,89 @@
         }
 
         .hero-illustrations {
-            opacity: 0.08;
+            display: none;
         }
+
+        .testimonial-card {
+            padding: 25px;
+        }
+
+        .section-testimonials, .section-contact {
+            padding: 60px 0;
+        }
+
+        .floating-shape, .hero-wave {
+            display: none;
+        }
+    }
+
+    /* Testimonials Section */
+    .section-testimonials {
+        padding: 100px 0;
+        background: #fff;
+    }
+
+    .testimonial-card {
+        background: white;
+        padding: 40px;
+        border-radius: 20px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+        height: 100%;
+        transition: all 0.3s ease;
+        border: 1px solid #f0f0f0;
+    }
+
+    .testimonial-card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+    }
+
+    .testimonial-text {
+        font-size: 1.1rem;
+        color: #4a5568;
+        font-style: italic;
+        line-height: 1.7;
+    }
+
+    /* Contact Section */
+    .section-contact {
+        padding: 100px 0;
+        background: #f8f9fa;
+    }
+
+    .contact-info .contact-icon {
+        width: 50px;
+        height: 50px;
+        background: #e8eef7;
+        color: #001f5c;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+    }
+
+    .contact-form-wrapper {
+        background: white;
+        padding: 40px;
+        border-radius: 20px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+    }
+
+    .contact-form .form-control {
+        padding: 12px 20px;
+        border-radius: 10px;
+        border: 1px solid #e2e8f0;
+    }
+
+    .contact-form .form-label {
+        font-weight: 600;
+        color: #2d3748;
+    }
+
+    .contact-form .btn-primary {
+        background: #001f5c;
+        border: none;
     }
 </style>
 @endpush
@@ -828,6 +912,31 @@
         </div>
 
         <div class="row g-4">
+            @forelse($testimonials as $index => $testimonial)
+            <div class="col-lg-4" data-aos="fade-up" data-aos-delay="{{ ($index + 1) * 100 }}">
+                <div class="testimonial-card">
+                    <div class="testimonial-rating mb-3">
+                        @for($i = 1; $i <= 5; $i++)
+                            <i class="bi bi-star{{ $i <= $testimonial->rating ? '-fill' : '' }} text-warning"></i>
+                        @endfor
+                    </div>
+                    <p class="testimonial-text">"{{ $testimonial->content }}"</p>
+                    <div class="testimonial-author d-flex align-items-center mt-4">
+                        @if($testimonial->avatar)
+                            <img src="{{ asset('storage/' . $testimonial->avatar) }}" alt="{{ $testimonial->name }}" class="rounded-circle me-3" width="60" height="60" style="object-fit: cover;">
+                        @else
+                            <div class="rounded-circle bg-primary me-3 d-flex align-items-center justify-content-center text-white fw-bold" style="width: 60px; height: 60px;">
+                                {{ substr($testimonial->name, 0, 1) }}
+                            </div>
+                        @endif
+                        <div>
+                            <h6 class="mb-0">{{ $testimonial->name }}</h6>
+                            <small class="text-muted">{{ $testimonial->role }}</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            @empty
             <div class="col-lg-4" data-aos="fade-up" data-aos-delay="100">
                 <div class="testimonial-card">
                     <div class="testimonial-rating mb-3">
@@ -847,44 +956,7 @@
                     </div>
                 </div>
             </div>
-            <div class="col-lg-4" data-aos="fade-up" data-aos-delay="200">
-                <div class="testimonial-card">
-                    <div class="testimonial-rating mb-3">
-                        <i class="bi bi-star-fill text-warning"></i>
-                        <i class="bi bi-star-fill text-warning"></i>
-                        <i class="bi bi-star-fill text-warning"></i>
-                        <i class="bi bi-star-fill text-warning"></i>
-                        <i class="bi bi-star-fill text-warning"></i>
-                    </div>
-                    <p class="testimonial-text">"Pelatihan digital marketing sangat membantu saya memahami cara menjual produk secara online. Sangat recommended!"</p>
-                    <div class="testimonial-author d-flex align-items-center mt-4">
-                        <img src="https://i.pravatar.cc/60?img=5" alt="Bu Siti" class="rounded-circle me-3">
-                        <div>
-                            <h6 class="mb-0">Bu Siti</h6>
-                            <small class="text-muted">Pemilik UMKM Terasi</small>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-lg-4" data-aos="fade-up" data-aos-delay="300">
-                <div class="testimonial-card">
-                    <div class="testimonial-rating mb-3">
-                        <i class="bi bi-star-fill text-warning"></i>
-                        <i class="bi bi-star-fill text-warning"></i>
-                        <i class="bi bi-star-fill text-warning"></i>
-                        <i class="bi bi-star-fill text-warning"></i>
-                        <i class="bi bi-star-half text-warning"></i>
-                    </div>
-                    <p class="testimonial-text">"Bantuan modal dari CSR PIK2 sangat membantu untuk mengembangkan usaha ikan asin saya. Sekarang sudah punya 3 karyawan!"</p>
-                    <div class="testimonial-author d-flex align-items-center mt-4">
-                        <img src="https://i.pravatar.cc/60?img=12" alt="Pak Rudi" class="rounded-circle me-3">
-                        <div>
-                            <h6 class="mb-0">Pak Rudi</h6>
-                            <small class="text-muted">Pemilik UMKM Ikan Asin</small>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            @endforelse
         </div>
     </div>
 </section>
@@ -916,7 +988,7 @@
                         </div>
                         <div>
                             <h6>Email</h6>
-                            <p class="text-muted mb-0">info@lokalin.id</p>
+                            <p class="text-muted mb-0">{{ App\Models\Setting::get('company_email', 'info@lokalin.id') }}</p>
                         </div>
                     </div>
                     <div class="contact-item d-flex mb-4">
@@ -925,33 +997,51 @@
                         </div>
                         <div>
                             <h6>Telepon</h6>
-                            <p class="text-muted mb-0">+62 812 3456 7890</p>
+                            <p class="text-muted mb-0">{{ App\Models\Setting::get('company_phone', '+62 812 3456 7890') }}</p>
                         </div>
                     </div>
                 </div>
             </div>
             <div class="col-lg-6" data-aos="fade-left">
                 <div class="contact-form-wrapper">
-                    <form class="contact-form">
+                    @if(session('success'))
+                        <div class="alert alert-success alert-dismissible fade show mb-4" role="alert">
+                            {{ session('success') }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    @endif
+
+                    @if($errors->any())
+                        <div class="alert alert-danger alert-dismissible fade show mb-4" role="alert">
+                            <ul class="mb-0">
+                                @foreach($errors->all() as $error)
+                                    <li>{{ $error }}</li>
+                                @endforeach
+                            </ul>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    @endif
+                    <form action="{{ route('contact.store') }}" method="POST" class="contact-form">
+                        @csrf
                         <div class="row g-3">
                             <div class="col-md-6">
                                 <label class="form-label">Nama Lengkap</label>
-                                <input type="text" class="form-control" placeholder="Masukkan nama Anda">
+                                <input type="text" name="name" class="form-control" placeholder="Masukkan nama Anda" required>
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label">Email</label>
-                                <input type="email" class="form-control" placeholder="Masukkan email Anda">
+                                <input type="email" name="email" class="form-control" placeholder="Masukkan email Anda" required>
                             </div>
                             <div class="col-12">
                                 <label class="form-label">Subjek</label>
-                                <input type="text" class="form-control" placeholder="Subjek pesan">
+                                <input type="text" name="subject" class="form-control" placeholder="Subjek pesan">
                             </div>
                             <div class="col-12">
                                 <label class="form-label">Pesan</label>
-                                <textarea class="form-control" rows="5" placeholder="Tulis pesan Anda..."></textarea>
+                                <textarea name="message" class="form-control" rows="5" placeholder="Tulis pesan Anda..." required></textarea>
                             </div>
                             <div class="col-12">
-                                <button type="submit" class="btn btn-primary btn-lg w-100 rounded-pill">
+                                <button type="submit" class="btn btn-primary w-100 py-3 rounded-pill fw-bold">
                                     Kirim Pesan <i class="bi bi-send ms-2"></i>
                                 </button>
                             </div>
@@ -963,28 +1053,29 @@
     </div>
 </section>
 
-<div class="row">
-    <div class="col-lg-9">
-        <!-- Main Content -->
-        @yield('content-main')
-    </div>
-
-    <!-- Sidebar Iklan Kanan (Sticky) -->
-    <div class="col-lg-3 d-none d-lg-block">
-        <div style="position: fixed; right: 20px; width: 280px; top: 120px; z-index: 100;">
-            <div class="card border-0 shadow-lg" style="background: linear-gradient(135deg, #001f5c 0%, #000f3d 100%); color: white;">
-                <div class="card-body p-4 text-center">
-                    <h5 class="fw-bold mb-3 text-white">🎉 Event Spesial</h5>
-                    <h3 class="fw-bold mb-3 text-white" style="font-size: 1.5rem;">Floating Market UMKM</h3>
-                    <h4 class="fw-bold mb-3 text-white" style="font-size: 1.2rem;">Sunset Pier</h4>
-                    <p class="mb-4">Ayo datang dan nikmati berbagai produk lokal berkualitas dari UMKM Teluknaga!</p>
-                    <a href="/katalog" class="btn btn-light btn-sm fw-bold">
-                        <i class="bi bi-shop"></i> Jelajahi Sekarang
-                    </a>
+    <!-- Floating Event Sidebar -->
+    <div class="d-none d-xl-block" style="position: fixed; right: 30px; top: 120px; width: 280px; z-index: 99;">
+        <div class="card border-0 shadow-lg overflow-hidden" style="border-radius: 20px; background: linear-gradient(135deg, #001f5c 0%, #000f3d 100%); color: white;">
+            <div class="card-body p-4 text-center">
+                <div class="mb-4 d-flex justify-content-between align-items-center">
+                    <span class="badge bg-warning text-dark px-3 py-2 rounded-pill fw-bold" style="font-size: 0.7rem;">
+                        <i class="bi bi-stars me-1"></i> Event Spesial
+                    </span>
+                    <i class="bi bi-rocket-takeoff text-white-50 fs-4"></i>
                 </div>
+                
+                <h3 class="fw-bold mb-1 text-white" style="font-size: 1.5rem; letter-spacing: -0.5px;">Floating Market UMKM</h3>
+                <h5 class="fw-bold mb-3 text-white-50" style="font-size: 1.1rem;">Sunset Pier</h5>
+                
+                <p class="small text-white-50 mb-4 px-2" style="line-height: 1.6; font-size: 0.85rem;">
+                    Ayo datang dan nikmati berbagai produk lokal berkualitas dari UMKM Teluknaga!
+                </p>
+                
+                <a href="/katalog" class="btn btn-light w-100 rounded-pill fw-bold shadow-sm py-2" style="font-size: 0.9rem;">
+                    Jelajahi Sekarang
+                </a>
             </div>
         </div>
     </div>
-</div>
 
 @endsection

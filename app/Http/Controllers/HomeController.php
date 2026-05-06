@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Product;
+use App\Models\Testimonial;
 use Illuminate\Http\Request;
 
 class HomeController extends Controller
@@ -15,7 +16,8 @@ class HomeController extends Controller
             ->orderByDesc('reviews_avg_rating')
             ->limit(4)
             ->get();
-        return view('index', compact('recommendedProducts'));
+        $testimonials = Testimonial::where('is_active', true)->latest()->get();
+        return view('index', compact('recommendedProducts', 'testimonials'));
     }
 
     public function showProduct($id)

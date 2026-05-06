@@ -914,23 +914,41 @@
             </div>
             <div class="col-lg-6" data-aos="fade-left">
                 <div class="contact-form-wrapper">
-                    <form class="contact-form">
+                    @if(session('success'))
+                        <div class="alert alert-success alert-dismissible fade show mb-4" role="alert">
+                            {{ session('success') }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    @endif
+
+                    @if($errors->any())
+                        <div class="alert alert-danger alert-dismissible fade show mb-4" role="alert">
+                            <ul class="mb-0">
+                                @foreach($errors->all() as $error)
+                                    <li>{{ $error }}</li>
+                                @endforeach
+                            </ul>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    @endif
+                    <form action="{{ route('contact.store') }}" method="POST" class="contact-form">
+                        @csrf
                         <div class="row g-3">
                             <div class="col-md-6">
                                 <label class="form-label">Nama Lengkap</label>
-                                <input type="text" class="form-control" placeholder="Masukkan nama Anda">
+                                <input type="text" name="name" class="form-control" placeholder="Masukkan nama Anda" required>
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label">Email</label>
-                                <input type="email" class="form-control" placeholder="Masukkan email Anda">
+                                <input type="email" name="email" class="form-control" placeholder="Masukkan email Anda" required>
                             </div>
                             <div class="col-12">
                                 <label class="form-label">Subjek</label>
-                                <input type="text" class="form-control" placeholder="Subjek pesan">
+                                <input type="text" name="subject" class="form-control" placeholder="Subjek pesan">
                             </div>
                             <div class="col-12">
                                 <label class="form-label">Pesan</label>
-                                <textarea class="form-control" rows="5" placeholder="Tulis pesan Anda..."></textarea>
+                                <textarea name="message" class="form-control" rows="5" placeholder="Tulis pesan Anda..." required></textarea>
                             </div>
                             <div class="col-12">
                                 <button type="submit" class="btn btn-primary btn-lg w-100 rounded-pill">
@@ -944,5 +962,30 @@
         </div>
     </div>
 </section>
+
+    <!-- Floating Event Sidebar -->
+    <div class="d-none d-xl-block" style="position: fixed; right: 30px; top: 120px; width: 280px; z-index: 99;">
+        <div class="card border-0 shadow-lg overflow-hidden" style="border-radius: 20px; background: linear-gradient(135deg, #001f5c 0%, #000f3d 100%); color: white;">
+            <div class="card-body p-4 text-center">
+                <div class="mb-4 d-flex justify-content-between align-items-center">
+                    <span class="badge bg-warning text-dark px-3 py-2 rounded-pill fw-bold" style="font-size: 0.7rem;">
+                        <i class="bi bi-stars me-1"></i> Event Spesial
+                    </span>
+                    <i class="bi bi-rocket-takeoff text-white-50 fs-4"></i>
+                </div>
+                
+                <h3 class="fw-bold mb-1 text-white" style="font-size: 1.5rem; letter-spacing: -0.5px;">Floating Market UMKM</h3>
+                <h5 class="fw-bold mb-3 text-white-50" style="font-size: 1.1rem;">Sunset Pier</h5>
+                
+                <p class="small text-white-50 mb-4 px-2" style="line-height: 1.6; font-size: 0.85rem;">
+                    Ayo datang dan nikmati berbagai produk lokal berkualitas dari UMKM Teluknaga!
+                </p>
+                
+                <a href="/katalog" class="btn btn-light w-100 rounded-pill fw-bold shadow-sm py-2" style="font-size: 0.9rem;">
+                    Jelajahi Sekarang
+                </a>
+            </div>
+        </div>
+    </div>
 
 @endsection

@@ -81,7 +81,17 @@
                     <i class="bi bi-eye me-2"></i>
                     <span>Moderasi</span>
                 </a>
-                
+                <div class="nav-divider my-2"></div>
+                <span class="nav-label">KONTEN</span>
+                <a href="{{ route('admin.testimonials.index') }}" class="nav-link {{ Route::is('admin.testimonials.*') ? 'active' : '' }}">
+                    <i class="bi bi-chat-left-quote me-2"></i>
+                    <span>Testimoni</span>
+                </a>
+                <a href="{{ route('admin.contact_messages.index') }}" class="nav-link {{ Route::is('admin.contact_messages.*') ? 'active' : '' }}">
+                    <i class="bi bi-envelope me-2"></i>
+                    <span>Pesan Masuk</span>
+                </a>
+
                 <div class="nav-divider my-2"></div>
                 <span class="nav-label">LAINNYA</span>
                 <a href="{{ route('admin.desa.index') }}" class="nav-link {{ Route::is('admin.desa.*') ? 'active' : '' }}">

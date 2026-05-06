@@ -31,6 +31,10 @@ use App\Http\Controllers\Admin\UnitController;
 
 use Illuminate\Support\Facades\Artisan;
 
+Route::get('/debug-contact', function() {
+    return \App\Models\ContactMessage::count();
+});
+
 Route::get('/run-migrate', function() {
     try {
         Artisan::call('migrate', [
@@ -135,7 +139,18 @@ Route::middleware(['auth', 'admin.superadmin'])->group(function () {
     
     // User Management
     Route::resource('admin/users', UserController::class, ['as' => 'admin']);
+
+    // Testimonials Management
+    Route::resource('admin/testimonials', \App\Http\Controllers\Admin\TestimonialController::class, ['as' => 'admin']);
+
+    // Contact Messages Management
+    Route::get('admin/contact-messages', [\App\Http\Controllers\Admin\ContactMessageController::class, 'index'])->name('admin.contact_messages.index');
+    Route::get('admin/contact-messages/{message}', [\App\Http\Controllers\Admin\ContactMessageController::class, 'show'])->name('admin.contact_messages.show');
+    Route::delete('admin/contact-messages/{message}', [\App\Http\Controllers\Admin\ContactMessageController::class, 'destroy'])->name('admin.contact_messages.destroy');
 });
+
+// Public Contact Form
+Route::post('/contact', [\App\Http\Controllers\ContactController::class, 'store'])->name('contact.store');
 
 // SuperAdmin only routes
 Route::middleware(['auth', 'role:superadmin'])->group(function () {

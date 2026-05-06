@@ -108,7 +108,6 @@
 
 <body class="dashboard-layout">
 
-    @include('components.sidebar')
     <div class="sidebar" id="sidebar">
         <div class="sidebar-header">
             <div class="brand-logo">
@@ -191,6 +190,24 @@
                             <a href="{{ route('admin.users.index') }}" class="nav-link {{ request()->routeIs('admin.users.*') ? 'active' : '' }}">
                                 <i class="nav-icon bi bi-people"></i>
                                 <span class="nav-text">Manajemen User</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="nav-section">
+                    <span class="nav-section-title">KONTEN</span>
+                    <ul class="nav-list">
+                        <li class="nav-item">
+                            <a href="{{ route('admin.testimonials.index') }}" class="nav-link {{ request()->routeIs('admin.testimonials.*') ? 'active' : '' }}">
+                                <i class="nav-icon bi bi-chat-left-quote"></i>
+                                <span class="nav-text">Testimoni</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('admin.contact_messages.index') }}" class="nav-link {{ request()->routeIs('admin.contact_messages.*') ? 'active' : '' }}">
+                                <i class="nav-icon bi bi-envelope"></i>
+                                <span class="nav-text">Pesan Masuk</span>
                             </a>
                         </li>
                     </ul>
