@@ -85,6 +85,8 @@ class SettingController extends Controller
     public function updatePayment(Request $request)
     {
         $validated = $request->validate([
+            'payment_bank_name' => 'nullable|string|max:255',
+            'payment_bank_account' => 'nullable|string|max:255',
             'payment_bank_holder' => 'nullable|string|max:255',
             'payment_qris_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'payment_manual_enabled' => 'nullable|in:0,1',
