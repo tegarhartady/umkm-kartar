@@ -10,8 +10,9 @@ class PagesController extends Controller
     public function daftarUmkm()
     {
         $desas = Desa::all();
+        $banks = \App\Models\Bank::where('is_active', true)->orderBy('nama_bank')->get();
         $categories = ['Hasil Laut', 'Makanan Olahan', 'Bumbu Dapur', 'Kerajinan', 'Kuliner'];
-        return view('pages.daftar-umkm', compact('desas', 'categories'));
+        return view('pages.daftar-umkm', compact('desas', 'categories', 'banks'));
     }
 
     public function desaMitra()

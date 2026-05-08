@@ -477,11 +477,13 @@
             padding: 25px;
         }
 
-        .section-testimonials, .section-contact {
+        .section-testimonials,
+        .section-contact {
             padding: 60px 0;
         }
 
-        .floating-shape, .hero-wave {
+        .floating-shape,
+        .hero-wave {
             display: none;
         }
     }
@@ -918,16 +920,16 @@
                     <div class="testimonial-rating mb-3">
                         @for($i = 1; $i <= 5; $i++)
                             <i class="bi bi-star{{ $i <= $testimonial->rating ? '-fill' : '' }} text-warning"></i>
-                        @endfor
+                            @endfor
                     </div>
                     <p class="testimonial-text">"{{ $testimonial->content }}"</p>
                     <div class="testimonial-author d-flex align-items-center mt-4">
                         @if($testimonial->avatar)
-                            <img src="{{ asset('storage/' . $testimonial->avatar) }}" alt="{{ $testimonial->name }}" class="rounded-circle me-3" width="60" height="60" style="object-fit: cover;">
+                        <img src="{{ asset('storage/' . $testimonial->avatar) }}" alt="{{ $testimonial->name }}" class="rounded-circle me-3" width="60" height="60" style="object-fit: cover;">
                         @else
-                            <div class="rounded-circle bg-primary me-3 d-flex align-items-center justify-content-center text-white fw-bold" style="width: 60px; height: 60px;">
-                                {{ substr($testimonial->name, 0, 1) }}
-                            </div>
+                        <div class="rounded-circle bg-primary me-3 d-flex align-items-center justify-content-center text-white fw-bold" style="width: 60px; height: 60px;">
+                            {{ substr($testimonial->name, 0, 1) }}
+                        </div>
                         @endif
                         <div>
                             <h6 class="mb-0">{{ $testimonial->name }}</h6>
@@ -1005,24 +1007,35 @@
             <div class="col-lg-6" data-aos="fade-left">
                 <div class="contact-form-wrapper">
                     @if(session('success'))
-                        <div class="alert alert-success alert-dismissible fade show mb-4" role="alert">
-                            {{ session('success') }}
-                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                        </div>
+                    <div class="alert alert-success alert-dismissible fade show mb-4" role="alert">
+                        {{ session('success') }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                    @endif
+
+                    @if(session('error'))
+                    <div class="alert alert-danger alert-dismissible fade show mb-4" role="alert">
+                        {{ session('error') }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
                     @endif
 
                     @if($errors->any())
-                        <div class="alert alert-danger alert-dismissible fade show mb-4" role="alert">
-                            <ul class="mb-0">
-                                @foreach($errors->all() as $error)
-                                    <li>{{ $error }}</li>
-                                @endforeach
-                            </ul>
-                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                        </div>
+                    <div class="alert alert-danger alert-dismissible fade show mb-4" role="alert">
+                        <ul class="mb-0">
+                            @foreach($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
                     @endif
                     <form action="{{ route('contact.store') }}" method="POST" class="contact-form">
                         @csrf
+                        {{-- Honeypot Field for Security --}}
+                        <div style="display: none;">
+                            <input type="text" name="_hp_name" tabindex="-1" autocomplete="off">
+                        </div>
                         <div class="row g-3">
                             <div class="col-md-6">
                                 <label class="form-label">Nama Lengkap</label>
@@ -1053,29 +1066,40 @@
     </div>
 </section>
 
-    <!-- Floating Event Sidebar -->
-    <div class="d-none d-xl-block" style="position: fixed; right: 30px; top: 120px; width: 280px; z-index: 99;">
-        <div class="card border-0 shadow-lg overflow-hidden" style="border-radius: 20px; background: linear-gradient(135deg, #001f5c 0%, #000f3d 100%); color: white;">
-            <div class="card-body p-4 text-center">
-                <div class="mb-4 d-flex justify-content-between align-items-center">
-                    <span class="badge bg-warning text-dark px-3 py-2 rounded-pill fw-bold" style="font-size: 0.7rem;">
-                        <i class="bi bi-stars me-1"></i> Event Spesial
-                    </span>
-                    <i class="bi bi-rocket-takeoff text-white-50 fs-4"></i>
-                </div>
-                
-                <h3 class="fw-bold mb-1 text-white" style="font-size: 1.5rem; letter-spacing: -0.5px;">Floating Market UMKM</h3>
-                <h5 class="fw-bold mb-3 text-white-50" style="font-size: 1.1rem;">Sunset Pier</h5>
-                
-                <p class="small text-white-50 mb-4 px-2" style="line-height: 1.6; font-size: 0.85rem;">
-                    Ayo datang dan nikmati berbagai produk lokal berkualitas dari UMKM Teluknaga!
-                </p>
-                
-                <a href="/katalog" class="btn btn-light w-100 rounded-pill fw-bold shadow-sm py-2" style="font-size: 0.9rem;">
-                    Jelajahi Sekarang
-                </a>
+<!-- Floating Event Sidebar -->
+@php
+$promo = $activePromotion ?? (object)[
+'title' => 'Floating Market UMKM',
+'subtitle' => 'Sunset Pier',
+'description' => 'Ayo datang dan nikmati berbagai produk lokal berkualitas dari UMKM Teluknaga!',
+'button_text' => 'Jelajahi Sekarang',
+'button_link' => '/katalog'
+];
+@endphp
+@if(isset($activePromotion) || true) {{-- Always show for now, but use DB if exists --}}
+<div class="d-none d-xl-block" style="position: fixed; right: 30px; top: 120px; width: 280px; z-index: 99;">
+    <div class="card border-0 shadow-lg overflow-hidden" style="border-radius: 20px; background: linear-gradient(135deg, #001f5c 0%, #000f3d 100%); color: white;">
+        <div class="card-body p-4 text-center">
+            <div class="mb-4 d-flex justify-content-between align-items-center">
+                <span class="badge bg-warning text-dark px-3 py-2 rounded-pill fw-bold" style="font-size: 0.7rem;">
+                    <i class="bi bi-stars me-1"></i> Event Spesial
+                </span>
+                <i class="bi bi-rocket-takeoff text-white-50 fs-4"></i>
             </div>
+
+            <h3 class="fw-bold mb-1 text-white" style="font-size: 1.5rem; letter-spacing: -0.5px;">{{ $promo->title }}</h3>
+            <h5 class="fw-bold mb-3 text-white-50" style="font-size: 1.1rem;">{{ $promo->subtitle }}</h5>
+
+            <p class="small text-white-50 mb-4 px-2" style="line-height: 1.6; font-size: 0.85rem;">
+                {{ $promo->description }}
+            </p>
+
+            <a href="{{ $promo->button_link }}" class="btn btn-light w-100 rounded-pill fw-bold shadow-sm py-2" style="font-size: 0.9rem;">
+                {{ $promo->button_text }}
+            </a>
         </div>
     </div>
+</div>
+@endif
 
 @endsection

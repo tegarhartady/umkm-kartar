@@ -275,15 +275,11 @@
                                     <label class="form-label">Tipe Rekening / E-Wallet</label>
                                     <select name="tipe_rekening" class="form-select @error('tipe_rekening') is-invalid @enderror">
                                         <option value="">-- Pilih Tipe --</option>
-                                        <option value="BCA" {{ old('tipe_rekening') == 'BCA' ? 'selected' : '' }}>BCA</option>
-                                        <option value="Mandiri" {{ old('tipe_rekening') == 'Mandiri' ? 'selected' : '' }}>Mandiri</option>
-                                        <option value="BNI" {{ old('tipe_rekening') == 'BNI' ? 'selected' : '' }}>BNI</option>
-                                        <option value="CIMB" {{ old('tipe_rekening') == 'CIMB' ? 'selected' : '' }}>CIMB Niaga</option>
-                                        <option value="Danamon" {{ old('tipe_rekening') == 'Danamon' ? 'selected' : '' }}>Danamon</option>
-                                        <option value="GCash" {{ old('tipe_rekening') == 'GCash' ? 'selected' : '' }}>GCash (PH)</option>
-                                        <option value="Dana" {{ old('tipe_rekening') == 'Dana' ? 'selected' : '' }}>Dana</option>
-                                        <option value="OVO" {{ old('tipe_rekening') == 'OVO' ? 'selected' : '' }}>OVO</option>
-                                        <option value="GOPAY" {{ old('tipe_rekening') == 'GOPAY' ? 'selected' : '' }}>GoPay</option>
+                                        @foreach($banks as $bank)
+                                            <option value="{{ $bank->nama_bank }}" {{ old('tipe_rekening') == $bank->nama_bank ? 'selected' : '' }}>
+                                                {{ $bank->nama_bank }}
+                                            </option>
+                                        @endforeach
                                     </select>
                                     @error('tipe_rekening')
                                         <div class="invalid-feedback d-block">{{ $message }}</div>

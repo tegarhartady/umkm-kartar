@@ -3,17 +3,17 @@
 @section('title', 'Tambah UMKM')
 
 @php
-    use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Storage;
 @endphp
 
 @section('breadcrumb')
-    <nav aria-label="breadcrumb">
-        <ol class="breadcrumb mb-0">
-            <li class="breadcrumb-item"><a href="{{ route('dashboard.admin') }}"><i class="bi bi-house me-1"></i>Dashboard</a></li>
-            <li class="breadcrumb-item"><a href="{{ route('admin.umkm.index') }}">UMKM</a></li>
-            <li class="breadcrumb-item active">Tambah UMKM</li>
-        </ol>
-    </nav>
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb mb-0">
+        <li class="breadcrumb-item"><a href="{{ route('dashboard.admin') }}"><i class="bi bi-house me-1"></i>Dashboard</a></li>
+        <li class="breadcrumb-item"><a href="{{ route('admin.umkm.index') }}">UMKM</a></li>
+        <li class="breadcrumb-item active">Tambah UMKM</li>
+    </ol>
+</nav>
 @endsection
 
 @section('content')
@@ -33,15 +33,15 @@
                 </div>
                 <div class="card-body p-4">
                     @if ($errors->any())
-                        <div class="alert alert-danger alert-dismissible fade show">
-                            <strong>Terjadi Kesalahan!</strong>
-                            <ul class="mb-0 mt-2">
-                                @foreach ($errors->all() as $error)
-                                    <li>{{ $error }}</li>
-                                @endforeach
-                            </ul>
-                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                        </div>
+                    <div class="alert alert-danger alert-dismissible fade show">
+                        <strong>Terjadi Kesalahan!</strong>
+                        <ul class="mb-0 mt-2">
+                            @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
                     @endif
 
                     <form action="{{ route('admin.umkm.store') }}" method="POST" enctype="multipart/form-data">
@@ -51,14 +51,14 @@
                         <div class="row mb-3">
                             <div class="col-md-6">
                                 <label class="form-label fw-600">Nama Toko *</label>
-                                <input type="text" name="nama_toko" class="form-control @error('nama_toko') is-invalid @enderror" 
-                                       value="{{ old('nama_toko') }}" placeholder="Nama toko" required>
+                                <input type="text" name="nama_toko" class="form-control @error('nama_toko') is-invalid @enderror"
+                                    value="{{ old('nama_toko') }}" placeholder="Nama toko" required>
                                 @error('nama_toko') <div class="invalid-feedback d-block">{{ $message }}</div> @enderror
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label fw-600">Nama Pemilik *</label>
-                                <input type="text" name="pemilik" class="form-control @error('pemilik') is-invalid @enderror" 
-                                       value="{{ old('pemilik') }}" placeholder="Nama pemilik" required>
+                                <input type="text" name="pemilik" class="form-control @error('pemilik') is-invalid @enderror"
+                                    value="{{ old('pemilik') }}" placeholder="Nama pemilik" required>
                                 @error('pemilik') <div class="invalid-feedback d-block">{{ $message }}</div> @enderror
                             </div>
                         </div>
@@ -67,14 +67,14 @@
                         <div class="row mb-3">
                             <div class="col-md-6">
                                 <label class="form-label fw-600">Email *</label>
-                                <input type="email" name="email" class="form-control @error('email') is-invalid @enderror" 
-                                       value="{{ old('email') }}" placeholder="Email" required>
+                                <input type="email" name="email" class="form-control @error('email') is-invalid @enderror"
+                                    value="{{ old('email') }}" placeholder="Email" required>
                                 @error('email') <div class="invalid-feedback d-block">{{ $message }}</div> @enderror
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label fw-600">Telepon *</label>
-                                <input type="tel" name="phone" class="form-control @error('phone') is-invalid @enderror" 
-                                       value="{{ old('phone') }}" placeholder="Nomor telepon" required>
+                                <input type="tel" name="phone" class="form-control @error('phone') is-invalid @enderror"
+                                    value="{{ old('phone') }}" placeholder="Nomor telepon" required>
                                 @error('phone') <div class="invalid-feedback d-block">{{ $message }}</div> @enderror
                             </div>
                         </div>
@@ -85,11 +85,11 @@
                             <select name="desa" class="form-select @error('desa') is-invalid @enderror" required>
                                 <option value="">-- Pilih Desa --</option>
                                 @forelse($desas as $desaItem)
-                                    <option value="{{ $desaItem->nama_desa }}" {{ old('desa') == $desaItem->nama_desa ? 'selected' : '' }}>
-                                        {{ $desaItem->nama_desa }}
-                                    </option>
+                                <option value="{{ $desaItem->nama_desa }}" {{ old('desa') == $desaItem->nama_desa ? 'selected' : '' }}>
+                                    {{ $desaItem->nama_desa }}
+                                </option>
                                 @empty
-                                    <option value="" disabled>Tidak ada desa tersedia</option>
+                                <option value="" disabled>Tidak ada desa tersedia</option>
                                 @endforelse
                             </select>
                             @error('desa') <div class="invalid-feedback d-block">{{ $message }}</div> @enderror
@@ -98,8 +98,8 @@
                         <!-- Alamat Lengkap -->
                         <div class="mb-3">
                             <label class="form-label fw-600">Alamat Lengkap *</label>
-                            <textarea name="alamat" class="form-control @error('alamat') is-invalid @enderror" 
-                                      rows="3" placeholder="Alamat lengkap" required>{{ old('alamat') }}</textarea>
+                            <textarea name="alamat" class="form-control @error('alamat') is-invalid @enderror"
+                                rows="3" placeholder="Alamat lengkap" required>{{ old('alamat') }}</textarea>
                             @error('alamat') <div class="invalid-feedback d-block">{{ $message }}</div> @enderror
                         </div>
 
@@ -131,8 +131,8 @@
                         <!-- Deskripsi -->
                         <div class="mb-3">
                             <label class="form-label fw-600">Deskripsi Usaha</label>
-                            <textarea name="deskripsi" class="form-control @error('deskripsi') is-invalid @enderror" 
-                                      rows="4" placeholder="Deskripsi usaha">{{ old('deskripsi') }}</textarea>
+                            <textarea name="deskripsi" class="form-control @error('deskripsi') is-invalid @enderror"
+                                rows="4" placeholder="Deskripsi usaha">{{ old('deskripsi') }}</textarea>
                             @error('deskripsi') <div class="invalid-feedback d-block">{{ $message }}</div> @enderror
                         </div>
 
@@ -141,10 +141,10 @@
                             <label class="form-label fw-600">Omzet Bulanan (Rp)</label>
                             <div class="input-group">
                                 <span class="input-group-text" style="background: #f8f9fa; border: 1px solid #ddd; border-radius: 8px 0 0 8px;">Rp</span>
-                                <input type="text" id="omzet_display_admin" class="form-control @error('omzet_bulanan') is-invalid @enderror" 
-                                       placeholder="Contoh: 5.000.000" 
-                                       value="{{ old('omzet_bulanan') }}" 
-                                       style="border-radius: 0 8px 8px 0;">
+                                <input type="text" id="omzet_display_admin" class="form-control @error('omzet_bulanan') is-invalid @enderror"
+                                    placeholder="Contoh: 5.000.000"
+                                    value="{{ old('omzet_bulanan') }}"
+                                    style="border-radius: 0 8px 8px 0;">
                                 <input type="hidden" name="omzet_bulanan" id="omzet_actual_admin">
                             </div>
                             @error('omzet_bulanan') <div class="invalid-feedback d-block">{{ $message }}</div> @enderror
@@ -153,13 +153,13 @@
                         <!-- Upload Foto Section -->
                         <div class="border-top pt-4 mt-4 mb-4">
                             <h6 class="fw-600 mb-3"><i class="bi bi-image me-2"></i>Unggah Foto</h6>
-                            
+
                             <!-- Foto KTP -->
                             <div class="mb-4">
                                 <label class="form-label fw-600">Foto KTP Pemilik</label>
                                 <div class="input-group mb-2">
-                                    <input type="file" name="foto_ktp" class="form-control @error('foto_ktp') is-invalid @enderror" 
-                                           accept="image/*">
+                                    <input type="file" name="foto_ktp" class="form-control @error('foto_ktp') is-invalid @enderror"
+                                        accept="image/*">
                                     @error('foto_ktp') <div class="invalid-feedback d-block">{{ $message }}</div> @enderror
                                 </div>
                                 <small class="text-muted d-block">Format: JPG, PNG | Max: 5MB</small>
@@ -169,8 +169,8 @@
                             <div class="mb-4">
                                 <label class="form-label fw-600">Foto Tempat Usaha</label>
                                 <div class="input-group mb-2">
-                                    <input type="file" name="foto_tempat" class="form-control @error('foto_tempat') is-invalid @enderror" 
-                                           accept="image/*">
+                                    <input type="file" name="foto_tempat" class="form-control @error('foto_tempat') is-invalid @enderror"
+                                        accept="image/*">
                                     @error('foto_tempat') <div class="invalid-feedback d-block">{{ $message }}</div> @enderror
                                 </div>
                                 <small class="text-muted d-block">Format: JPG, PNG | Max: 5MB | Rekomendasi ukuran: 800x600px</small>
@@ -180,7 +180,7 @@
                         <!-- Lokasi dengan OpenStreetMap -->
                         <div class="form-section mb-4 border-top pt-4 mt-4">
                             <h6 class="fw-600 mb-3"><i class="bi bi-geo-alt me-2"></i>Lokasi Usaha (Pilih di Peta)</h6>
-                            
+
                             <!-- Map Container -->
                             <div class="mb-3">
                                 <div id="map" style="height: 400px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);"></div>
@@ -191,16 +191,16 @@
                             <div class="row g-3">
                                 <div class="col-md-6">
                                     <label class="form-label fw-600">Latitude</label>
-                                    <input type="number" id="latitude" name="latitude" step="0.000001" 
-                                           class="form-control @error('latitude') is-invalid @enderror" 
-                                           placeholder="-6.123456" value="{{ old('latitude', '-6.1753') }}" readonly>
+                                    <input type="number" id="latitude" name="latitude" step="0.000001"
+                                        class="form-control @error('latitude') is-invalid @enderror"
+                                        placeholder="-6.123456" value="{{ old('latitude', '-6.1753') }}" readonly>
                                     @error('latitude') <div class="invalid-feedback d-block">{{ $message }}</div> @enderror
                                 </div>
                                 <div class="col-md-6">
                                     <label class="form-label fw-600">Longitude</label>
-                                    <input type="number" id="longitude" name="longitude" step="0.000001" 
-                                           class="form-control @error('longitude') is-invalid @enderror" 
-                                           placeholder="106.123456" value="{{ old('longitude', '106.9749') }}" readonly>
+                                    <input type="number" id="longitude" name="longitude" step="0.000001"
+                                        class="form-control @error('longitude') is-invalid @enderror"
+                                        placeholder="106.123456" value="{{ old('longitude', '106.9749') }}" readonly>
                                     @error('longitude') <div class="invalid-feedback d-block">{{ $message }}</div> @enderror
                                 </div>
                             </div>
@@ -214,8 +214,8 @@
                             <!-- Password -->
                             <div class="mb-3">
                                 <label class="form-label fw-600">Password *</label>
-                                <input type="password" name="password" class="form-control @error('password') is-invalid @enderror" 
-                                       placeholder="Masukkan password (minimal 8 karakter)" required>
+                                <input type="password" name="password" class="form-control @error('password') is-invalid @enderror"
+                                    placeholder="Masukkan password (minimal 8 karakter)" required>
                                 @error('password') <div class="invalid-feedback d-block">{{ $message }}</div> @enderror
                                 <small class="text-muted d-block mt-1">Gunakan kombinasi huruf besar, kecil, angka, dan simbol untuk keamanan maksimal</small>
                             </div>
@@ -223,8 +223,8 @@
                             <!-- Password Konfirmasi -->
                             <div class="mb-4">
                                 <label class="form-label fw-600">Konfirmasi Password *</label>
-                                <input type="password" name="password_confirmation" class="form-control @error('password_confirmation') is-invalid @enderror" 
-                                       placeholder="Ulangi password" required>
+                                <input type="password" name="password_confirmation" class="form-control @error('password_confirmation') is-invalid @enderror"
+                                    placeholder="Ulangi password" required>
                                 @error('password_confirmation') <div class="invalid-feedback d-block">{{ $message }}</div> @enderror
                             </div>
                         </div>
@@ -239,15 +239,11 @@
                                 <label class="form-label fw-600">Tipe Rekening / E-Wallet</label>
                                 <select name="tipe_rekening" class="form-select @error('tipe_rekening') is-invalid @enderror">
                                     <option value="">-- Pilih Tipe --</option>
-                                    <option value="BCA" {{ old('tipe_rekening') == 'BCA' ? 'selected' : '' }}>BCA</option>
-                                    <option value="Mandiri" {{ old('tipe_rekening') == 'Mandiri' ? 'selected' : '' }}>Mandiri</option>
-                                    <option value="BNI" {{ old('tipe_rekening') == 'BNI' ? 'selected' : '' }}>BNI</option>
-                                    <option value="CIMB" {{ old('tipe_rekening') == 'CIMB' ? 'selected' : '' }}>CIMB Niaga</option>
-                                    <option value="Danamon" {{ old('tipe_rekening') == 'Danamon' ? 'selected' : '' }}>Danamon</option>
-                                    <option value="GCash" {{ old('tipe_rekening') == 'GCash' ? 'selected' : '' }}>GCash (PH)</option>
-                                    <option value="Dana" {{ old('tipe_rekening') == 'Dana' ? 'selected' : '' }}>Dana</option>
-                                    <option value="OVO" {{ old('tipe_rekening') == 'OVO' ? 'selected' : '' }}>OVO</option>
-                                    <option value="GOPAY" {{ old('tipe_rekening') == 'GOPAY' ? 'selected' : '' }}>GoPay</option>
+                                    @foreach($banks as $bank)
+                                        <option value="{{ $bank->nama_bank }}" {{ old('tipe_rekening') == $bank->nama_bank ? 'selected' : '' }}>
+                                            {{ $bank->nama_bank }}
+                                        </option>
+                                    @endforeach
                                 </select>
                                 @error('tipe_rekening') <div class="invalid-feedback d-block">{{ $message }}</div> @enderror
                             </div>
@@ -255,8 +251,8 @@
                             <!-- Nomor Rekening -->
                             <div class="mb-3">
                                 <label class="form-label fw-600">Nomor Rekening / No E-Wallet</label>
-                                <input type="text" name="no_rekening" class="form-control @error('no_rekening') is-invalid @enderror" 
-                                       value="{{ old('no_rekening') }}" placeholder="Contoh: 1234567890">
+                                <input type="text" name="no_rekening" class="form-control @error('no_rekening') is-invalid @enderror"
+                                    value="{{ old('no_rekening') }}" placeholder="Contoh: 1234567890">
                                 @error('no_rekening') <div class="invalid-feedback d-block">{{ $message }}</div> @enderror
                                 <small class="text-muted d-block mt-1">Nomor rekening atau nomor e-wallet yang aktif</small>
                             </div>
@@ -264,8 +260,8 @@
                             <!-- Nama Pemilik Rekening -->
                             <div class="mb-4">
                                 <label class="form-label fw-600">Nama Pemilik Rekening</label>
-                                <input type="text" name="nama_pemilik_rekening" class="form-control @error('nama_pemilik_rekening') is-invalid @enderror" 
-                                       value="{{ old('nama_pemilik_rekening') }}" placeholder="Nama sesuai rekening/e-wallet">
+                                <input type="text" name="nama_pemilik_rekening" class="form-control @error('nama_pemilik_rekening') is-invalid @enderror"
+                                    value="{{ old('nama_pemilik_rekening') }}" placeholder="Nama sesuai rekening/e-wallet">
                                 @error('nama_pemilik_rekening') <div class="invalid-feedback d-block">{{ $message }}</div> @enderror
                                 <small class="text-muted d-block mt-1">Nama pemilik rekening untuk verifikasi pembayaran</small>
                             </div>
@@ -290,102 +286,105 @@
 
 @push('styles')
 <style>
-.form-label.fw-600 {
-    font-weight: 600;
-    color: #333;
-    margin-bottom: 0.5rem;
-}
+    .form-label.fw-600 {
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 0.5rem;
+    }
 
-.form-control, .form-select {
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    padding: 0.75rem;
-    font-size: 0.95rem;
-    transition: all 0.3s ease;
-}
+    .form-control,
+    .form-select {
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        padding: 0.75rem;
+        font-size: 0.95rem;
+        transition: all 0.3s ease;
+    }
 
-.form-control:focus, .form-select:focus {
-    border-color: #001f5c;
-    box-shadow: 0 0 0 0.2rem rgba(0, 31, 92, 0.15);
-}
+    .form-control:focus,
+    .form-select:focus {
+        border-color: #001f5c;
+        box-shadow: 0 0 0 0.2rem rgba(0, 31, 92, 0.15);
+    }
 
-.form-control.is-invalid, .form-select.is-invalid {
-    border-color: #dc3545;
-}
+    .form-control.is-invalid,
+    .form-select.is-invalid {
+        border-color: #dc3545;
+    }
 
-.invalid-feedback {
-    color: #dc3545;
-    font-size: 0.875rem;
-    margin-top: 0.25rem;
-}
+    .invalid-feedback {
+        color: #dc3545;
+        font-size: 0.875rem;
+        margin-top: 0.25rem;
+    }
 
-.btn-primary {
-    background: linear-gradient(135deg, #001f5c 0%, #000f3d 100%);
-    border: none;
-    box-shadow: 0 4px 15px rgba(0, 31, 92, 0.2);
-    color: white;
-}
+    .btn-primary {
+        background: linear-gradient(135deg, #001f5c 0%, #000f3d 100%);
+        border: none;
+        box-shadow: 0 4px 15px rgba(0, 31, 92, 0.2);
+        color: white;
+    }
 
-.btn-primary:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(0, 31, 92, 0.3);
-    color: white;
-}
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(0, 31, 92, 0.3);
+        color: white;
+    }
 
-.btn-lg.grow {
-    flex: 1;
-}
+    .btn-lg.grow {
+        flex: 1;
+    }
 
-/* Leaflet CSS Override */
-#map {
-    border-radius: 12px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-    z-index: 1;
-}
-
-.leaflet-control-container {
-    font-family: inherit;
-}
-
-.leaflet-bar {
-    border-radius: 8px;
-}
-
-.leaflet-control-search {
-    border-radius: 8px;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-}
-
-.leaflet-control-search input {
-    padding: 10px 12px;
-    font-size: 14px;
-    border-radius: 4px;
-    border: 1px solid #ddd;
-    width: 280px;
-}
-
-.leaflet-control-search button {
-    background: #001f5c;
-    color: white;
-    border: none;
-    padding: 8px 12px;
-    cursor: pointer;
-    border-radius: 4px;
-}
-
-.leaflet-control-search button:hover {
-    background: #000f3d;
-}
-
-@media (max-width: 767px) {
+    /* Leaflet CSS Override */
     #map {
-        height: 300px !important;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        z-index: 1;
     }
-    
+
+    .leaflet-control-container {
+        font-family: inherit;
+    }
+
+    .leaflet-bar {
+        border-radius: 8px;
+    }
+
+    .leaflet-control-search {
+        border-radius: 8px;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    }
+
     .leaflet-control-search input {
-        width: 180px;
+        padding: 10px 12px;
+        font-size: 14px;
+        border-radius: 4px;
+        border: 1px solid #ddd;
+        width: 280px;
     }
-}
+
+    .leaflet-control-search button {
+        background: #001f5c;
+        color: white;
+        border: none;
+        padding: 8px 12px;
+        cursor: pointer;
+        border-radius: 4px;
+    }
+
+    .leaflet-control-search button:hover {
+        background: #000f3d;
+    }
+
+    @media (max-width: 767px) {
+        #map {
+            height: 300px !important;
+        }
+
+        .leaflet-control-search input {
+            width: 180px;
+        }
+    }
 </style>
 @endpush
 
@@ -397,113 +396,111 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet-control-geocoder/2.4.0/Control.Geocoder.min.js"></script>
 
 <script>
-// Default location: Teluknaga, Tangerang
-const DEFAULT_LAT = -6.1753;
-const DEFAULT_LNG = 106.9749;
+    // Default location: Teluknaga, Tangerang
+    const DEFAULT_LAT = -6.1753;
+    const DEFAULT_LNG = 106.9749;
 
-let map;
-let marker;
+    let map;
+    let marker;
 
-function initMap() {
-    // Initialize Leaflet map
-    map = L.map('map').setView([DEFAULT_LAT, DEFAULT_LNG], 15);
+    function initMap() {
+        // Initialize Leaflet map
+        map = L.map('map').setView([DEFAULT_LAT, DEFAULT_LNG], 15);
 
-    // Add OpenStreetMap tiles
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-        maxZoom: 19,
-    }).addTo(map);
+        // Add OpenStreetMap tiles
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+            maxZoom: 19,
+        }).addTo(map);
 
-    // Get initial values from inputs
-    const initialLat = parseFloat(document.getElementById('latitude').value) || DEFAULT_LAT;
-    const initialLng = parseFloat(document.getElementById('longitude').value) || DEFAULT_LNG;
+        // Get initial values from inputs
+        const initialLat = parseFloat(document.getElementById('latitude').value) || DEFAULT_LAT;
+        const initialLng = parseFloat(document.getElementById('longitude').value) || DEFAULT_LNG;
 
-    // Create initial marker
-    marker = L.marker([initialLat, initialLng], {
-        draggable: true,
-        title: 'Lokasi Usaha Anda - Drag untuk menggeser',
-    }).addTo(map);
+        // Create initial marker
+        marker = L.marker([initialLat, initialLng], {
+            draggable: true,
+            title: 'Lokasi Usaha Anda - Drag untuk menggeser',
+        }).addTo(map);
 
-    // Update coordinates when marker is dragged
-    marker.on('dragend', function() {
-        const position = marker.getLatLng();
-        document.getElementById('latitude').value = position.lat.toFixed(6);
-        document.getElementById('longitude').value = position.lng.toFixed(6);
-    });
+        // Update coordinates when marker is dragged
+        marker.on('dragend', function() {
+            const position = marker.getLatLng();
+            document.getElementById('latitude').value = position.lat.toFixed(6);
+            document.getElementById('longitude').value = position.lng.toFixed(6);
+        });
 
-    // Click on map to place marker
-    map.on('click', function(e) {
-        const position = e.latlng;
-        marker.setLatLng(position);
-        document.getElementById('latitude').value = position.lat.toFixed(6);
-        document.getElementById('longitude').value = position.lng.toFixed(6);
-    });
+        // Click on map to place marker
+        map.on('click', function(e) {
+            const position = e.latlng;
+            marker.setLatLng(position);
+            document.getElementById('latitude').value = position.lat.toFixed(6);
+            document.getElementById('longitude').value = position.lng.toFixed(6);
+        });
 
-    // Add search/geocoding control
-    const geocoder = L.Control.geocoder({
-        defaultMarkGeocode: false,
-        position: 'topleft',
-    })
-    .on('markgeocode', function(e) {
-        const bbox = e.geocode.bbox;
-        const center = [
-            (bbox.getSouthWest().lat + bbox.getNorthEast().lat) / 2,
-            (bbox.getSouthWest().lng + bbox.getNorthEast().lng) / 2
-        ];
-        
-        marker.setLatLng(center);
-        map.fitBounds(bbox);
-        
-        document.getElementById('latitude').value = center[0].toFixed(6);
-        document.getElementById('longitude').value = center[1].toFixed(6);
-    })
-    .addTo(map);
+        // Add search/geocoding control
+        const geocoder = L.Control.geocoder({
+                defaultMarkGeocode: false,
+                position: 'topleft',
+            })
+            .on('markgeocode', function(e) {
+                const bbox = e.geocode.bbox;
+                const center = [
+                    (bbox.getSouthWest().lat + bbox.getNorthEast().lat) / 2,
+                    (bbox.getSouthWest().lng + bbox.getNorthEast().lng) / 2
+                ];
 
-    // Add attribution
-    L.control.attribution({
-        prefix: '<a href="https://leafletjs.com">Leaflet</a>'
-    }).addTo(map);
+                marker.setLatLng(center);
+                map.fitBounds(bbox);
 
-    // Ensure map resizes properly
-    setTimeout(() => {
-        map.invalidateSize();
-    }, 100);
-}
+                document.getElementById('latitude').value = center[0].toFixed(6);
+                document.getElementById('longitude').value = center[1].toFixed(6);
+            })
+            .addTo(map);
 
-// Initialize map when page loads
-document.addEventListener('DOMContentLoaded', function() {
-    initMap();
-});
+        // Add attribution
+        L.control.attribution({
+            prefix: '<a href="https://leafletjs.com">Leaflet</a>'
+        }).addTo(map);
 
-// Format Rupiah untuk Omzet Bulanan di Admin Create
-function formatRupiah(value) {
-    // Hapus karakter non-digit
-    value = value.replace(/\D/g, '');
-    
-    // Format dengan separator
-    value = value.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
-    
-    return value;
-}
-
-const omzetDisplayAdmin = document.getElementById('omzet_display_admin');
-const omzetActualAdmin = document.getElementById('omzet_actual_admin');
-
-if (omzetDisplayAdmin) {
-    omzetDisplayAdmin.addEventListener('input', function() {
-        const formatted = formatRupiah(this.value);
-        this.value = formatted;
-        
-        // Simpan nilai asli (tanpa format) ke input hidden
-        omzetActualAdmin.value = this.value.replace(/\D/g, '');
-    });
-
-    // Set nilai awal jika ada
-    if (omzetDisplayAdmin.value) {
-        omzetActualAdmin.value = omzetDisplayAdmin.value.replace(/\D/g, '');
+        // Ensure map resizes properly
+        setTimeout(() => {
+            map.invalidateSize();
+        }, 100);
     }
-}
+
+    // Initialize map when page loads
+    document.addEventListener('DOMContentLoaded', function() {
+        initMap();
+    });
+
+    // Format Rupiah untuk Omzet Bulanan di Admin Create
+    function formatRupiah(value) {
+        // Hapus karakter non-digit
+        value = value.replace(/\D/g, '');
+
+        // Format dengan separator
+        value = value.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+
+        return value;
+    }
+
+    const omzetDisplayAdmin = document.getElementById('omzet_display_admin');
+    const omzetActualAdmin = document.getElementById('omzet_actual_admin');
+
+    if (omzetDisplayAdmin) {
+        omzetDisplayAdmin.addEventListener('input', function() {
+            const formatted = formatRupiah(this.value);
+            this.value = formatted;
+
+            // Simpan nilai asli (tanpa format) ke input hidden
+            omzetActualAdmin.value = this.value.replace(/\D/g, '');
+        });
+
+        // Set nilai awal jika ada
+        if (omzetDisplayAdmin.value) {
+            omzetActualAdmin.value = omzetDisplayAdmin.value.replace(/\D/g, '');
+        }
+    }
 </script>
 @endpush
-            
-            

@@ -17,7 +17,16 @@ class HomeController extends Controller
             ->limit(4)
             ->get();
         $testimonials = Testimonial::where('is_active', true)->latest()->get();
-        return view('index', compact('recommendedProducts', 'testimonials'));
+        
+        $activePromotion = null;
+        try {
+            $activePromotion = \App\Models\Promotion::where('is_active', true)->first();
+        } catch (\Exception $e) {
+            // Table might not exist yet
+            \Log::warning('Promotions table missing: ' . $e->getMessage());
+        }
+        
+        return view('index', compact('recommendedProducts', 'testimonials', 'activePromotion'));
     }
 
     public function showProduct($id)

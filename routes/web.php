@@ -50,6 +50,16 @@ Route::get('/run-migrate', function() {
 Route::post('payment/callback', [PaymentCallbackController::class, 'callback'])->name('payment.callback');
 
 // Main Routes
+Route::get('/run-migration', function() {
+    try {
+        \Illuminate\Support\Facades\Artisan::call('migrate', ['--force' => true]);
+        \Illuminate\Support\Facades\Artisan::call('db:seed', ['--class' => 'BankSeeder', '--force' => true]);
+        return "Migration and Seeding successful! <br><a href='/admin/master/banks'>Back to Master Bank</a>";
+    } catch (\Exception $e) {
+        return "Process failed: " . $e->getMessage();
+    }
+});
+
 Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/katalog', [CatalogController::class, 'indexProducts'])->name('katalog');
 
@@ -141,9 +151,21 @@ Route::middleware(['auth', 'admin.superadmin'])->group(function () {
     Route::resource('admin/users', UserController::class, ['as' => 'admin']);
 
     // Testimonials Management
-    Route::resource('admin/testimonials', \App\Http\Controllers\Admin\TestimonialController::class, ['as' => 'admin']);
+    Route::resource('admin/testimonials', \App\Http\Controllers\Admin\TestimonialController::class, [
+        'as' => 'admin'
+    ]);
+    Route::post('admin/testimonials/{testimonial}/toggle', [\App\Http\Controllers\Admin\TestimonialController::class, 'toggle'])->name('admin.testimonials.toggle');
 
-    // Contact Messages Management
+    Route::resource('admin/promotions', \App\Http\Controllers\Admin\PromotionController::class, [
+        'as' => 'admin'
+    ]);
+    Route::post('admin/promotions/{promotion}/toggle', [\App\Http\Controllers\Admin\PromotionController::class, 'toggle'])->name('admin.promotions.toggle');
+
+    Route::resource('admin/master/banks', \App\Http\Controllers\Admin\BankController::class, [
+        'as' => 'admin.master'
+    ]);
+    Route::post('admin/master/banks/{bank}/toggle', [\App\Http\Controllers\Admin\BankController::class, 'toggle'])->name('admin.master.banks.toggle');
+
     Route::get('admin/contact-messages', [\App\Http\Controllers\Admin\ContactMessageController::class, 'index'])->name('admin.contact_messages.index');
     Route::get('admin/contact-messages/{message}', [\App\Http\Controllers\Admin\ContactMessageController::class, 'show'])->name('admin.contact_messages.show');
     Route::delete('admin/contact-messages/{message}', [\App\Http\Controllers\Admin\ContactMessageController::class, 'destroy'])->name('admin.contact_messages.destroy');

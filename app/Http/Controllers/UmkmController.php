@@ -20,7 +20,8 @@ class UmkmController extends Controller
     public function create()
     {
         $desas = Desa::all();
-        return view('admin.umkm.create', compact('desas'));
+        $banks = \App\Models\Bank::where('is_active', true)->orderBy('nama_bank')->get();
+        return view('admin.umkm.create', compact('desas', 'banks'));
     }
 
     public function store(Request $request)
@@ -75,11 +76,11 @@ class UmkmController extends Controller
         return view('admin.umkm.show', compact('umkm'));
     }
 
-    public function edit($id)
+    public function edit(Umkm $umkm)
     {
-        $umkm = Umkm::findOrFail($id);
         $desas = Desa::all();
-        return view('admin.umkm.edit', compact('umkm', 'desas'));
+        $banks = \App\Models\Bank::where('is_active', true)->orderBy('nama_bank')->get();
+        return view('admin.umkm.edit', compact('umkm', 'desas', 'banks'));
     }
 
     public function update(Request $request, $id)

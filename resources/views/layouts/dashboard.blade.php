@@ -205,6 +205,12 @@
                             </a>
                         </li>
                         <li class="nav-item">
+                            <a href="{{ route('admin.promotions.index') }}" class="nav-link {{ request()->routeIs('admin.promotions.*') ? 'active' : '' }}">
+                                <i class="nav-icon bi bi-megaphone"></i>
+                                <span class="nav-text">Promo & Event</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
                             <a href="{{ route('admin.contact_messages.index') }}" class="nav-link {{ request()->routeIs('admin.contact_messages.*') ? 'active' : '' }}">
                                 <i class="nav-icon bi bi-envelope"></i>
                                 <span class="nav-text">Pesan Masuk</span>
@@ -224,8 +230,14 @@
                         </li>
                         <li class="nav-item">
                             <a href="{{ route('admin.master.units.index') }}" class="nav-link {{ request()->routeIs('admin.master.units.*') ? 'active' : '' }}">
-                                <i class="nav-icon bi bi-layers"></i>
+                                <i class="nav-icon bi bi-list-ul"></i>
                                 <span class="nav-text">Master Satuan</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('admin.master.banks.index') }}" class="nav-link {{ request()->routeIs('admin.master.banks.*') ? 'active' : '' }}">
+                                <i class="nav-icon bi bi-bank"></i>
+                                <span class="nav-text">Master Bank</span>
                             </a>
                         </li>
                         <li class="nav-item">

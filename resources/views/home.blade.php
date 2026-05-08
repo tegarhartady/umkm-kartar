@@ -921,6 +921,13 @@
                         </div>
                     @endif
 
+                    @if(session('error'))
+                        <div class="alert alert-danger alert-dismissible fade show mb-4" role="alert">
+                            {{ session('error') }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    @endif
+
                     @if($errors->any())
                         <div class="alert alert-danger alert-dismissible fade show mb-4" role="alert">
                             <ul class="mb-0">
@@ -933,6 +940,10 @@
                     @endif
                     <form action="{{ route('contact.store') }}" method="POST" class="contact-form">
                         @csrf
+                        {{-- Honeypot Field for Security --}}
+                        <div style="display: none;">
+                            <input type="text" name="_hp_name" tabindex="-1" autocomplete="off">
+                        </div>
                         <div class="row g-3">
                             <div class="col-md-6">
                                 <label class="form-label">Nama Lengkap</label>
@@ -964,6 +975,16 @@
 </section>
 
     <!-- Floating Event Sidebar -->
+    @php
+        $promo = $activePromotion ?? (object)[
+            'title' => 'Floating Market UMKM',
+            'subtitle' => 'Sunset Pier',
+            'description' => 'Ayo datang dan nikmati berbagai produk lokal berkualitas dari UMKM Teluknaga!',
+            'button_text' => 'Jelajahi Sekarang',
+            'button_link' => '/katalog'
+        ];
+    @endphp
+    @if(isset($activePromotion) || true)
     <div class="d-none d-xl-block" style="position: fixed; right: 30px; top: 120px; width: 280px; z-index: 99;">
         <div class="card border-0 shadow-lg overflow-hidden" style="border-radius: 20px; background: linear-gradient(135deg, #001f5c 0%, #000f3d 100%); color: white;">
             <div class="card-body p-4 text-center">
@@ -974,18 +995,19 @@
                     <i class="bi bi-rocket-takeoff text-white-50 fs-4"></i>
                 </div>
                 
-                <h3 class="fw-bold mb-1 text-white" style="font-size: 1.5rem; letter-spacing: -0.5px;">Floating Market UMKM</h3>
-                <h5 class="fw-bold mb-3 text-white-50" style="font-size: 1.1rem;">Sunset Pier</h5>
+                <h3 class="fw-bold mb-1 text-white" style="font-size: 1.5rem; letter-spacing: -0.5px;">{{ $promo->title }}</h3>
+                <h5 class="fw-bold mb-3 text-white-50" style="font-size: 1.1rem;">{{ $promo->subtitle }}</h5>
                 
                 <p class="small text-white-50 mb-4 px-2" style="line-height: 1.6; font-size: 0.85rem;">
-                    Ayo datang dan nikmati berbagai produk lokal berkualitas dari UMKM Teluknaga!
+                    {{ $promo->description }}
                 </p>
                 
-                <a href="/katalog" class="btn btn-light w-100 rounded-pill fw-bold shadow-sm py-2" style="font-size: 0.9rem;">
-                    Jelajahi Sekarang
+                <a href="{{ $promo->button_link }}" class="btn btn-light w-100 rounded-pill fw-bold shadow-sm py-2" style="font-size: 0.9rem;">
+                    {{ $promo->button_text }}
                 </a>
             </div>
         </div>
     </div>
+    @endif
 
 @endsection
