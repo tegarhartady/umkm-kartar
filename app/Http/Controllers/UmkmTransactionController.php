@@ -12,10 +12,9 @@ class UmkmTransactionController extends Controller
     public function index()
     {
         $umkm = Auth::guard('umkm')->user();
-        $umkmProductIds = $umkm->products()->pluck('id');
         
-        $transactions = Transaction::whereIn('product_id', $umkmProductIds)
-            ->with(['product', 'review'])
+        $transactions = Transaction::where('umkm_id', $umkm->id)
+            ->with(['product', 'items', 'review'])
             ->orderByDesc('created_at')
             ->paginate(15);
             
@@ -31,12 +30,12 @@ class UmkmTransactionController extends Controller
         $month = $request->input('month', Carbon::now()->month);
         $year = $request->input('year', Carbon::now()->year);
         
-        $query = Transaction::whereIn('product_id', $umkmProductIds)
+        $query = Transaction::where('umkm_id', $umkm->id)
             ->where('status', 'completed')
             ->whereMonth('created_at', $month)
             ->whereYear('created_at', $year);
             
-        $transactions = $query->with(['product', 'review'])->orderBy('created_at', 'desc')->get();
+        $transactions = $query->with(['product', 'items', 'review'])->orderBy('created_at', 'desc')->get();
         
         // Hitung total pendapatan dari harga * qty agar terpisah dari ongkir (jika ongkir masuk total_price)
         // Atau kita gunakan total_price sesuai dengan dashboard
@@ -84,10 +83,20 @@ class UmkmTransactionController extends Controller
 
         // Logic: Jika status berubah menjadi 'proses' (diterima oleh UMKM)
         // Maka kurangi stok produk sesuai quantity pesanan
+        // Logic: Jika status berubah menjadi 'proses' (diterima oleh UMKM)
+        // Maka kurangi stok produk sesuai quantity pesanan
         if ($validated['status'] === 'proses' && $transaction->status !== 'proses') {
-            $product = $transaction->product;
-            if ($product) {
-                // Pastikan stok tidak menjadi negatif (opsional, tergantung kebijakan bisnis)
+            // Check items first, then fallback to single product
+            if ($transaction->items->count() > 0) {
+                foreach ($transaction->items as $item) {
+                    $product = $item->product;
+                    if ($product) {
+                        $newStock = max(0, $product->stok - $item->quantity);
+                        $product->update(['stok' => $newStock]);
+                    }
+                }
+            } elseif ($transaction->product) {
+                $product = $transaction->product;
                 $newStock = max(0, $product->stok - $transaction->quantity);
                 $product->update(['stok' => $newStock]);
             }

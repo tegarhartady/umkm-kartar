@@ -59,11 +59,11 @@
                                     <label class="form-label">Kategori *</label>
                                     <select name="kategori" class="form-select @error('kategori') is-invalid @enderror" required>
                                         <option value="">Pilih Kategori</option>
-                                        <option value="Hasil Laut" {{ old('kategori', $product->kategori) == 'Hasil Laut' ? 'selected' : '' }}>Hasil Laut</option>
-                                        <option value="Makanan Olahan" {{ old('kategori', $product->kategori) == 'Makanan Olahan' ? 'selected' : '' }}>Makanan Olahan</option>
-                                        <option value="Bumbu Dapur" {{ old('kategori', $product->kategori) == 'Bumbu Dapur' ? 'selected' : '' }}>Bumbu Dapur</option>
-                                        <option value="Kerajinan" {{ old('kategori', $product->kategori) == 'Kerajinan' ? 'selected' : '' }}>Kerajinan</option>
-                                        <option value="Kuliner" {{ old('kategori', $product->kategori) == 'Kuliner' ? 'selected' : '' }}>Kuliner</option>
+                                        @foreach($categories as $category)
+                                            <option value="{{ $category->nama_kategori }}" {{ old('kategori', $product->kategori) == $category->nama_kategori ? 'selected' : '' }}>
+                                                {{ $category->nama_kategori }}
+                                            </option>
+                                        @endforeach
                                     </select>
                                     @error('kategori') <div class="invalid-feedback d-block">{{ $message }}</div> @enderror
                                 </div>
@@ -73,11 +73,11 @@
                                     <label class="form-label">Satuan *</label>
                                     <select name="satuan" class="form-select @error('satuan') is-invalid @enderror" required>
                                         <option value="">Pilih Satuan</option>
-                                        <option value="kg" {{ old('satuan', $product->satuan) == 'kg' ? 'selected' : '' }}>Kilogram (kg)</option>
-                                        <option value="gram" {{ old('satuan', $product->satuan) == 'gram' ? 'selected' : '' }}>Gram (gr)</option>
-                                        <option value="pcs" {{ old('satuan', $product->satuan) == 'pcs' ? 'selected' : '' }}>Pieces (pcs)</option>
-                                        <option value="pack" {{ old('satuan', $product->satuan) == 'pack' ? 'selected' : '' }}>Pack</option>
-                                        <option value="porsi" {{ old('satuan', $product->satuan) == 'porsi' ? 'selected' : '' }}>Porsi</option>
+                                        @foreach($units as $unit)
+                                            <option value="{{ $unit->nama_satuan }}" {{ old('satuan', $product->satuan) == $unit->nama_satuan ? 'selected' : '' }}>
+                                                {{ $unit->nama_satuan }}
+                                            </option>
+                                        @endforeach
                                     </select>
                                     @error('satuan') <div class="invalid-feedback d-block">{{ $message }}</div> @enderror
                                 </div>
