@@ -29,8 +29,27 @@
     </div>
 
     @if(session('success'))
-        <div class="alert alert-success alert-dismissible fade show" role="alert">
-            {{ session('success') }}
+        <div class="alert alert-success alert-dismissible fade show border-0 shadow-sm mb-4" role="alert">
+            <div class="d-flex align-items-center">
+                <i class="bi bi-check-circle-fill me-2"></i>
+                <div>{{ session('success') }}</div>
+            </div>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    @endif
+
+    @if($errors->any())
+        <div class="alert alert-danger alert-dismissible fade show border-0 shadow-sm mb-4" role="alert">
+            <div class="d-flex align-items-center">
+                <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                <div>
+                    <ul class="mb-0">
+                        @foreach($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            </div>
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
     @endif
@@ -83,7 +102,10 @@
                                         <div class="modal-body">
                                             <div class="mb-3">
                                                 <label class="form-label">Nama Kategori *</label>
-                                                <input type="text" name="nama_kategori" class="form-control" value="{{ $category->nama_kategori }}" required>
+                                                <input type="text" name="nama_kategori" class="form-control @error('nama_kategori') is-invalid @enderror" value="{{ old('nama_kategori', $category->nama_kategori) }}" required>
+                                                @error('nama_kategori')
+                                                    <div class="invalid-feedback">{{ $message }}</div>
+                                                @enderror
                                             </div>
                                             <div class="mb-3">
                                                 <label class="form-label">Deskripsi</label>
@@ -128,7 +150,10 @@
                 <div class="modal-body">
                     <div class="mb-3">
                         <label class="form-label">Nama Kategori *</label>
-                        <input type="text" name="nama_kategori" class="form-control" placeholder="Contoh: Makanan Ringan" required>
+                        <input type="text" name="nama_kategori" class="form-control @error('nama_kategori') is-invalid @enderror" placeholder="Contoh: Makanan Ringan" value="{{ old('nama_kategori') }}" required>
+                        @error('nama_kategori')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Deskripsi</label>
