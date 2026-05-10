@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use App\Models\Category;
+use App\Models\Unit;
 use Illuminate\Support\Facades\Storage;
 
 class UmkmProductController extends Controller
@@ -24,7 +26,9 @@ class UmkmProductController extends Controller
 
     public function create()
     {
-        return view('umkm.products.create');
+        $categories = Category::orderBy('nama_kategori')->get();
+        $units = Unit::orderBy('nama_satuan')->get();
+        return view('umkm.products.create', compact('categories', 'units'));
     }
 
     public function store(Request $request)
@@ -67,7 +71,10 @@ class UmkmProductController extends Controller
             abort(403);
         }
 
-        return view('umkm.products.edit', compact('product'));
+        $categories = Category::orderBy('nama_kategori')->get();
+        $units = Unit::orderBy('nama_satuan')->get();
+
+        return view('umkm.products.edit', compact('product', 'categories', 'units'));
     }
 
     public function update(Request $request, $id)
