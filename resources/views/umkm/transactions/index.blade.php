@@ -50,22 +50,41 @@
                                 <tbody>
                                     @foreach($transactions as $t)
                                         <tr>
-                                            <td><span class="badge bg-light text-dark fw-bold border">{{ $t->transaction_code }}</span></td>
-                                            <td>{{ $t->created_at->format('d M Y, H:i') }}</td>
                                             <td>
-                                                <div class="fw-bold">{{ $t->product->nama_produk ?? 'Produk Dihapus' }}</div>
-                                                <small class="text-muted d-block">{{ $t->quantity }} {{ $t->product->satuan ?? 'pcs' }}</small>
-                                                @if($t->order_type == 'po')
-                                                    <span class="badge bg-warning text-dark">Pre-Order (Target: {{ \Carbon\Carbon::parse($t->po_date)->format('d/m/Y') }})</span>
-                                                @else
-                                                    <span class="badge bg-info text-white">Langsung</span>
+                                                <span class="badge bg-light text-dark fw-bold border">{{ $t->transaction_code }}</span>
+                                                @if($t->checkout_code)
+                                                    <div class="x-small text-muted mt-1" style="font-size: 0.65rem;">Grup: {{ $t->checkout_code }}</div>
                                                 @endif
                                             </td>
-                                            <td>
-                                                <div>{{ $t->buyer_name ?? ($t->user->name ?? '-') }}</div>
-                                                <small class="text-muted">{{ $t->buyer_phone ?? '-' }}</small>
-                                            </td>
-                                            <td class="fw-bold text-success">Rp {{ number_format($t->total_price, 0, ',', '.') }}</td>
+                                            <td>{{ $t->created_at->format('d M Y, H:i') }}</td>
+                                             <td>
+                                                <div class="fw-bold" style="font-size: 0.8rem;">
+                                                     @if($t->items->count() > 0)
+                                                         @foreach($t->items as $item)
+                                                             <div class="mb-1 text-dark fw-bold" style="font-size: 0.75rem;">
+                                                                 <i class="bi bi-dot"></i> {{ $item->product_name }} ({{ $item->quantity }}x)
+                                                             </div>
+                                                         @endforeach
+                                                     @else
+                                                         <div class="text-dark fw-bold" style="font-size: 0.75rem;">{{ $t->product->nama_produk ?? 'Produk Dihapus' }}</div>
+                                                     @endif
+                                                 </div>
+                                                 @if($t->order_type == 'po')
+                                                     <span class="badge bg-warning text-dark x-small mt-1" style="font-size: 0.65rem;">Pre-Order ({{ \Carbon\Carbon::parse($t->po_date)->format('d/m/Y') }})</span>
+                                                 @endif
+                                             </td>
+                                             <td>
+                                                 <div>{{ $t->buyer_name ?? ($t->user->name ?? '-') }}</div>
+                                                 <small class="text-muted">{{ $t->buyer_phone ?? '-' }}</small>
+                                             </td>
+                                             <td>
+                                                 <div class="fw-bold text-success" style="font-size: 0.9rem;">Rp {{ number_format($t->total_price, 0, ',', '.') }}</div>
+                                                 @if($t->checkout_code && isset($grandTotals[$t->checkout_code]))
+                                                     <div class="text-muted x-small mt-1" style="font-size: 0.65rem;" title="Total Transfer Pelanggan">
+                                                         Total Transfer: Rp {{ number_format($grandTotals[$t->checkout_code], 0, ',', '.') }}
+                                                     </div>
+                                                 @endif
+                                             </td>
                                             <td>
                                                 @if($t->status == 'completed')
                                                     <span class="badge bg-success bg-opacity-10 text-success border-success border-opacity-25 px-2 py-1">Selesai</span>
@@ -182,6 +201,15 @@
                                                         <small class="text-muted d-block">Metode Pengiriman:</small>
                                                         <span class="badge bg-info bg-opacity-10 text-info">{{ $t->delivery_type == 'delivery' ? 'Diantar' : 'Ambil Sendiri' }}</span>
                                                     </div>
+                                                    @if($t->checkout_code)
+                                                    <div class="mt-3 p-2 bg-light rounded border-start border-primary border-4">
+                                                        <small class="text-muted d-block">Grup Checkout:</small>
+                                                        <span class="fw-bold text-primary">{{ $t->checkout_code }}</span>
+                                                        <small class="text-muted d-block mt-1">Total Pembayaran Pelanggan:</small>
+                                                        <span class="fw-bold text-dark">Rp{{ number_format($grandTotals[$t->checkout_code] ?? $t->total_price, 0, ',', '.') }}</span>
+                                                        <div class="x-small text-muted mt-1" style="font-size: 0.7rem;">(Termasuk produk dari toko lain dalam satu keranjang)</div>
+                                                    </div>
+                                                    @endif
                                                 </div>
                                                 <div class="col-md-6">
                                                     <h6 class="fw-bold mb-3">Bukti Pembayaran</h6>
@@ -220,37 +248,58 @@
                                                 </div>
                                                 <div class="col-12">
                                                     <hr class="my-2 opacity-50">
-                                                    <h6 class="fw-bold mb-3">Rincian Produk</h6>
-                                                    <div class="d-flex align-items-center mb-3">
-                                                        <div class="flex-shrink-0 me-3">
-                                                            @php
-                                                                $foto = $t->product->image;
-                                                                if (!$foto && $t->product->foto_produk) {
-                                                                    $foto_array = json_decode($t->product->foto_produk);
-                                                                    $foto = (is_array($foto_array) && count($foto_array) > 0) ? $foto_array[0] : $t->product->foto_produk;
-                                                                }
-                                                                
-                                                                if (!$foto) {
-                                                                    $foto_url = asset('storage/default.jpg');
-                                                                } else {
-                                                                    // Jika path sudah ada prefix 'products/', gunakan asset('storage/' . $foto)
-                                                                    // Jika tidak, tambahkan prefix 'products/' (opsional, tergantung cara simpan)
-                                                                    $foto_url = (strpos($foto, 'products/') === 0) ? asset('storage/' . $foto) : asset('storage/products/' . $foto);
-                                                                }
-                                                            @endphp
-                                                            <img src="{{ $foto_url }}" class="rounded shadow-sm" style="width: 60px; height: 60px; object-fit: cover;" onerror="this.src='https://ui-avatars.com/api/?name={{ urlencode($t->product->nama_produk ?? 'P') }}&background=random&color=fff&size=60'">
-                                                        </div>
-                                                        <div class="flex-grow-1">
-                                                            <div class="fw-bold">{{ $t->product->nama_produk }}</div>
-                                                            <small class="text-muted">{{ $t->quantity }} {{ $t->product->satuan }} x Rp{{ number_format($t->price, 0, ',', '.') }}</small>
-                                                        </div>
-                                                        <div class="text-end fw-bold text-success">
-                                                            Rp{{ number_format($t->total_price, 0, ',', '.') }}
-                                                        </div>
+                                                    <h6 class="fw-bold mb-3">Rincian Produk (Toko Anda)</h6>
+                                                    <div class="table-responsive">
+                                                        <table class="table table-sm table-borderless">
+                                                            <tbody>
+                                                                @php $productSubtotal = 0; @endphp
+                                                                @forelse($t->items as $item)
+                                                                    @php $productSubtotal += $item->subtotal; @endphp
+                                                                    <tr>
+                                                                        <td>
+                                                                            <div class="fw-bold" style="font-size: 0.85rem;">{{ $item->product_name }}</div>
+                                                                            <small class="text-muted">{{ $item->quantity }} x Rp{{ number_format($item->price, 0, ',', '.') }}</small>
+                                                                        </td>
+                                                                        <td class="text-end fw-bold align-middle">Rp{{ number_format($item->subtotal, 0, ',', '.') }}</td>
+                                                                    </tr>
+                                                                @empty
+                                                                    @if($t->product)
+                                                                        @php $itemTotal = $t->price * $t->quantity; $productSubtotal = $itemTotal; @endphp
+                                                                        <tr>
+                                                                            <td>
+                                                                                <div class="fw-bold" style="font-size: 0.85rem;">{{ $t->product->nama_produk }}</div>
+                                                                                <small class="text-muted">{{ $t->quantity }} x Rp{{ number_format($t->price, 0, ',', '.') }}</small>
+                                                                            </td>
+                                                                            <td class="text-end fw-bold align-middle">Rp{{ number_format($itemTotal, 0, ',', '.') }}</td>
+                                                                        </tr>
+                                                                    @endif
+                                                                @endforelse
+                                                            </tbody>
+                                                            <tfoot class="border-top">
+                                                                <tr>
+                                                                    <td class="text-muted small ps-0">Subtotal Produk:</td>
+                                                                    <td class="text-end small pe-0">Rp{{ number_format($productSubtotal, 0, ',', '.') }}</td>
+                                                                </tr>
+                                                                <tr>
+                                                                    <td class="text-muted small ps-0">Biaya Pengiriman (Toko Anda):</td>
+                                                                    <td class="text-end small pe-0">Rp{{ number_format($t->delivery_fee ?? 0, 0, ',', '.') }}</td>
+                                                                </tr>
+                                                                <tr>
+                                                                    <td class="fw-bold ps-0">Total Pendapatan Anda:</td>
+                                                                    <td class="text-end fw-bold text-success pe-0" style="font-size: 1rem;">Rp{{ number_format($t->total_price, 0, ',', '.') }}</td>
+                                                                </tr>
+                                                                @if($t->checkout_code && isset($grandTotals[$t->checkout_code]))
+                                                                <tr class="bg-light">
+                                                                    <td class="small ps-1 py-1">Total Bayar Pelanggan (Grup):</td>
+                                                                    <td class="text-end small pe-1 py-1">Rp{{ number_format($grandTotals[$t->checkout_code], 0, ',', '.') }}</td>
+                                                                </tr>
+                                                                @endif
+                                                            </tfoot>
+                                                        </table>
                                                     </div>
                                                     @if($t->notes)
-                                                        <div class="bg-light p-3 rounded-3 mt-2">
-                                                            <small class="text-muted d-block fw-bold mb-1">Catatan:</small>
+                                                        <div class="bg-light p-2 rounded mt-2">
+                                                            <small class="text-muted d-block fw-bold mb-1">Catatan dari Pembeli:</small>
                                                             <span class="small">"{{ $t->notes }}"</span>
                                                         </div>
                                                     @endif

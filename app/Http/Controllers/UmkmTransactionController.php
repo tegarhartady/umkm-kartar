@@ -18,7 +18,23 @@ class UmkmTransactionController extends Controller
             ->orderByDesc('created_at')
             ->paginate(15);
             
-        return view('umkm.transactions.index', compact('transactions'));
+        // Get all related transactions for these checkout groups to show all products
+        $checkoutCodes = $transactions->pluck('checkout_code')->filter()->unique();
+        $groupData = [];
+        $grandTotals = [];
+        if ($checkoutCodes->count() > 0) {
+            $related = Transaction::whereIn('checkout_code', $checkoutCodes)
+                ->with(['product', 'items', 'umkm'])
+                ->get()
+                ->groupBy('checkout_code');
+            
+            foreach ($related as $code => $items) {
+                $groupData[$code] = $items;
+                $grandTotals[$code] = $items->sum('total_price');
+            }
+        }
+            
+        return view('umkm.transactions.index', compact('transactions', 'groupData', 'grandTotals'));
     }
 
     public function income(Request $request)

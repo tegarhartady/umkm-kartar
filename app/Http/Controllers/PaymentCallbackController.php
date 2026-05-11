@@ -28,31 +28,36 @@ class PaymentCallbackController extends Controller
             $paymentType = $notification->payment_type;
             $fraudStatus = $notification->fraud_status;
 
-            $transaction = Transaction::where('transaction_code', $orderId)->first();
-
-            if (!$transaction) {
-                return response()->json(['message' => 'Transaction not found'], 404);
+            $transactions = Transaction::where('transaction_code', $orderId)->get();
+            if ($transactions->isEmpty()) {
+                $transactions = Transaction::where('checkout_code', $orderId)->get();
             }
 
-            if ($transactionStatus == 'capture') {
-                if ($paymentType == 'credit_card') {
-                    if ($fraudStatus == 'challenge') {
-                        $transaction->status = 'pending';
-                    } else {
-                        $transaction->status = 'paid';
-                        $transaction->paid_at = now();
+            if ($transactions->isEmpty()) {
+                return response()->json(['message' => 'Transaction(s) not found'], 404);
+            }
+
+            foreach ($transactions as $transaction) {
+                if ($transactionStatus == 'capture') {
+                    if ($paymentType == 'credit_card') {
+                        if ($fraudStatus == 'challenge') {
+                            $transaction->status = 'pending';
+                        } else {
+                            $transaction->status = 'paid';
+                            $transaction->paid_at = now();
+                        }
                     }
+                } elseif ($transactionStatus == 'settlement') {
+                    $transaction->status = 'paid';
+                    $transaction->paid_at = now();
+                } elseif ($transactionStatus == 'pending') {
+                    $transaction->status = 'pending';
+                } elseif (in_array($transactionStatus, ['deny', 'expire', 'cancel', 'failure'])) {
+                    $transaction->status = 'failed';
                 }
-            } elseif ($transactionStatus == 'settlement') {
-                $transaction->status = 'paid';
-                $transaction->paid_at = now();
-            } elseif ($transactionStatus == 'pending') {
-                $transaction->status = 'pending';
-            } elseif (in_array($transactionStatus, ['deny', 'expire', 'cancel', 'failure'])) {
-                $transaction->status = 'failed';
-            }
 
-            $transaction->save();
+                $transaction->save();
+            }
 
             return response()->json(['message' => 'Callback handled successfully']);
 

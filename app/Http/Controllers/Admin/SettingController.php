@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Setting;
+use App\Models\AdminBankAccount;
+use App\Models\Bank;
 use Illuminate\Http\Request;
 
 class SettingController extends Controller
@@ -76,7 +78,9 @@ class SettingController extends Controller
     public function payment()
     {
         $settings = Setting::where('group', 'payment')->get()->keyBy('key');
-        return view('admin.settings.payment', compact('settings'));
+        $adminBanks = AdminBankAccount::latest()->get();
+        $masterBanks = Bank::where('is_active', true)->orderBy('nama_bank')->get();
+        return view('admin.settings.payment', compact('settings', 'adminBanks', 'masterBanks'));
     }
 
     /**
@@ -116,6 +120,25 @@ class SettingController extends Controller
         }
 
         return redirect()->back()->with('success', 'Pengaturan pembayaran berhasil diperbarui!');
+    }
+
+    public function addAdminBank(Request $request)
+    {
+        $validated = $request->validate([
+            'bank_name' => 'required|string|max:255',
+            'account_number' => 'required|string|max:255',
+            'account_holder' => 'required|string|max:255',
+        ]);
+
+        AdminBankAccount::create($validated);
+
+        return redirect()->back()->with('success', 'Rekening bank berhasil ditambahkan!');
+    }
+
+    public function deleteAdminBank(AdminBankAccount $bank)
+    {
+        $bank->delete();
+        return redirect()->back()->with('success', 'Rekening bank berhasil dihapus!');
     }
 
     /**

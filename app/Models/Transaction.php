@@ -32,6 +32,7 @@ class Transaction extends Model
         'paid_at',
         'completed_at',
         'umkm_id',
+        'checkout_code',
     ];
 
     protected $casts = [
@@ -60,5 +61,10 @@ class Transaction extends Model
     public function review()
     {
         return $this->hasOne(Review::class);
+    }
+
+    public function items()
+    {
+        return $this->hasMany(TransactionItem::class);
     }
 }

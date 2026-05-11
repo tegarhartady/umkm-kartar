@@ -24,33 +24,45 @@
                     <a class="nav-link {{ Request::is('csr-pik2') ? 'active' : '' }} px-4" href="{{ url('/csr-pik2') }}">Dukungan CSR PIK2</a>
                 </li>
             </ul>
-            
-            <!-- Login Button -->
-            <div class="d-flex">
+
+            <!-- Action Buttons (Cart & Login) -->
+            <div class="d-flex align-items-center">
+                <!-- Cart Icon -->
+                @auth
+                <a class="nav-link position-relative me-4" href="{{ route('cart.index') }}">
+                    <i class="bi bi-cart3 fs-4 text-dark"></i>
+                    @if(session('cart') && count(session('cart')) > 0)
+                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="font-size: 0.6rem; margin-top: 5px;">
+                            {{ count(session('cart')) }}
+                        </span>
+                    @endif
+                </a>
+                @endauth
+
                 @auth
                     <div class="dropdown">
-                        <a href="#" class="btn btn-outline-dark px-4 rounded-pill dropdown-toggle" data-bs-toggle="dropdown">
-                            {{ auth()->user()->name }}
+                        <a href="#" class="btn btn-outline-dark px-4 rounded-pill dropdown-toggle shadow-sm" data-bs-toggle="dropdown">
+                            <i class="bi bi-person-circle me-2"></i>{{ auth()->user()->name }}
                         </a>
-                        <ul class="dropdown-menu">
+                        <ul class="dropdown-menu dropdown-menu-end shadow border-0 mt-2">
                             @if(in_array(auth()->user()->role, ['admin', 'superadmin']))
-                                <li><a class="dropdown-item" href="{{ route('dashboard.admin') }}">Dashboard Admin</a></li>
-                            @elseif(auth()->guard('umkm')->check())
-                                <li><a class="dropdown-item" href="/umkm/dashboard">Dashboard UMKM</a></li>
+                                <li><a class="dropdown-item py-2" href="{{ route('dashboard.admin') }}"><i class="bi bi-speedometer2 me-2"></i>Dashboard Admin</a></li>
+                            @elseif(auth()->guard('umkm')->check() || auth()->user()->role == 'umkm')
+                                <li><a class="dropdown-item py-2" href="/umkm/dashboard"><i class="bi bi-shop me-2"></i>Dashboard UMKM</a></li>
                             @endif
-                            <li><a class="dropdown-item" href="/profile"><i class="bi bi-person me-2"></i>Profil Saya</a></li>
-                            <li><a class="dropdown-item" href="/orders"><i class="bi bi-bag-check me-2"></i>Pesanan Saya</a></li>
+                            <li><a class="dropdown-item py-2" href="/profile"><i class="bi bi-person me-2"></i>Profil Saya</a></li>
+                            <li><a class="dropdown-item py-2" href="/orders"><i class="bi bi-bag-check me-2"></i>Riwayat Belanja</a></li>
                             <li><hr class="dropdown-divider"></li>
                             <li>
                                 <form method="POST" action="{{ route('logout') }}">
                                     @csrf
-                                    <button type="submit" class="dropdown-item">Logout</button>
+                                    <button type="submit" class="dropdown-item py-2 text-danger"><i class="bi bi-box-arrow-right me-2"></i>Logout</button>
                                 </form>
                             </li>
                         </ul>
                     </div>
                 @else
-                    <a href="{{ route('login') }}" class="btn btn-dark px-4 rounded-pill">Login</a>
+                    <a href="{{ route('login') }}" class="btn btn-dark px-4 rounded-pill shadow-sm">Login</a>
                 @endauth
             </div>
         </div>

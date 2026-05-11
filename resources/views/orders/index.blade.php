@@ -3,173 +3,162 @@
 @section('title', 'Pesanan Saya - Karang Taruna Teluknaga')
 
 @section('content')
-<div class="container py-5 mt-5">
-    <div class="row">
-        <!-- Sidebar Profil (Ringkasan) -->
-        <div class="col-lg-3 mb-4">
-            <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
-                <div class="card-body p-4">
-                    <div class="d-flex align-items-center mb-4">
-                        <div class="avatar-circle me-3" style="width: 50px; height: 50px; background: #001f5c; color: white; display: flex; align-items: center; justify-content: center; border-radius: 50%; font-weight: bold; font-size: 1.2rem;">
-                            {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
+<section class="py-5" style="margin-top: 100px !important;">
+    <div class="container">
+        <div class="row">
+            <!-- Sidebar Profil (Ringkasan) -->
+            <div class="col-lg-3 mb-4">
+                <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+                    <div class="card-body p-4">
+                        <div class="d-flex align-items-center mb-4">
+                            <div class="avatar-circle me-3" style="width: 50px; height: 50px; background: #001f5c; color: white; display: flex; align-items: center; justify-content: center; border-radius: 50%; font-weight: bold; font-size: 1.2rem;">
+                                {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
+                            </div>
+                            <div>
+                                <h6 class="fw-bold mb-0 text-truncate" style="max-width: 150px;">{{ auth()->user()->name }}</h6>
+                                <small class="text-muted">Pelanggan</small>
+                            </div>
                         </div>
-                        <div>
-                            <h6 class="fw-bold mb-0 text-truncate" style="max-width: 150px;">{{ auth()->user()->name }}</h6>
-                            <small class="text-muted">Pelanggan</small>
-                        </div>
+                        <hr class="text-muted opacity-25">
+                        <ul class="nav flex-column gap-2">
+                            <li class="nav-item">
+                                <a href="/profile" class="nav-link text-dark p-0 d-flex align-items-center">
+                                    <i class="bi bi-person me-2 fs-5"></i> Profil Saya
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="/orders" class="nav-link text-primary fw-bold p-0 d-flex align-items-center">
+                                    <i class="bi bi-bag-check me-2 fs-5"></i> Pesanan Saya
+                                </a>
+                            </li>
+                        </ul>
                     </div>
-                    <hr class="text-muted opacity-25">
-                    <ul class="nav flex-column gap-2">
-                        <li class="nav-item">
-                            <a href="/profile" class="nav-link text-dark p-0 d-flex align-items-center">
-                                <i class="bi bi-person me-2 fs-5"></i> Profil Saya
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="/orders" class="nav-link text-primary fw-bold p-0 d-flex align-items-center">
-                                <i class="bi bi-bag-check me-2 fs-5"></i> Pesanan Saya
-                            </a>
-                        </li>
-                    </ul>
                 </div>
             </div>
-        </div>
 
-        <!-- Daftar Pesanan -->
-        <div class="col-lg-9">
-            <h4 class="fw-bold mb-4">Daftar Pesanan</h4>
+            <!-- Daftar Pesanan -->
+            <div class="col-lg-9">
+                <h4 class="fw-bold mb-4">Daftar Pesanan</h4>
 
-            <!-- Filter Status -->
-            <div class="d-flex overflow-auto pb-3 mb-4 gap-2 scrollbar-hide">
-                <a href="/orders" class="btn {{ !request('status') ? 'btn-primary' : 'btn-outline-secondary' }} rounded-pill px-4 flex-shrink-0">Semua</a>
-                <a href="/orders?status=proses" class="btn {{ request('status') === 'proses' ? 'btn-primary' : 'btn-outline-secondary' }} rounded-pill px-4 flex-shrink-0">Diproses</a>
-                <a href="/orders?status=pending" class="btn {{ request('status') === 'pending' ? 'btn-primary' : 'btn-outline-secondary' }} rounded-pill px-4 flex-shrink-0">Belum Bayar</a>
-                <a href="/orders?status=packing" class="btn {{ request('status') === 'packing' ? 'btn-primary' : 'btn-outline-secondary' }} rounded-pill px-4 flex-shrink-0">Packing</a>
-                <a href="/orders?status=pengiriman" class="btn {{ request('status') === 'pengiriman' ? 'btn-primary' : 'btn-outline-secondary' }} rounded-pill px-4 flex-shrink-0">Pengiriman</a>
-                <a href="/orders?status=delivered" class="btn {{ request('status') === 'delivered' ? 'btn-primary' : 'btn-outline-secondary' }} rounded-pill px-4 flex-shrink-0">Diterima</a>
-                <a href="/orders?status=selesai" class="btn {{ request('status') === 'selesai' ? 'btn-primary' : 'btn-outline-secondary' }} rounded-pill px-4 flex-shrink-0">Selesai</a>
-                <a href="/orders?status=gagal" class="btn {{ request('status') === 'gagal' ? 'btn-primary' : 'btn-outline-secondary' }} rounded-pill px-4 flex-shrink-0">Gagal/Batal</a>
-            </div>
+                <!-- Filter Status -->
+                <div class="d-flex overflow-auto pb-3 mb-4 gap-2 scrollbar-hide">
+                    <a href="/orders" class="btn {{ !request('status') ? 'btn-primary' : 'btn-outline-secondary' }} rounded-pill px-4 flex-shrink-0">Semua</a>
+                    <a href="/orders?status=proses" class="btn {{ request('status') === 'proses' ? 'btn-primary' : 'btn-outline-secondary' }} rounded-pill px-4 flex-shrink-0">Diproses</a>
+                    <a href="/orders?status=pending" class="btn {{ request('status') === 'pending' ? 'btn-primary' : 'btn-outline-secondary' }} rounded-pill px-4 flex-shrink-0">Belum Bayar</a>
+                    <a href="/orders?status=packing" class="btn {{ request('status') === 'packing' ? 'btn-primary' : 'btn-outline-secondary' }} rounded-pill px-4 flex-shrink-0">Packing</a>
+                    <a href="/orders?status=pengiriman" class="btn {{ request('status') === 'pengiriman' ? 'btn-primary' : 'btn-outline-secondary' }} rounded-pill px-4 flex-shrink-0">Pengiriman</a>
+                    <a href="/orders?status=delivered" class="btn {{ request('status') === 'delivered' ? 'btn-primary' : 'btn-outline-secondary' }} rounded-pill px-4 flex-shrink-0">Diterima</a>
+                    <a href="/orders?status=selesai" class="btn {{ request('status') === 'selesai' ? 'btn-primary' : 'btn-outline-secondary' }} rounded-pill px-4 flex-shrink-0">Selesai</a>
+                    <a href="/orders?status=gagal" class="btn {{ request('status') === 'gagal' ? 'btn-primary' : 'btn-outline-secondary' }} rounded-pill px-4 flex-shrink-0">Gagal/Batal</a>
+                </div>
 
-            @forelse ($transactions as $order)
-            <div class="card border-0 shadow-sm rounded-4 mb-4 overflow-hidden order-card">
-                <div class="card-header bg-white py-3 border-bottom border-light">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div class="d-flex align-items-center">
-                            <span class="badge bg-light text-dark border me-2"><i class="bi bi-bag me-1"></i> Belanja</span>
-                            <span class="text-muted small me-2">{{ $order->created_at->format('d M Y') }}</span>
-                            @php
+                @forelse ($transactions as $group)
+                @php
+                    $order = $group->first(); // Primary transaction for metadata
+                    $totalOrderPrice = $group->sum('total_price');
+                    $totalItemsCount = $group->sum(function($t) {
+                        return $t->items->count() > 0 ? $t->items->sum('quantity') : $t->quantity;
+                    });
+                    $checkoutCode = $order->checkout_code ?: $order->transaction_code;
+                @endphp
+                <div class="card border-0 shadow-sm rounded-4 mb-4 overflow-hidden order-card">
+                    <div class="card-header bg-white py-3 border-bottom border-light">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div class="d-flex align-items-center">
+                                <span class="badge bg-light text-dark border me-2"><i class="bi bi-bag me-1"></i> Belanja</span>
+                                <span class="text-muted small me-2">{{ $order->created_at->format('d M Y') }}</span>
+                                @php
                                 $status_labels = [
-                                    'pending' => ['label' => 'Belum Bayar', 'class' => 'bg-warning'],
-                                    'paid' => ['label' => 'Sudah Bayar', 'class' => 'bg-info'],
-                                    'proses' => ['label' => 'Diproses', 'class' => 'bg-primary'],
-                                    'ready' => ['label' => 'Siap Dikirim', 'class' => 'bg-primary'],
-                                    'shipping' => ['label' => 'Dikirim', 'class' => 'bg-primary'],
-                                    'delivered' => ['label' => 'Tiba di Tujuan', 'class' => 'bg-success'],
-                                    'completed' => ['label' => 'Selesai', 'class' => 'bg-success'],
-                                    'failed' => ['label' => 'Gagal', 'class' => 'bg-danger'],
-                                    'cancelled' => ['label' => 'Dibatalkan', 'class' => 'bg-secondary'],
+                                'pending' => ['label' => 'Belum Bayar', 'class' => 'bg-warning'],
+                                'paid' => ['label' => 'Sudah Bayar', 'class' => 'bg-info'],
+                                'proses' => ['label' => 'Diproses', 'class' => 'bg-primary'],
+                                'ready' => ['label' => 'Siap Dikirim', 'class' => 'bg-success'],
+                                'shipping' => ['label' => 'Dikirim', 'class' => 'bg-primary'],
+                                'delivered' => ['label' => 'Tiba di Tujuan', 'class' => 'bg-success'],
+                                'completed' => ['label' => 'Selesai', 'class' => 'bg-success'],
+                                'failed' => ['label' => 'Gagal', 'class' => 'bg-danger'],
+                                'cancelled' => ['label' => 'Dibatalkan', 'class' => 'bg-secondary'],
                                 ];
                                 $curr_status = $status_labels[$order->status] ?? ['label' => strtoupper($order->status), 'class' => 'bg-secondary'];
-                            @endphp
-                            <span class="badge {{ $curr_status['class'] }} bg-opacity-10 text-{{ str_replace('bg-', '', $curr_status['class']) }}">
-                                {{ strtoupper($curr_status['label']) }}
-                            </span>
-                            <span class="ms-2 text-muted small d-none d-md-inline">/ {{ $order->transaction_code }}</span>
+                                @endphp
+                                <span class="badge {{ $curr_status['class'] }} bg-opacity-10 text-{{ str_replace('bg-', '', $curr_status['class']) }}">
+                                    {{ strtoupper($curr_status['label']) }}
+                                </span>
+                                <span class="ms-2 text-muted small d-none d-md-inline">/ {{ $checkoutCode }}</span>
+                            </div>
+                            <div class="text-muted small">
+                                <i class="bi bi-shop me-1"></i> {{ $group->count() }} UMKM
+                            </div>
                         </div>
-                        <div class="text-primary fw-bold">{{ $order->product->umkm->nama_toko ?? 'Toko UMKM' }}</div>
                     </div>
-                </div>
-                <div class="card-body p-4">
-                    <div class="row align-items-center">
-                        <div class="col-md-8">
-                            <div class="d-flex align-items-center">
-                                <div class="flex-shrink-0 me-3">
-                                    @if($order->product)
-                                        @php
-                                            $foto = $order->product->image;
-                                            if (!$foto && $order->product->foto_produk) {
-                                                $foto_array = json_decode($order->product->foto_produk);
-                                                $foto = (is_array($foto_array) && count($foto_array) > 0) ? $foto_array[0] : $order->product->foto_produk;
-                                            }
-                                            
-                                            if (!$foto) {
-                                                $foto_url = asset('storage/default.jpg');
-                                            } else {
-                                                $foto_url = (strpos($foto, 'products/') === 0) ? asset('storage/' . $foto) : asset('storage/products/' . $foto);
-                                            }
-                                        @endphp
-                                        <img src="{{ $foto_url }}" class="rounded-3 shadow-sm" style="width: 80px; height: 80px; object-fit: cover;" onerror="this.src='https://ui-avatars.com/api/?name={{ urlencode($order->product->nama_produk) }}&background=random&color=fff&size=80'">
-                                    @else
-                                        <div class="rounded-3 bg-light d-flex align-items-center justify-content-center shadow-sm" style="width: 80px; height: 80px;">
-                                            <i class="bi bi-box text-muted"></i>
+                    <div class="card-body p-4">
+                        <div class="row align-items-center">
+                            <div class="col-md-8">
+                                @foreach($group as $trans)
+                                    @foreach($trans->items as $item)
+                                    <div class="d-flex align-items-center mb-3">
+                                        <div class="flex-shrink-0 me-3">
+                                            <img src="{{ ($item->product && $item->product->image) ? asset('storage/' . $item->product->image) : asset('images/no-image.png') }}" 
+                                                 class="rounded-3 shadow-sm" style="width: 60px; height: 60px; object-fit: cover;">
                                         </div>
+                                        <div class="flex-grow-1">
+                                            <h6 class="fw-bold mb-0" style="font-size: 0.9rem;">{{ $item->product_name }}</h6>
+                                            <p class="text-muted small mb-0">{{ $item->quantity }} x Rp{{ number_format($item->price, 0, ',', '.') }}</p>
+                                            <small class="text-primary" style="font-size: 0.75rem;">{{ $trans->umkm->nama_toko ?? 'UMKM' }}</small>
+                                        </div>
+                                    </div>
+                                    @endforeach
+                                    @if($trans->items->count() == 0 && $trans->product)
+                                    <div class="d-flex align-items-center mb-3">
+                                        <div class="flex-shrink-0 me-3">
+                                            <img src="{{ $trans->product->image ? asset('storage/' . $trans->product->image) : asset('images/no-image.png') }}" 
+                                                 class="rounded-3 shadow-sm" style="width: 60px; height: 60px; object-fit: cover;">
+                                        </div>
+                                        <div class="flex-grow-1">
+                                            <h6 class="fw-bold mb-0" style="font-size: 0.9rem;">{{ $trans->product->nama_produk }}</h6>
+                                            <p class="text-muted small mb-0">{{ $trans->quantity }} x Rp{{ number_format($trans->price, 0, ',', '.') }}</p>
+                                            <small class="text-primary" style="font-size: 0.75rem;">{{ $trans->umkm->nama_toko ?? 'UMKM' }}</small>
+                                        </div>
+                                    </div>
                                     @endif
-                                </div>
-                                <div class="flex-grow-1">
-                                    @if($order->product)
-                                        <h6 class="fw-bold mb-1">{{ $order->product->nama_produk }}</h6>
-                                        <p class="text-muted small mb-1">{{ $order->quantity }} x Rp{{ number_format($order->price, 0, ',', '.') }}</p>
-                                        @if($order->order_type == 'po')
-                                        <span class="badge bg-warning bg-opacity-10 text-warning border-warning border-opacity-25 x-small">
-                                            <i class="bi bi-clock-history me-1"></i> Pre-Order (Target Selesai: {{ $order->po_date ? \Carbon\Carbon::parse($order->po_date)->format('d M Y') : '-' }})
-                                        </span>
-                                        @endif
-                                    @else
-                                        <h6 class="fw-bold mb-1 text-muted">Produk tidak tersedia</h6>
-                                        <p class="text-muted small mb-1">{{ $order->quantity }} item</p>
-                                    @endif
-                                    @if($order->quantity > 1)
-                                    <small class="text-muted">+ {{ $order->quantity - 1 }} produk lainnya</small>
-                                    @endif
-                                </div>
+                                @endforeach
                             </div>
-                        </div>
-                        <div class="col-md-4 mt-3 mt-md-0 border-start ps-md-4">
-                            <p class="text-muted small mb-1">Total Belanja</p>
-                            <h5 class="fw-bold text-dark mb-3">Rp{{ number_format($order->total_price, 0, ',', '.') }}</h5>
+                            <div class="col-md-4 mt-3 mt-md-0 border-start ps-md-4">
+                                <p class="text-muted small mb-1">Total Tagihan</p>
+                                <h5 class="fw-bold text-dark mb-3">Rp{{ number_format($totalOrderPrice, 0, ',', '.') }}</h5>
 
-                            <div class="d-grid gap-2">
-                                @if($order->status === 'pending' && ($order->payment_method === 'midtrans' || $order->snap_token))
-                                <button onclick="payOrder('{{ $order->snap_token }}')" class="btn btn-primary btn-sm rounded-pill py-2">
-                                    <i class="bi bi-credit-card me-2"></i>Bayar Sekarang
-                                </button>
-                                @elseif($order->status === 'pending' && ($order->payment_method === 'transfer' || $order->payment_method === 'qris'))
-                                <button type="button" class="btn btn-primary btn-sm rounded-pill py-2" data-bs-toggle="modal" data-bs-target="#uploadProofModal{{ $order->id }}">
-                                    <i class="bi bi-cloud-upload me-2"></i>{{ $order->payment_proof ? 'Ganti Bukti' : 'Upload Bukti' }}
-                                </button>
-
-                                @endif
-                                @if($order->status === 'ready' || $order->delivery_status === 'shipping')
-                                <form action="{{ route('transaction.update_status_user', $order->id) }}" method="POST" class="d-grid">
-                                    @csrf
-                                    <input type="hidden" name="status" value="completed">
-                                    <input type="hidden" name="delivery_status" value="delivered">
-                                    <button type="submit" class="btn btn-success btn-sm rounded-pill py-2" onclick="return confirm('Apakah pesanan sudah Anda terima dengan baik?')">
-                                        <i class="bi bi-check-circle me-2"></i>Selesaikan Pesanan
+                                <div class="d-grid gap-2">
+                                    @if($order->status === 'pending' && ($order->payment_method === 'midtrans' || $order->snap_token))
+                                    <button onclick="payOrder('{{ $order->snap_token }}')" class="btn btn-primary btn-sm rounded-pill py-2">
+                                        <i class="bi bi-credit-card me-2"></i>Bayar Sekarang
                                     </button>
-                                </form>
-                                @endif
-                                <a href="{{ route('orders.show', $order->id) }}" class="btn btn-light btn-sm rounded-pill px-3 py-2 text-muted border">
-                                    <i class="bi bi-info-circle me-1"></i> Lihat Detail
-                                </a>
+                                    @elseif($order->status === 'pending' && ($order->payment_method === 'transfer' || $order->payment_method === 'qris'))
+                                    <button type="button" class="btn btn-primary btn-sm rounded-pill py-2" data-bs-toggle="modal" data-bs-target="#uploadProofModal{{ $order->id }}">
+                                        <i class="bi bi-cloud-upload me-2"></i>{{ $order->payment_proof ? 'Ganti Bukti' : 'Upload Bukti' }}
+                                    </button>
+                                    @endif
+                                    
+                                    <a href="{{ route('orders.show', $order->id) }}" class="btn btn-light btn-sm rounded-pill px-3 py-2 text-muted border">
+                                        <i class="bi bi-info-circle me-1"></i> Lihat Detail
+                                    </a>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
 
-            @empty
-            <div class="text-center py-5 bg-white rounded-4 shadow-sm">
-                <img src="https://illustrations.popsy.co/blue/shopping-cart.svg" alt="Empty" style="width: 200px;" class="mb-4">
-                <h5 class="fw-bold">Belum ada pesanan</h5>
-                <p class="text-muted">Ayo mulai belanja produk UMKM terbaik dari Teluknaga!</p>
-                <a href="/katalog" class="btn btn-primary px-5 rounded-pill mt-2">Belanja Sekarang</a>
-            </div>
-            @endforelse
+                @empty
+                <div class="text-center py-5 bg-white rounded-4 shadow-sm">
+                    <img src="https://illustrations.popsy.co/blue/shopping-cart.svg" alt="Empty" style="width: 200px;" class="mb-4">
+                    <h5 class="fw-bold">Belum ada pesanan</h5>
+                    <p class="text-muted">Ayo mulai belanja produk UMKM terbaik dari Teluknaga!</p>
+                    <a href="/katalog" class="btn btn-primary px-5 rounded-pill mt-2">Belanja Sekarang</a>
+                </div>
+                @endforelse
 
-            <!-- All Modals (Moved Outside Main Loop) -->
-            @foreach ($transactions as $order)
+                <!-- All Modals (Moved Outside Main Loop) -->
+                @foreach ($transactions as $group)
+                @php $order = $group->first(); @endphp
                 @if($order->status === 'pending' && ($order->payment_method === 'transfer' || $order->payment_method === 'qris'))
                 <div class="modal fade" id="uploadProofModal{{ $order->id }}" tabindex="-1" aria-hidden="true">
                     <div class="modal-dialog modal-dialog-centered">
@@ -204,14 +193,15 @@
                     </div>
                 </div>
                 @endif
-            @endforeach
+                @endforeach
 
-            <div class="mt-4 d-flex justify-content-center">
-                {{ $transactions->links() }}
+                <div class="mt-4 d-flex justify-content-center">
+                    {{ $transactions->links() }}
+                </div>
             </div>
         </div>
     </div>
-</div>
+</section>
 
 @if($transactions->where('payment_method', 'midtrans')->where('status', 'pending')->count() > 0)
 @php

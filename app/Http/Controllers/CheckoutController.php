@@ -155,8 +155,19 @@ class CheckoutController extends Controller
      */
     public function success($id)
     {
-        $transaction = Transaction::with('product.umkm')->findOrFail($id);
-        return view('checkout.success', compact('transaction'));
+        $transaction = Transaction::with(['items.product', 'umkm'])->findOrFail($id);
+        
+        // If this transaction is part of a multi-UMKM checkout, get all of them
+        $transactions = collect([$transaction]);
+        if ($transaction->checkout_code) {
+            $transactions = Transaction::with(['items.product', 'umkm'])
+                ->where('checkout_code', $transaction->checkout_code)
+                ->get();
+        }
+        
+        $banks = \App\Models\AdminBankAccount::where('is_active', true)->get();
+        
+        return view('checkout.success', compact('transaction', 'transactions', 'banks'));
     }
 
     /**
@@ -215,5 +226,27 @@ class CheckoutController extends Controller
         $transaction->update($updateData);
 
         return back()->with('success', 'Terima kasih! Pesanan telah selesai.');
+    }
+
+    /**
+     * Cancel transaction by User
+     */
+    public function cancel($id)
+    {
+        $transaction = Transaction::findOrFail($id);
+        
+        // Ensure this transaction belongs to the logged in user
+        if ($transaction->user_id !== auth()->id()) {
+            abort(403);
+        }
+
+        // Only allow cancellation if status is pending
+        if ($transaction->status !== 'pending') {
+            return back()->with('error', 'Pesanan ini tidak dapat dibatalkan karena sudah diproses.');
+        }
+
+        $transaction->update(['status' => 'cancelled']);
+
+        return redirect()->route('home')->with('success', 'Pesanan Anda telah berhasil dibatalkan.');
     }
 }

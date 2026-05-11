@@ -13,11 +13,27 @@ class TransactionController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $transactions = Transaction::with(['user', 'product'])
-            ->orderBy('created_at', 'desc')
-            ->paginate(15);
+        $query = Transaction::with(['user', 'product', 'items', 'umkm']);
+        
+        // Fetch all and group by checkout_code or transaction_code
+        $allTransactions = $query->latest()->get();
+        $groupedTransactions = $allTransactions->groupBy(function($item) {
+            return $item->checkout_code ?: $item->transaction_code;
+        });
+
+        // Paginate the groups
+        $currentPage = \Illuminate\Pagination\Paginator::resolveCurrentPage() ?: 1;
+        $perPage = 15;
+        $currentPageItems = $groupedTransactions->slice(($currentPage - 1) * $perPage, $perPage)->all();
+        $transactions = new \Illuminate\Pagination\LengthAwarePaginator(
+            $currentPageItems, 
+            count($groupedTransactions), 
+            $perPage, 
+            $currentPage, 
+            ['path' => $request->url(), 'query' => $request->query()]
+        );
 
         return view('admin.transactions.index', compact('transactions'));
     }
@@ -65,11 +81,18 @@ class TransactionController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Transaction $transaction)
+    public function show($id)
     {
-        $transaction->load(['user', 'product']);
+        $transaction = Transaction::with(['user', 'product', 'items.product', 'umkm'])->findOrFail($id);
+        
+        $groupTransactions = collect([$transaction]);
+        if ($transaction->checkout_code) {
+            $groupTransactions = Transaction::where('checkout_code', $transaction->checkout_code)
+                ->with(['product', 'items.product', 'umkm'])
+                ->get();
+        }
 
-        return view('admin.transactions.show', compact('transaction'));
+        return view('admin.transactions.show', compact('transaction', 'groupTransactions'));
     }
 
     /**
@@ -86,25 +109,25 @@ class TransactionController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Transaction $transaction)
+    public function update(Request $request, $id)
     {
+        $transaction = Transaction::findOrFail($id);
+
+        if ($request->has('bulk_approve') && $transaction->checkout_code) {
+            Transaction::where('checkout_code', $transaction->checkout_code)
+                ->where('status', 'pending')
+                ->update(['status' => 'paid', 'paid_at' => now()]);
+            
+            return redirect()->route('admin.transactions.index')
+                ->with('success', 'Seluruh transaksi dalam grup checkout ini telah disetujui.');
+        }
+
         $validated = $request->validate([
             'status' => 'required|string',
             'delivery_status' => 'nullable|string',
-            'payment_method' => 'nullable|in:transfer,ewallet,cod,midtrans,qris',
-            'buyer_name' => 'required|string|max:255',
-            'buyer_phone' => 'required|string|max:20',
-            'buyer_address' => 'required|string',
-            'buyer_city' => 'required|string|max:100',
-            'buyer_postal_code' => 'nullable|string|max:10',
-            'notes' => 'nullable|string',
         ]);
 
-        if ($request->status === 'completed' && $transaction->status !== 'completed') {
-            $validated['completed_at'] = now();
-        }
-
-        if ($request->status === 'paid' && $transaction->status !== 'paid') {
+        if ($validated['status'] === 'paid' && $transaction->status === 'pending') {
             $validated['paid_at'] = now();
         }
 

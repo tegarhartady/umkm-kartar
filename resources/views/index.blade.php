@@ -702,9 +702,17 @@
                         </div>
                         <h5 class="product-title">{{ Str::limit($product->nama_produk, 30) }}</h5>
                         <p class="product-seller text-muted small mb-3"><i class="bi bi-shop me-1"></i> {{ $product->umkm->nama_toko ?? 'UMKM Pesisir' }}</p>
-                        <div class="product-footer d-flex justify-content-between align-items-center mt-auto">
+                        <div class="product-footer d-flex justify-content-between align-items-center mt-auto gap-2">
                             <span class="product-price fw-bold text-primary">Rp {{ number_format($product->harga, 0, ',', '.') }}</span>
-                            <a href="{{ route('beli', $product->id) }}" class="btn btn-sm btn-primary rounded-pill px-3">Detail</a>
+                            <div class="d-flex gap-1">
+                                <form action="{{ route('cart.add', $product->id) }}" method="POST">
+                                    @csrf
+                                    <button type="submit" class="btn btn-sm btn-outline-primary rounded-pill px-2">
+                                        <i class="bi bi-cart-plus"></i>
+                                    </button>
+                                </form>
+                                <a href="{{ route('beli', $product->id) }}" class="btn btn-sm btn-primary rounded-pill px-3">Detail</a>
+                            </div>
                         </div>
                     </div>
                 </div>

@@ -455,6 +455,16 @@
                     <li class="nav-item">
                         <a class="nav-link" href="{{ route('tentang') }}">Tentang</a>
                     </li>
+                    <li class="nav-item">
+                        <a class="nav-link position-relative px-3" href="{{ route('cart.index') }}">
+                            <i class="bi bi-cart3 fs-5"></i>
+                            @if(session('cart') && count(session('cart')) > 0)
+                                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="font-size: 0.6rem;">
+                                    {{ count(session('cart')) }}
+                                </span>
+                            @endif
+                        </a>
+                    </li>
                 </ul>
             </div>
         </div>

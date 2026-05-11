@@ -177,67 +177,105 @@
 
                 <!-- Order Details -->
                 <div class="col-md-7">
-                    @if($transaction->order_photo)
-                        <div class="card border-0 shadow-sm rounded-4 mb-4 overflow-hidden">
-                            <div class="card-header bg-primary bg-opacity-10 border-0 py-3">
-                                <h5 class="fw-bold mb-0 text-primary"><i class="bi bi-camera me-2"></i>Foto Pesanan</h5>
-                            </div>
-                            <div class="card-body p-0">
-                                <a href="{{ asset('storage/' . $transaction->order_photo) }}" target="_blank">
-                                    <img src="{{ asset('storage/' . $transaction->order_photo) }}" class="img-fluid w-100" style="max-height: 400px; object-fit: cover;">
-                                </a>
-                                <div class="p-3 bg-light">
-                                    <p class="text-muted small mb-0"><i class="bi bi-info-circle me-1"></i>Ini adalah foto pesanan Anda yang disiapkan oleh UMKM.</p>
-                                </div>
-                            </div>
-                        </div>
-                    @elseif(in_array($transaction->status, ['ready', 'shipping', 'delivered', 'completed']))
-                         <div class="card border-0 shadow-sm rounded-4 mb-4">
-                            <div class="card-body p-4 text-center">
-                                <i class="bi bi-camera text-muted fs-1 mb-2 d-block"></i>
-                                <h6 class="fw-bold mb-1">Foto Belum Tersedia</h6>
-                                <p class="text-muted small mb-0">UMKM belum mengunggah foto pesanan ini.</p>
-                            </div>
-                        </div>
-                    @endif
-
                     <div class="card border-0 shadow-sm rounded-4 mb-4">
                         <div class="card-body p-4">
-                            <h5 class="fw-bold mb-4">Detail Produk</h5>
-                            @if($transaction->product)
-                                <div class="d-flex align-items-center mb-4">
-                                    <div class="flex-shrink-0 me-3">
-                                        @php
-                                            // Cek field 'image' dulu (biasanya path lengkap: products/xxx.jpg)
-                                            // Jika kosong, cek 'foto_produk' (biasanya JSON array)
-                                            $foto = $transaction->product->image;
-                                            
-                                            if (!$foto && $transaction->product->foto_produk) {
-                                                $foto_array = json_decode($transaction->product->foto_produk);
-                                                $foto = (is_array($foto_array) && count($foto_array) > 0) ? $foto_array[0] : $transaction->product->foto_produk;
-                                            }
-                                            
-                                            if (!$foto) {
-                                                $foto_url = asset('storage/default.jpg');
-                                            } else {
-                                                // Jika path sudah ada prefix 'products/', gunakan asset('storage/' . $foto)
-                                                // Jika tidak, tambahkan prefix 'products/'
-                                                $foto_url = (strpos($foto, 'products/') === 0) ? asset('storage/' . $foto) : asset('storage/products/' . $foto);
-                                            }
-                                        @endphp
-                                        <img src="{{ $foto_url }}" class="rounded-3 shadow-sm" style="width: 100px; height: 100px; object-fit: cover;" onerror="this.src='https://ui-avatars.com/api/?name={{ urlencode($transaction->product->nama_produk) }}&background=random&color=fff&size=100'">
+                            <h5 class="fw-bold mb-4">Daftar Produk</h5>
+                            @php 
+                                $totalShipping = 0;
+                                $totalItemsPrice = 0;
+                            @endphp
+                            @foreach($transactions as $t)
+                                @php 
+                                    $totalShipping += $t->delivery_fee;
+                                @endphp
+                                <div class="mb-4 pb-4 border-bottom last-child-no-border">
+                                    <div class="d-flex justify-content-between align-items-center mb-3">
+                                        <h6 class="fw-bold mb-0 text-primary"><i class="bi bi-shop me-2"></i>{{ $t->umkm->nama_toko ?? 'UMKM' }}</h6>
+                                        <span class="badge bg-light text-dark border">{{ strtoupper($t->status) }}</span>
                                     </div>
-                                    <div class="flex-grow-1">
-                                        <h6 class="fw-bold mb-1">{{ $transaction->product->nama_produk }}</h6>
-                                        <p class="text-primary fw-bold mb-0">Rp{{ number_format($transaction->price, 0, ',', '.') }}</p>
-                                        <small class="text-muted">Jumlah: {{ $transaction->quantity }} {{ $transaction->product->satuan ?? 'pcs' }}</small>
-                                    </div>
+
+                                    <!-- Produk List for this UMKM -->
+                                    @forelse($t->items as $item)
+                                        @php $totalItemsPrice += $item->subtotal; @endphp
+                                        <div class="d-flex align-items-center mb-3 ms-2">
+                                            <div class="flex-shrink-0 me-3">
+                                                <img src="{{ ($item->product && $item->product->image) ? asset('storage/' . $item->product->image) : asset('images/no-image.png') }}" 
+                                                     class="rounded-3 shadow-sm" style="width: 60px; height: 60px; object-fit: cover;"
+                                                     onerror="this.src='https://ui-avatars.com/api/?name={{ urlencode($item->product_name) }}&background=random&color=fff&size=60'">
+                                            </div>
+                                            <div class="flex-grow-1">
+                                                <h6 class="fw-bold mb-0" style="font-size: 0.9rem;">{{ $item->product_name }}</h6>
+                                                <div class="d-flex justify-content-between align-items-center">
+                                                    <small class="text-muted">{{ $item->quantity }} x Rp{{ number_format($item->price, 0, ',', '.') }}</small>
+                                                    <span class="fw-bold text-dark small">Rp{{ number_format($item->subtotal, 0, ',', '.') }}</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    @empty
+                                        @if($t->product)
+                                            @php $totalItemsPrice += ($t->price * $t->quantity); @endphp
+                                            <div class="d-flex align-items-center mb-3 ms-2">
+                                                <div class="flex-shrink-0 me-3">
+                                                    <img src="{{ $t->product->image ? asset('storage/' . $t->product->image) : asset('images/no-image.png') }}" 
+                                                         class="rounded-3 shadow-sm" style="width: 60px; height: 60px; object-fit: cover;"
+                                                         onerror="this.src='https://ui-avatars.com/api/?name={{ urlencode($t->product->nama_produk) }}&background=random&color=fff&size=60'">
+                                                </div>
+                                                <div class="flex-grow-1">
+                                                    <h6 class="fw-bold mb-0" style="font-size: 0.9rem;">{{ $t->product->nama_produk }}</h6>
+                                                    <div class="d-flex justify-content-between align-items-center">
+                                                        <small class="text-muted">{{ $t->quantity }} x Rp{{ number_format($t->price, 0, ',', '.') }}</small>
+                                                        <span class="fw-bold text-dark small">Rp{{ number_format($t->price * $t->quantity, 0, ',', '.') }}</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        @endif
+                                    @endforelse
+
+                                    <!-- Foto Pesanan for this UMKM -->
+                                    @if($t->order_photo)
+                                        <div class="mt-3 ms-2">
+                                            <p class="text-muted small mb-2"><i class="bi bi-camera me-1"></i>Foto pesanan dari toko ini:</p>
+                                            <a href="{{ asset('storage/' . $t->order_photo) }}" target="_blank">
+                                                <img src="{{ asset('storage/' . $t->order_photo) }}" class="rounded-3 border" style="width: 120px; height: 80px; object-fit: cover;">
+                                            </a>
+                                        </div>
+                                    @endif
+
+                                    <!-- Rating Form for this UMKM -->
+                                    @if($t->status === 'completed' || $t->status === 'delivered')
+                                        @if(!$t->review)
+                                            <div class="mt-3 p-3 bg-light rounded-3 ms-2">
+                                                <h6 class="fw-bold small mb-2"><i class="bi bi-star-fill text-warning me-2"></i>Beri Rating untuk Toko Ini</h6>
+                                                <form action="{{ route('reviews.store') }}" method="POST">
+                                                    @csrf
+                                                    <input type="hidden" name="transaction_id" value="{{ $t->id }}">
+                                                    <div class="mb-2">
+                                                        <div class="star-rating d-flex gap-1 text-warning fs-5">
+                                                            @for($i = 1; $i <= 5; $i++)
+                                                                <input type="radio" name="rating" id="star_{{ $t->id }}_{{ $i }}" value="{{ $i }}" class="d-none" {{ $i == 5 ? 'checked' : '' }}>
+                                                                <label for="star_{{ $t->id }}_{{ $i }}" class="bi bi-star pointer" data-rating="{{ $i }}"></label>
+                                                            @endfor
+                                                        </div>
+                                                    </div>
+                                                    <div class="mb-2">
+                                                        <textarea name="comment" rows="1" class="form-control form-control-sm rounded-2" placeholder="Tulis ulasan..."></textarea>
+                                                    </div>
+                                                    <button type="submit" class="btn btn-sm btn-primary rounded-pill px-3">Kirim Ulasan</button>
+                                                </form>
+                                            </div>
+                                        @else
+                                            <div class="mt-3 p-3 bg-light rounded-3 ms-2">
+                                                <div class="text-warning mb-1 small">
+                                                    @for($i = 1; $i <= 5; $i++)
+                                                        <i class="bi bi-star{{ $i <= $t->review->rating ? '-fill' : '' }}"></i>
+                                                    @endfor
+                                                </div>
+                                                <p class="text-muted x-small mb-0">"{{ $t->review->comment }}"</p>
+                                            </div>
+                                        @endif
+                                    @endif
                                 </div>
-                            @else
-                                <div class="alert alert-warning">
-                                    Produk ini sudah tidak tersedia lagi.
-                                </div>
-                            @endif
+                            @endforeach
 
                             <hr class="my-4 opacity-50">
 
@@ -268,16 +306,16 @@
                             <hr class="my-4 opacity-50">
 
                             <div class="d-flex justify-content-between align-items-center mb-2">
-                                <span class="text-muted">Total Harga ({{ $transaction->quantity }} Produk)</span>
-                                <span>Rp{{ number_format($transaction->price * $transaction->quantity, 0, ',', '.') }}</span>
+                                <span class="text-muted">Subtotal Produk</span>
+                                <span>Rp{{ number_format($totalItemsPrice, 0, ',', '.') }}</span>
                             </div>
                             <div class="d-flex justify-content-between align-items-center mb-3">
-                                <span class="text-muted">Biaya Pengiriman</span>
-                                <span>Rp{{ number_format($transaction->delivery_fee ?? 0, 0, ',', '.') }}</span>
+                                <span class="text-muted">Total Biaya Pengiriman</span>
+                                <span>Rp{{ number_format($totalShipping, 0, ',', '.') }}</span>
                             </div>
                             <div class="d-flex justify-content-between align-items-center pt-3 border-top">
-                                <h5 class="fw-bold mb-0">Total Belanja</h5>
-                                <h4 class="fw-bold text-primary mb-0">Rp{{ number_format($transaction->total_price, 0, ',', '.') }}</h4>
+                                <h5 class="fw-bold mb-0">Total Tagihan Keseluruhan</h5>
+                                <h4 class="fw-bold text-primary mb-0">Rp{{ number_format($totalItemsPrice + $totalShipping, 0, ',', '.') }}</h4>
                             </div>
                         </div>
                     </div>

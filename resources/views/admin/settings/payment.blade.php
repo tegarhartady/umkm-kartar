@@ -139,23 +139,71 @@
                         <label class="form-check-label ms-2 fw-bold" for="manual_enabled">Aktifkan</label>
                     </div>
                 </div>
+
+                <div class="alert alert-light border mb-4 d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="fw-bold mb-1">Daftar Rekening Bank</h6>
+                        <p class="text-muted small mb-0">Klik tombol di samping untuk menambah rekening baru.</p>
+                    </div>
+                    <button type="button" class="btn btn-primary rounded-pill px-4" data-bs-toggle="modal" data-bs-target="#addBankModal">
+                        <i class="bi bi-plus-lg me-2"></i>Tambah Rekening
+                    </button>
+                </div>
+
+                <div class="table-responsive mb-4">
+                    <table class="table table-hover align-middle border-top">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Bank</th>
+                                <th>Nomor Rekening</th>
+                                <th>Nama Pemilik</th>
+                                <th class="text-center">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @forelse($adminBanks as $bank)
+                            <tr>
+                                <td class="fw-600">{{ $bank->bank_name }}</td>
+                                <td>{{ $bank->account_number }}</td>
+                                <td>{{ $bank->account_holder }}</td>
+                                <td class="text-center">
+                                    <form action="{{ route('admin.settings.payment.bank.delete', $bank->id) }}" method="POST" onsubmit="return confirm('Hapus rekening ini?')">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="btn btn-sm btn-outline-danger">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                            @empty
+                            <tr>
+                                <td colspan="4" class="text-center text-muted py-4 italic">Belum ada rekening yang ditambahkan</td>
+                            </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
                 
-                <div class="form-row">
+                <hr class="my-4">
+
+                <!-- Legacy Single Settings (Keep for compatibility if needed, or remove) -->
+                <div class="form-row d-none">
                     <div class="form-group">
-                        <label class="form-label">Nama Bank</label>
+                        <label class="form-label">Nama Bank (Default)</label>
                         <input type="text" name="payment_bank_name" class="form-control-custom" 
                                value="{{ $settings['payment_bank_name']->value ?? '' }}" placeholder="Contoh: BCA, Mandiri, BRI">
                     </div>
                     <div class="form-group">
-                        <label class="form-label">Nomor Rekening</label>
+                        <label class="form-label">Nomor Rekening (Default)</label>
                         <input type="text" name="payment_bank_account" class="form-control-custom" 
                                value="{{ $settings['payment_bank_account']->value ?? '' }}" placeholder="Contoh: 1234567890">
                     </div>
                 </div>
 
-                <div class="form-row">
+                <div class="form-row d-none">
                     <div class="form-group">
-                        <label class="form-label">Nama Pemilik Rekening</label>
+                        <label class="form-label">Nama Pemilik Rekening (Default)</label>
                         <input type="text" name="payment_bank_holder" class="form-control-custom" 
                                value="{{ $settings['payment_bank_holder']->value ?? '' }}" placeholder="Nama sesuai di buku tabungan">
                     </div>
@@ -223,6 +271,44 @@
                 </button>
             </div>
         </form>
+    </div>
+</div>
+
+<!-- Add Bank Modal -->
+<div class="modal fade" id="addBankModal" tabindex="-1" aria-labelledby="addBankModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg rounded-4">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title fw-bold" id="addBankModalLabel">Tambah Rekening Baru</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form action="{{ route('admin.settings.payment.bank.add') }}" method="POST">
+                @csrf
+                <div class="modal-body p-4">
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold">Nama Bank</label>
+                        <select name="bank_name" class="form-select form-control-custom w-100" required>
+                            <option value="">-- Pilih Bank --</option>
+                            @foreach($masterBanks as $mb)
+                                <option value="{{ $mb->nama_bank }}">{{ $mb->nama_bank }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold">Nomor Rekening</label>
+                        <input type="text" name="account_number" class="form-control-custom w-100" placeholder="Contoh: 1234567890" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold">Nama Pemilik Rekening</label>
+                        <input type="text" name="account_holder" class="form-control-custom w-100" placeholder="Nama sesuai buku tabungan" required>
+                    </div>
+                </div>
+                <div class="modal-footer border-0 pt-0 p-4">
+                    <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Batal</button>
+                    <button type="submit" class="btn btn-primary rounded-pill px-4">Simpan Rekening</button>
+                </div>
+            </form>
+        </div>
     </div>
 </div>
 

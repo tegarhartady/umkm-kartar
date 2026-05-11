@@ -15,9 +15,8 @@ class OrderController extends Controller
     {
         $status = $request->get('status');
         
-        $query = Transaction::with('product.umkm')
-            ->where('user_id', auth()->id())
-            ->latest();
+        $query = Transaction::with(['product.umkm', 'items.product', 'umkm'])
+            ->where('user_id', auth()->id());
 
         if ($status) {
             if ($status === 'pending') {
@@ -37,7 +36,25 @@ class OrderController extends Controller
             }
         }
 
-        $transactions = $query->paginate(10);
+        // Get all transactions for the user
+        $allTransactions = $query->latest()->get();
+        
+        // Group by checkout_code or transaction_code if checkout_code is null
+        $groupedTransactions = $allTransactions->groupBy(function($item) {
+            return $item->checkout_code ?: $item->transaction_code;
+        });
+
+        // Paginate the grouped results
+        $currentPage = \Illuminate\Pagination\Paginator::resolveCurrentPage() ?: 1;
+        $perPage = 10;
+        $currentPageItems = $groupedTransactions->slice(($currentPage - 1) * $perPage, $perPage)->all();
+        $transactions = new \Illuminate\Pagination\LengthAwarePaginator(
+            $currentPageItems, 
+            count($groupedTransactions), 
+            $perPage, 
+            $currentPage,
+            ['path' => $request->url(), 'query' => $request->query()]
+        );
         $settings = Setting::whereIn('group', ['payment'])->get()->keyBy('key');
 
         return view('orders.index', compact('transactions', 'settings'));
@@ -48,10 +65,17 @@ class OrderController extends Controller
      */
     public function show($id)
     {
-        $transaction = Transaction::with(['product.umkm', 'user'])
+        $transaction = Transaction::with(['product.umkm', 'user', 'items.product', 'umkm'])
             ->where('user_id', auth()->id())
             ->findOrFail($id);
             
-        return view('orders.show', compact('transaction'));
+        $transactions = collect([$transaction]);
+        if ($transaction->checkout_code) {
+            $transactions = Transaction::with(['product.umkm', 'items.product', 'umkm'])
+                ->where('checkout_code', $transaction->checkout_code)
+                ->get();
+        }
+            
+        return view('orders.show', compact('transaction', 'transactions'));
     }
 }

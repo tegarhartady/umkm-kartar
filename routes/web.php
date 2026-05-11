@@ -63,6 +63,16 @@ Route::get('/run-migration', function() {
 Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/katalog', [CatalogController::class, 'indexProducts'])->name('katalog');
 
+// Cart Routes (Protected by Auth)
+Route::middleware(['auth'])->group(function () {
+    Route::get('/cart', [\App\Http\Controllers\CartController::class, 'index'])->name('cart.index');
+    Route::post('/cart/add/{id}', [\App\Http\Controllers\CartController::class, 'add'])->name('cart.add');
+    Route::patch('/cart/update', [\App\Http\Controllers\CartController::class, 'update'])->name('cart.update');
+    Route::delete('/cart/remove', [\App\Http\Controllers\CartController::class, 'remove'])->name('cart.remove');
+    Route::get('/cart/checkout', [\App\Http\Controllers\CartController::class, 'checkout'])->name('cart.checkout');
+    Route::post('/cart/checkout', [\App\Http\Controllers\CartController::class, 'processCheckout'])->name('cart.checkout.process');
+});
+
 // Checkout routes (Protected)
 Route::middleware(['auth'])->group(function () {
     Route::get('/checkout/{productId}', [CheckoutController::class, 'show'])->name('checkout.show');
@@ -144,6 +154,8 @@ Route::middleware(['auth', 'admin.superadmin'])->group(function () {
     Route::post('admin/settings/company', [SettingController::class, 'updateCompany'])->name('admin.settings.company.update');
     Route::get('admin/settings/payment', [SettingController::class, 'payment'])->name('admin.settings.payment');
     Route::post('admin/settings/payment', [SettingController::class, 'updatePayment'])->name('admin.settings.payment.update');
+    Route::post('admin/settings/payment/bank', [SettingController::class, 'addAdminBank'])->name('admin.settings.payment.bank.add');
+    Route::delete('admin/settings/payment/bank/{bank}', [SettingController::class, 'deleteAdminBank'])->name('admin.settings.payment.bank.delete');
     Route::get('admin/settings/delivery', [SettingController::class, 'delivery'])->name('admin.settings.delivery');
     Route::post('admin/settings/delivery', [SettingController::class, 'updateDelivery'])->name('admin.settings.delivery.update');
     
@@ -225,3 +237,4 @@ Route::post('/payment/{order}/process', [CatalogController::class, 'processPayme
 Route::get('/order-success/{order}', [CatalogController::class, 'success'])->name('catalog.success');
 Route::post('/transaction/{transaction}/upload-proof', [CheckoutController::class, 'uploadProof'])->name('transaction.upload_proof');
 Route::post('/transaction/{transaction}/update-status', [CheckoutController::class, 'updateStatusUser'])->name('transaction.update_status_user');
+Route::post('/transaction/{transaction}/cancel', [CheckoutController::class, 'cancel'])->name('transaction.cancel');

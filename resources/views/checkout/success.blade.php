@@ -24,61 +24,112 @@
 
                         <!-- Transaction Code -->
                         <div class="alert alert-info mb-4">
-                            <strong>Kode Transaksi:</strong>
+                            <strong>Kode Checkout:</strong>
                             <div class="mt-2">
                                 <code style="font-size: 1.2rem; background: #f8f9fa; padding: 10px; border-radius: 5px; display: inline-block;">
-                                    {{ $transaction->transaction_code }}
+                                    {{ $transaction->checkout_code ?? $transaction->transaction_code }}
                                 </code>
                             </div>
-                            <small class="text-muted d-block mt-2">Simpan kode ini untuk referensi pesanan Anda</small>
+                            <small class="text-muted d-block mt-2">Gunakan kode ini untuk melacak seluruh pesanan Anda</small>
                         </div>
 
                         <!-- Order Details -->
-                        <div class="row g-3 mb-4">
-                            <div class="col-md-6">
-                                <div class="p-3 bg-light rounded shadow-sm">
-                                    <small class="text-muted d-block mb-1">Produk</small>
-                                    <p class="fw-bold mb-0">{{ $transaction->product->nama_produk }}</p>
+                        <div class="mb-4">
+                            <div class="card border-0 bg-light rounded-4 overflow-hidden shadow-sm">
+                                <div class="card-header bg-white border-0 py-3 text-start">
+                                    <h6 class="mb-0 fw-bold"><i class="bi bi-box-seam me-2 text-success"></i>Rincian Seluruh Produk</h6>
+                                </div>
+                                <div class="card-body p-0">
+                                    <div class="table-responsive">
+                                        <table class="table table-borderless align-middle mb-0 text-start">
+                                            <tbody>
+                                                @php 
+                                                    $totalShipping = 0;
+                                                    $totalAll = 0;
+                                                @endphp
+                                                @foreach($transactions as $t)
+                                                    @php 
+                                                        $totalShipping += $t->delivery_fee;
+                                                        $totalAll += $t->total_price;
+                                                    @endphp
+                                                    @forelse($t->items as $item)
+                                                    <tr>
+                                                        <td style="width: 70px; padding-left: 1.5rem;">
+                                                            <img src="{{ ($item->product && $item->product->image) ? asset('storage/' . $item->product->image) : asset('images/no-image.png') }}" 
+                                                                 class="rounded-3" style="width: 50px; height: 50px; object-fit: cover;">
+                                                        </td>
+                                                        <td>
+                                                            <div class="fw-bold">{{ $item->product_name }}</div>
+                                                            <small class="text-muted">{{ $item->quantity }} x Rp{{ number_format($item->price, 0, ',', '.') }}</small>
+                                                            <div class="text-primary" style="font-size: 0.7rem;">Penjual: {{ $t->umkm->nama_toko ?? 'UMKM' }}</div>
+                                                        </td>
+                                                        <td class="text-end fw-bold" style="padding-right: 1.5rem;">
+                                                            Rp{{ number_format($item->subtotal, 0, ',', '.') }}
+                                                        </td>
+                                                    </tr>
+                                                    @empty
+                                                        @if($t->product)
+                                                        <tr>
+                                                            <td style="width: 70px; padding-left: 1.5rem;">
+                                                                <img src="{{ $t->product->image ? asset('storage/' . $t->product->image) : asset('images/no-image.png') }}" 
+                                                                     class="rounded-3" style="width: 50px; height: 50px; object-fit: cover;">
+                                                        </td>
+                                                        <td>
+                                                            <div class="fw-bold">{{ $t->product->nama_produk }}</div>
+                                                            <small class="text-muted">{{ $t->quantity }} x Rp{{ number_format($t->price, 0, ',', '.') }}</small>
+                                                            <div class="text-primary" style="font-size: 0.7rem;">Penjual: {{ $t->umkm->nama_toko ?? 'UMKM' }}</div>
+                                                        </td>
+                                                        <td class="text-end fw-bold" style="padding-right: 1.5rem;">
+                                                            Rp{{ number_format($t->price * $t->quantity, 0, ',', '.') }}
+                                                        </td>
+                                                    </tr>
+                                                    @endif
+                                                @endforelse
+                                                @endforeach
+                                            </tbody>
+                                            <tfoot class="bg-white border-top">
+                                                <tr>
+                                                    <td colspan="2" class="text-end text-muted small py-2" style="padding-left: 1.5rem;">Total Biaya Kirim ({{ count($transactions) }} UMKM)</td>
+                                                    <td class="text-end fw-bold py-2" style="padding-right: 1.5rem;">Rp{{ number_format($totalShipping, 0, ',', '.') }}</td>
+                                                </tr>
+                                                <tr>
+                                                    <td colspan="2" class="text-end fw-bold py-3" style="padding-left: 1.5rem;">Total Tagihan Keseluruhan</td>
+                                                    <td class="text-end fw-bold py-3 text-success fs-5" style="padding-right: 1.5rem;">Rp{{ number_format($totalAll, 0, ',', '.') }}</td>
+                                                </tr>
+                                            </tfoot>
+                                        </table>
+                                    </div>
                                 </div>
                             </div>
+                        </div>
+
+                        <!-- Info Grid -->
+                        <div class="row g-3 mb-4">
                             <div class="col-md-6">
-                                <div class="p-3 bg-light rounded shadow-sm">
-                                    <small class="text-muted d-block mb-1">Jenis & Distribusi</small>
-                                    <p class="fw-bold mb-0">
+                                <div class="p-3 bg-light rounded shadow-sm h-100">
+                                    <small class="text-muted d-block mb-1 text-start">Jenis & Distribusi</small>
+                                    <p class="fw-bold mb-0 text-start">
                                         {{ $transaction->order_type === 'po' ? 'Pre-Order' : 'Langsung Kirim' }} 
                                         <span class="text-muted mx-1">|</span>
                                         {{ $transaction->delivery_type === 'delivery' ? 'Diantar' : 'Take Away' }}
                                     </p>
                                 </div>
                             </div>
-                            <div class="col-md-4">
-                                <div class="p-3 bg-light rounded shadow-sm">
-                                    <small class="text-muted d-block mb-1">Metode Bayar</small>
-                                    <p class="fw-bold mb-0 text-uppercase">
-                                        @if ($transaction->payment_method === 'transfer')
-                                            Transfer Bank
-                                        @elseif ($transaction->payment_method === 'qris')
-                                            QRIS
-                                        @elseif ($transaction->payment_method === 'ewallet')
-                                            E-Wallet
-                                        @else
-                                            COD
-                                        @endif
+                            <div class="col-md-6">
+                                <div class="p-3 bg-light rounded shadow-sm h-100">
+                                    <small class="text-muted d-block mb-1 text-start">Metode Pembayaran</small>
+                                    <p class="fw-bold mb-0 text-uppercase text-start">
+                                        @php
+                                            $methods = [
+                                                'transfer' => 'Transfer Bank',
+                                                'qris' => 'QRIS',
+                                                'ewallet' => 'E-Wallet',
+                                                'cod' => 'COD',
+                                                'midtrans' => 'Midtrans'
+                                            ];
+                                        @endphp
+                                        {{ $methods[$transaction->payment_method] ?? $transaction->payment_method }}
                                     </p>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="p-3 bg-light rounded shadow-sm">
-                                    <small class="text-muted d-block mb-1">Biaya Kirim</small>
-                                    <p class="fw-bold mb-0 {{ $transaction->delivery_fee > 0 ? 'text-primary' : 'text-success' }}">
-                                        {{ $transaction->delivery_fee > 0 ? 'Rp' . number_format($transaction->delivery_fee, 0, ',', '.') : 'Gratis' }}
-                                    </p>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="p-3 bg-success bg-opacity-10 rounded shadow-sm border border-success border-opacity-25">
-                                    <small class="text-muted d-block mb-1 text-success">Total Tagihan</small>
-                                    <p class="fw-bold mb-0 text-success fs-5">Rp{{ number_format($transaction->total_price, 0, ',', '.') }}</p>
                                 </div>
                             </div>
                         </div>
@@ -98,9 +149,9 @@
                         </div>
 
                         @php
-                            $isProduction = (\App\Models\Setting::where('key', 'midtrans_is_production')->first()->value ?? '0') == '1';
+                            $isProduction = (App\Models\Setting::get('midtrans_is_production', '0')) == '1';
                             $snapUrl = $isProduction ? 'https://app.midtrans.com/snap/snap.js' : 'https://app.sandbox.midtrans.com/snap/snap.js';
-                            $clientKey = \App\Models\Setting::where('key', 'midtrans_client_key')->first()->value ?? config('midtrans.client_key');
+                            $clientKey = App\Models\Setting::get('midtrans_client_key', config('midtrans.client_key'));
                         @endphp
                         <script src="{{ $snapUrl }}" data-client-key="{{ $clientKey }}"></script>
                         <script type="text/javascript">
@@ -130,15 +181,15 @@
                             <div class="card-body text-center">
                                 <h6 class="fw-bold mb-3 text-primary"><i class="bi bi-qr-code-scan me-2"></i>Scan QRIS untuk Pembayaran</h6>
                                 @php
-                                    $qrisImage = \App\Models\Setting::where('key', 'payment_qris_image')->first();
+                                    $qrisImage = App\Models\Setting::get('payment_qris_image');
                                 @endphp
                                 @if($qrisImage)
-                                    <img src="{{ asset($qrisImage->value) }}" class="img-fluid rounded mb-3 shadow-sm" style="max-width: 300px; border: 1px solid #eee;">
+                                    <img src="{{ asset($qrisImage) }}" class="img-fluid rounded mb-3 shadow-sm" style="max-width: 300px; border: 1px solid #eee;">
                                     <div class="alert alert-info py-2 mb-0 small">
                                         <i class="bi bi-info-circle me-1"></i> Setelah scan dan bayar, mohon simpan bukti pembayaran Anda.
                                     </div>
                                 @else
-                                    <div class="alert alert-warning">QRIS Image not found. Please contact admin.</div>
+                                    <div class="alert alert-warning">Gambar QRIS belum tersedia. Silakan hubungi admin.</div>
                                 @endif
                             </div>
                         </div>
@@ -148,31 +199,85 @@
                         @if($transaction->payment_method === 'transfer')
                         <div class="card border-info mb-4 shadow-sm">
                             <div class="card-body">
-                                <h6 class="fw-bold mb-3 text-info"><i class="bi bi-bank me-2"></i>Informasi Rekening Bank</h6>
-                                @php
-                                    $bankName = \App\Models\Setting::where('key', 'payment_bank_name')->first();
-                                    $bankAcc = \App\Models\Setting::where('key', 'payment_bank_account')->first();
-                                    $bankHolder = \App\Models\Setting::where('key', 'payment_bank_holder')->first();
-                                @endphp
-                                <div class="p-3 bg-info bg-opacity-10 rounded border border-info border-opacity-25 text-start">
-                                    <div class="row align-items-center">
-                                        <div class="col-8">
-                                            <p class="mb-1 text-muted small">Bank {{ $bankName->value ?? '-' }}</p>
-                                            <p class="mb-1 h4 fw-bold text-dark">{{ $bankAcc->value ?? '-' }}</p>
-                                            <p class="mb-0 text-muted small">a.n {{ $bankHolder->value ?? '-' }}</p>
-                                        </div>
-                                        <div class="col-4 text-end">
-                                            <button class="btn btn-sm btn-outline-info" onclick="copyToClipboard('{{ $bankAcc->value ?? '' }}')">Salin</button>
+                                <h6 class="fw-bold mb-3 text-info"><i class="bi bi-bank me-2"></i>Informasi Rekening Transfer</h6>
+                                <p class="text-muted small mb-3 text-start">Pilih bank tujuan transfer Anda:</p>
+                                
+                                <div class="mb-3 text-start">
+                                    <select id="bank-selector" class="form-select border-info">
+                                        <option value="" selected disabled>-- Pilih Nama Bank --</option>
+                                        @forelse($banks ?? [] as $bank)
+                                            <option value="{{ $bank->id }}" 
+                                                    data-number="{{ $bank->account_number }}" 
+                                                    data-holder="{{ $bank->account_holder }}"
+                                                    data-name="{{ $bank->bank_name }}">
+                                                Bank {{ $bank->bank_name }}
+                                            </option>
+                                        @empty
+                                            @php
+                                                $bankName = App\Models\Setting::get('payment_bank_name', '-');
+                                                $bankAcc = App\Models\Setting::get('payment_bank_account', '-');
+                                                $bankHolder = App\Models\Setting::get('payment_bank_holder', '-');
+                                            @endphp
+                                            <option value="default" 
+                                                    data-number="{{ $bankAcc }}" 
+                                                    data-holder="{{ $bankHolder }}"
+                                                    data-name="{{ $bankName }}">
+                                                Bank {{ $bankName }}
+                                            </option>
+                                        @endforelse
+                                    </select>
+                                </div>
+
+                                <div id="bank-detail-container" class="d-none">
+                                    <div class="p-3 bg-info bg-opacity-10 rounded border border-info border-opacity-25 text-start">
+                                        <div class="row align-items-center">
+                                            <div class="col-8">
+                                                <p class="mb-1 text-muted small fw-bold" id="display-bank-name"></p>
+                                                <p class="mb-1 h4 fw-bold text-dark" id="display-bank-number"></p>
+                                                <p class="mb-0 text-muted small" id="display-bank-holder"></p>
+                                            </div>
+                                            <div class="col-4 text-end">
+                                                <button class="btn btn-sm btn-info text-white" onclick="copySelectedBank()">
+                                                    <i class="bi bi-clipboard me-1"></i>Salin
+                                                </button>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
+
                         <script>
-                            function copyToClipboard(text) {
-                                navigator.clipboard.writeText(text).then(() => {
-                                    alert('Nomor rekening berhasil disalin!');
-                                });
+                            const bankSelector = document.getElementById('bank-selector');
+                            const detailContainer = document.getElementById('bank-detail-container');
+                            const displayBankName = document.getElementById('display-bank-name');
+                            const displayBankNumber = document.getElementById('display-bank-number');
+                            const displayBankHolder = document.getElementById('display-bank-holder');
+
+                            bankSelector.addEventListener('change', function() {
+                                const selectedOption = this.options[this.selectedIndex];
+                                if (selectedOption.value) {
+                                    displayBankName.textContent = 'Bank ' + selectedOption.getAttribute('data-name');
+                                    displayBankNumber.textContent = selectedOption.getAttribute('data-number');
+                                    displayBankHolder.textContent = 'a.n ' + selectedOption.getAttribute('data-holder');
+                                    detailContainer.classList.remove('d-none');
+                                } else {
+                                    detailContainer.classList.add('d-none');
+                                }
+                            });
+
+                            function copySelectedBank() {
+                                const number = displayBankNumber.textContent;
+                                if (number) {
+                                    navigator.clipboard.writeText(number).then(() => {
+                                        const toast = document.createElement('div');
+                                        toast.className = 'position-fixed bottom-0 start-50 translate-middle-x mb-4 p-3 bg-dark text-white rounded shadow-lg';
+                                        toast.style.zIndex = '9999';
+                                        toast.innerHTML = '<i class="bi bi-check-circle-fill text-success me-2"></i> Nomor rekening berhasil disalin!';
+                                        document.body.appendChild(toast);
+                                        setTimeout(() => toast.remove(), 2000);
+                                    });
+                                }
                             }
                         </script>
                         @endif
@@ -256,13 +361,21 @@
                         </div>
 
                         <!-- Action Buttons -->
-                        <div class="d-flex gap-2 justify-content-center">
+                        <div class="d-flex gap-2 justify-content-center flex-wrap">
                             <a href="/katalog" class="btn btn-outline-secondary">
-                                <i class="bi bi-shop"></i> Lanjut Belanja
+                                <i class="bi bi-shop me-1"></i> Lanjut Belanja
                             </a>
                             <a href="/" class="btn btn-primary">
-                                <i class="bi bi-house"></i> Kembali ke Beranda
+                                <i class="bi bi-house me-1"></i> Kembali ke Beranda
                             </a>
+                            @if($transaction->status === 'pending')
+                                <form action="{{ route('transaction.cancel', $transaction->id) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin membatalkan pesanan ini?')">
+                                    @csrf
+                                    <button type="submit" class="btn btn-danger">
+                                        <i class="bi bi-x-circle me-1"></i> Batal Pembelian
+                                    </button>
+                                </form>
+                            @endif
                         </div>
                     </div>
                 </div>

@@ -104,7 +104,7 @@
                     <div class="stat-label">Produk</div>
                 </div>
                 <div class="stat">
-                    <div class="stat-value">{{ $umkm->email }}</div>
+                    <div class="stat-value email-value" title="{{ $umkm->email }}">{{ $umkm->email }}</div>
                     <div class="stat-label">Email</div>
                 </div>
             </div>
@@ -319,6 +319,16 @@
     color: #718096;
     text-transform: uppercase;
     letter-spacing: 0.5px;
+}
+
+.email-value {
+    font-size: 0.9rem !important;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: block;
+    width: 100%;
+    padding: 0 5px;
 }
 
 .card-footer-custom {

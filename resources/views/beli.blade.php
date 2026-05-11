@@ -83,11 +83,33 @@
                 <p class="text-muted lh-lg">{{ $product->deskripsi }}</p>
             </div>
 
+            <!-- Quantity Selector -->
+            <div class="mb-4">
+                <h6 class="fw-bold mb-3">Jumlah</h6>
+                <div class="input-group mb-3" style="width: 150px;">
+                    <button class="btn btn-outline-secondary" type="button" onclick="changeQty(-1)">-</button>
+                    <input type="number" id="display-qty" class="form-control text-center" value="1" min="1" max="{{ $product->stok }}" onchange="syncQty()">
+                    <button class="btn btn-outline-secondary" type="button" onclick="changeQty(1)">+</button>
+                </div>
+            </div>
+
             <!-- CTA Buttons -->
             <div class="d-flex gap-3">
-                <a href="/checkout/{{ $product->id }}" class="btn btn-success btn-lg grow">
-                    <i class="bi bi-cart me-2"></i>Beli Sekarang
-                </a>
+                <form action="{{ route('cart.add', $product->id) }}" method="POST" class="d-inline">
+                    @csrf
+                    <input type="hidden" name="quantity" id="cart-qty" value="1">
+                    <button type="submit" class="btn btn-outline-success btn-lg grow px-4 {{ $product->stok <= 0 ? 'disabled' : '' }}">
+                        <i class="bi bi-cart-plus me-2"></i>Tambah ke Keranjang
+                    </button>
+                </form>
+                <form action="{{ route('cart.add', $product->id) }}" method="POST" class="d-inline">
+                    @csrf
+                    <input type="hidden" name="quantity" id="buy-qty" value="1">
+                    <input type="hidden" name="redirect" value="cart">
+                    <button type="submit" class="btn btn-success btn-lg grow px-4 {{ $product->stok <= 0 ? 'disabled' : '' }}">
+                        <i class="bi bi-cart-check me-2"></i>Beli Sekarang
+                    </button>
+                </form>
                 <a href="/katalog" class="btn btn-outline-secondary btn-lg">
                     <i class="bi bi-arrow-left me-2"></i>Kembali
                 </a>
@@ -142,6 +164,25 @@
 </section>
 
 @endsection
+
+@push('scripts')
+<script>
+    function changeQty(amount) {
+        const input = document.getElementById('display-qty');
+        let val = parseInt(input.value) + amount;
+        if (val < 1) val = 1;
+        if (val > {{ $product->stok }}) val = {{ $product->stok }};
+        input.value = val;
+        syncQty();
+    }
+
+    function syncQty() {
+        const val = document.getElementById('display-qty').value;
+        document.getElementById('cart-qty').value = val;
+        document.getElementById('buy-qty').value = val;
+    }
+</script>
+@endpush
 
 @push('styles')
 <style>

@@ -30,128 +30,111 @@
                         <tr>
                             <th class="ps-4">NO</th>
                             <th>PEMBELI</th>
-                            <th>KODE TRANSAKSI</th>
+                            <th>PENJUAL</th>
+                            <th>KODE</th>
                             <th>PRODUK</th>
-                            <th>TOTAL HARGA</th>
-                            <th>STATUS BAYAR</th>
-                            <th>STATUS PENGIRIMAN</th>
+                            <th>TOTAL</th>
+                            <th>STATUS</th>
                             <th class="text-end pe-4">AKSI</th>
                         </tr>
                     </thead>
                     <tbody>
-                        @forelse ($transactions as $index => $transaction)
+                        @forelse ($transactions as $group)
+                        @php 
+                            $first = $group->first();
+                            $totalGroupPrice = $group->sum('total_price');
+                            $checkoutCode = $first->checkout_code ?: $first->transaction_code;
+                        @endphp
                         <tr>
                             <td class="ps-4 text-muted small">
                                 {{ ($transactions->currentPage() - 1) * $transactions->perPage() + $loop->iteration }}
                             </td>
                             <td>
                                 <div class="d-flex align-items-center">
-                                    <div class="avatar-circle me-3">
-                                        @php
-                                        $initials = collect(explode(' ', $transaction->buyer_name))
-                                        ->map(fn($n) => strtoupper(substr($n, 0, 1)))
-                                        ->take(2)
-                                        ->join('');
-                                        $colors = ['#4e73df', '#1cc88a', '#36b9cc', '#f6c23e', '#e74a3b'];
-                                        $color = $colors[ord($transaction->buyer_name) % count($colors)];
-                                        @endphp
-                                        <span style="background-color: {{ $color }};">{{ $initials }}</span>
-                                    </div>
                                     <div>
-                                        <div class="fw-bold text-dark">{{ $transaction->buyer_name }}</div>
-                                        <div class="text-muted small">{{ $transaction->buyer_phone }}</div>
+                                        <div class="fw-bold text-dark" style="font-size: 0.85rem;">{{ $first->buyer_name }}</div>
+                                        <div class="text-muted small" style="font-size: 0.75rem;">{{ $first->buyer_phone }}</div>
                                     </div>
                                 </div>
                             </td>
                             <td>
-                                <code class="text-primary fw-bold">{{ $transaction->transaction_code }}</code>
-                                <div class="text-muted x-small mt-1">{{ $transaction->created_at->format('d M Y, H:i') }}</div>
+                                @php $umkms = $group->pluck('umkm.nama_toko')->unique()->filter(); @endphp
+                                @foreach($umkms as $u)
+                                    <div class="badge bg-primary bg-opacity-10 text-primary border border-primary border-opacity-10 mb-1 d-block text-start" style="font-size: 0.65rem;">
+                                        {{ $u }}
+                                    </div>
+                                @endforeach
                             </td>
                             <td>
-                                @if ($transaction->product)
-                                <div class="text-dark fw-500">{{ $transaction->product->nama_produk }}</div>
-                                <div class="text-muted small">{{ $transaction->quantity }} {{ $transaction->product->satuan ?? 'item' }}</div>
-                                @if($transaction->order_type == 'po')
-                                <span class="badge badge-soft-warning x-small mt-1">PO: {{ \Carbon\Carbon::parse($transaction->po_date)->format('d/m/Y') }}</span>
-                                @endif
-                                @else
-                                <span class="text-danger small"><i class="bi bi-exclamation-triangle me-1"></i>Produk Dihapus</span>
-                                @endif
-                            </td>
-                            <td>
-                                <span class="fw-bold text-dark">Rp{{ number_format($transaction->total_price, 0, ',', '.') }}</span>
-                                <div class="text-muted x-small">via {{ ucfirst($transaction->payment_method ?? 'N/A') }}</div>
-                            </td>
-                            <td>
-                                @if ($transaction->status === 'pending')
-                                <span class="badge badge-soft-warning">Belum Bayar</span>
-                                @elseif ($transaction->status === 'paid' || $transaction->status === 'completed' || $transaction->status === 'proses' || $transaction->status === 'ready' || $transaction->status === 'shipping')
-                                <span class="badge badge-soft-success">Berhasil</span>
-                                @elseif ($transaction->status === 'cancelled')
-                                <span class="badge badge-soft-secondary">Batal</span>
-                                @else
-                                <span class="badge badge-soft-danger">Gagal</span>
+                                <div class="fw-bold text-dark" style="font-size: 0.75rem;">{{ $checkoutCode }}</div>
+                                @if($group->count() > 1)
+                                    <div class="badge bg-info bg-opacity-10 text-info x-small mt-1">{{ $group->count() }} Transaksi</div>
                                 @endif
                             </td>
                             <td>
-                                @if($transaction->delivery_status == 'delivered')
-                                    <span class="badge badge-soft-success">Selesai</span>
-                                @elseif($transaction->delivery_status == 'shipping')
-                                    <span class="badge badge-soft-primary">Pengiriman</span>
-                                @elseif($transaction->delivery_status == 'ready')
-                                    <span class="badge badge-soft-info">Packing</span>
-                                @elseif($transaction->status == 'proses')
-                                    <span class="badge badge-soft-info">Diproses</span>
+                                @foreach($group as $trans)
+                                    @foreach($trans->items as $item)
+                                        <div class="text-dark mb-1" style="font-size: 0.8rem;">
+                                            • {{ $item->product_name }} <span class="text-muted">({{ $item->quantity }}x)</span>
+                                        </div>
+                                    @endforeach
+                                    @if($trans->items->count() == 0 && $trans->product)
+                                        <div class="text-dark mb-1" style="font-size: 0.8rem;">
+                                            • {{ $trans->product->nama_produk }} <span class="text-muted">({{ $trans->quantity }}x)</span>
+                                        </div>
+                                    @endif
+                                @endforeach
+                            </td>
+                            <td>
+                                <div class="fw-bold text-dark">Rp{{ number_format($totalGroupPrice, 0, ',', '.') }}</div>
+                                <div class="text-muted x-small">{{ ucfirst($first->payment_method ?? 'N/A') }}</div>
+                            </td>
+                            <td>
+                                @if ($first->status === 'pending')
+                                <span class="badge badge-soft-warning">Pending</span>
+                                @elseif ($first->status === 'paid' || $first->status === 'completed' || $first->status === 'proses' || $first->status === 'ready' || $first->status === 'shipping')
+                                <span class="badge badge-soft-success">Paid</span>
                                 @else
-                                    <span class="badge badge-soft-secondary">Menunggu</span>
+                                <span class="badge badge-soft-danger">{{ strtoupper($first->status) }}</span>
                                 @endif
                             </td>
                             <td class="text-end pe-4">
                                 <div class="d-flex justify-content-end gap-2">
-                                    @if($transaction->payment_proof && $transaction->status == 'pending')
-                                    <a href="{{ asset('storage/' . $transaction->payment_proof) }}" target="_blank" class="btn btn-icon btn-outline-warning" title="Lihat Bukti">
+                                    @if($first->payment_proof && $first->status == 'pending')
+                                    <a href="{{ asset('storage/' . $first->payment_proof) }}" target="_blank" class="btn btn-icon btn-outline-warning" title="Lihat Bukti">
                                         <i class="bi bi-image"></i>
                                     </a>
-                                    <form action="{{ route('admin.transactions.update', $transaction->id) }}" method="POST" class="d-inline">
+                                    
+                                    @if($first->checkout_code)
+                                    <form action="{{ route('admin.transactions.update', $first->id) }}" method="POST" class="d-inline">
+                                        @csrf
+                                        @method('PUT')
+                                        <input type="hidden" name="bulk_approve" value="1">
+                                        <button type="submit" class="btn btn-sm btn-success text-white px-2 py-1" style="font-size: 0.7rem;" title="Setujui Semua Grup">
+                                            SETUJUI GRUP
+                                        </button>
+                                    </form>
+                                    @else
+                                    <form action="{{ route('admin.transactions.update', $first->id) }}" method="POST" class="d-inline">
                                         @csrf
                                         @method('PUT')
                                         <input type="hidden" name="status" value="paid">
-                                        <!-- Copy other fields to satisfy validation if necessary, or simplify the controller -->
-                                        <input type="hidden" name="buyer_name" value="{{ $transaction->buyer_name }}">
-                                        <input type="hidden" name="buyer_phone" value="{{ $transaction->buyer_phone }}">
-                                        <input type="hidden" name="buyer_address" value="{{ $transaction->buyer_address }}">
-                                        <input type="hidden" name="buyer_city" value="{{ $transaction->buyer_city }}">
-                                        <button type="submit" class="btn btn-icon btn-outline-success" title="Approve Bayar">
+                                        <button type="submit" class="btn btn-icon btn-outline-success" title="Approve">
                                             <i class="bi bi-check-lg"></i>
                                         </button>
                                     </form>
                                     @endif
-
-                                    @if($transaction->status == 'ready' || ($transaction->status == 'ready' && $transaction->delivery_status == 'shipping'))
-                                    <form action="{{ route('admin.transactions.update', $transaction->id) }}" method="POST" class="d-inline">
-                                        @csrf
-                                        @method('PUT')
-                                        <input type="hidden" name="status" value="completed">
-                                        <input type="hidden" name="delivery_status" value="delivered">
-                                        <input type="hidden" name="buyer_name" value="{{ $transaction->buyer_name }}">
-                                        <input type="hidden" name="buyer_phone" value="{{ $transaction->buyer_phone }}">
-                                        <input type="hidden" name="buyer_address" value="{{ $transaction->buyer_address }}">
-                                        <input type="hidden" name="buyer_city" value="{{ $transaction->buyer_city }}">
-                                        <button type="submit" class="btn btn-icon btn-success text-white" title="Selesaikan Pesanan">
-                                            <i class="bi bi-flag-fill"></i>
-                                        </button>
-                                    </form>
                                     @endif
-
-                                    <a href="{{ route('admin.transactions.show', $transaction->id) }}"
+                                    
+                                    <a href="{{ route('admin.transactions.show', $first->id) }}"
                                         class="btn btn-icon btn-outline-info" title="Detail">
                                         <i class="bi bi-eye"></i>
                                     </a>
-                                    <a href="{{ route('admin.transactions.edit', $transaction->id) }}"
+                                    <a href="{{ route('admin.transactions.edit', $first->id) }}"
                                         class="btn btn-icon btn-outline-primary" title="Edit">
                                         <i class="bi bi-pencil"></i>
                                     </a>
-                                    <form action="{{ route('admin.transactions.destroy', $transaction->id) }}"
+                                    <form action="{{ route('admin.transactions.destroy', $first->id) }}"
                                         method="POST" class="d-inline">
                                         @csrf
                                         @method('DELETE')

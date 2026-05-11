@@ -35,6 +35,9 @@
                             <a href="#change-password" class="list-group-item list-group-item-action py-3 px-4 border-0">
                                 <i class="bi bi-key me-3"></i>Ganti Password
                             </a>
+                            <a href="/orders" class="list-group-item list-group-item-action py-3 px-4 border-0">
+                                <i class="bi bi-bag-check me-3"></i>Riwayat Transaksi
+                            </a>
                         </div>
                     </div>
                 </div>
