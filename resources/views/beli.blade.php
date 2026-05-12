@@ -105,7 +105,7 @@
                 <form action="{{ route('cart.add', $product->id) }}" method="POST" class="d-inline">
                     @csrf
                     <input type="hidden" name="quantity" id="buy-qty" value="1">
-                    <input type="hidden" name="redirect" value="cart">
+                    <input type="hidden" name="redirect" value="checkout">
                     <button type="submit" class="btn btn-success btn-lg grow px-4 {{ $product->stok <= 0 ? 'disabled' : '' }}">
                         <i class="bi bi-cart-check me-2"></i>Beli Sekarang
                     </button>

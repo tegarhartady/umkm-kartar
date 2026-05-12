@@ -167,13 +167,10 @@
                                 <td>{{ $bank->account_number }}</td>
                                 <td>{{ $bank->account_holder }}</td>
                                 <td class="text-center">
-                                    <form action="{{ route('admin.settings.payment.bank.delete', $bank->id) }}" method="POST" onsubmit="return confirm('Hapus rekening ini?')">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="btn btn-sm btn-outline-danger">
-                                            <i class="bi bi-trash"></i>
-                                        </button>
-                                    </form>
+                                    <button type="button" class="btn btn-sm btn-outline-danger" 
+                                            onclick="if(confirm('Hapus rekening ini?')) { document.getElementById('delete-bank-form').action = '{{ route('admin.settings.payment.bank.delete', $bank->id) }}'; document.getElementById('delete-bank-form').submit(); }">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
                                 </td>
                             </tr>
                             @empty
@@ -273,6 +270,12 @@
         </form>
     </div>
 </div>
+
+<!-- Hidden form for bank deletion to avoid nested forms -->
+<form id="delete-bank-form" action="" method="POST" style="display: none;">
+    @csrf
+    @method('DELETE')
+</form>
 
 <!-- Add Bank Modal -->
 <div class="modal fade" id="addBankModal" tabindex="-1" aria-labelledby="addBankModalLabel" aria-hidden="true">

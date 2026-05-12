@@ -31,11 +31,11 @@ use App\Http\Controllers\Admin\UnitController;
 
 use Illuminate\Support\Facades\Artisan;
 
-Route::get('/debug-contact', function() {
+Route::get('/debug-contact', function () {
     return \App\Models\ContactMessage::count();
 });
 
-Route::get('/run-migrate', function() {
+Route::get('/run-migrate', function () {
     try {
         Artisan::call('migrate', [
             '--path' => 'database/migrations/2026_05_05_000001_create_units_table.php',
@@ -50,7 +50,34 @@ Route::get('/run-migrate', function() {
 Route::post('payment/callback', [PaymentCallbackController::class, 'callback'])->name('payment.callback');
 
 // Main Routes
-Route::get('/run-migration', function() {
+Route::get('/debug-routes', function() {
+    $routes = Route::getRoutes();
+    $output = '<table border="1"><tr><th>Method</th><th>URI</th><th>Name</th><th>Action</th></tr>';
+    foreach ($routes as $route) {
+        $output .= '<tr>';
+        $output .= '<td>' . implode('|', $route->methods()) . '</td>';
+        $output .= '<td>' . $route->uri() . '</td>';
+        $output .= '<td>' . $route->getName() . '</td>';
+        $output .= '<td>' . $route->getActionName() . '</td>';
+        $output .= '</tr>';
+    }
+    $output .= '</table>';
+    return $output;
+});
+
+Route::get('/clear-cache', function() {
+    try {
+        Artisan::call('route:clear');
+        Artisan::call('view:clear');
+        Artisan::call('cache:clear');
+        Artisan::call('config:clear');
+        return "Cache cleared successfully! <br><a href='/debug-routes'>Check Routes</a> | <a href='/admin/settings/payment'>Go to Payment Settings</a>";
+    } catch (\Exception $e) {
+        return "Failed to clear cache: " . $e->getMessage();
+    }
+});
+
+Route::get('/run-migration', function () {
     try {
         \Illuminate\Support\Facades\Artisan::call('migrate', ['--force' => true]);
         \Illuminate\Support\Facades\Artisan::call('db:seed', ['--class' => 'BankSeeder', '--force' => true]);
@@ -78,15 +105,15 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/checkout/{productId}', [CheckoutController::class, 'show'])->name('checkout.show');
     Route::post('/checkout', [CheckoutController::class, 'store'])->name('checkout.store');
     Route::get('/checkout/success/{transactionId}', [CheckoutController::class, 'success'])->name('checkout.success');
-    
+
     // Profile routes
     Route::get('/profile', [ProfileController::class, 'index'])->name('profile');
     Route::post('/profile', [ProfileController::class, 'update'])->name('profile.update');
-    
+
     // Orders
     Route::get('/orders', [OrderController::class, 'index'])->name('orders.index');
     Route::get('/orders/{id}', [OrderController::class, 'show'])->name('orders.show');
-    
+
     // Reviews
     Route::post('/reviews', [ReviewController::class, 'store'])->name('reviews.store');
 });
@@ -115,14 +142,24 @@ Route::post('/logout', [UnifiedAuthController::class, 'logout'])->name('logout')
 // Admin routes
 Route::middleware(['auth', 'admin.superadmin'])->group(function () {
     Route::get('/dashboard/admin', [DashboardController::class, 'admin'])->name('dashboard.admin');
-    
+
+    // Settings (Moved to top to prevent shadowing)
+    Route::get('admin/settings/company', [SettingController::class, 'company'])->name('admin.settings.company');
+    Route::post('admin/settings/company', [SettingController::class, 'updateCompany'])->name('admin.settings.company.update');
+    Route::get('admin/settings/payment', [SettingController::class, 'payment'])->name('admin.settings.payment');
+    Route::post('admin/settings/payment', [SettingController::class, 'updatePayment'])->name('admin.settings.payment.update');
+    Route::post('admin/settings/payment/bank', [SettingController::class, 'addAdminBank'])->name('admin.settings.payment.bank.add');
+    Route::delete('admin/settings/payment/bank/{bank}', [SettingController::class, 'deleteAdminBank'])->name('admin.settings.payment.bank.delete');
+    Route::get('admin/settings/delivery', [SettingController::class, 'delivery'])->name('admin.settings.delivery');
+    Route::post('admin/settings/delivery', [SettingController::class, 'updateDelivery'])->name('admin.settings.delivery.update');
+
     // UMKM Management
     Route::resource('admin/umkm', UmkmController::class, ['as' => 'admin']);
     Route::get('admin/umkm-verifikasi', [UmkmController::class, 'verifikasi'])->name('admin.umkm.verifikasi');
     Route::patch('admin/umkm/{umkm}/approve', [UmkmController::class, 'approve'])->name('admin.umkm.approve');
     Route::patch('admin/umkm/{umkm}/reject', [UmkmController::class, 'reject'])->name('admin.umkm.reject');
     Route::post('admin/umkm/{umkm}/reset-password', [UmkmController::class, 'resetPassword'])->name('admin.umkm.resetPassword');
-    
+
     // Product Management
     Route::get('admin/products', [ProductController::class, 'index'])->name('admin.products.index');
     Route::get('admin/products/create', [ProductController::class, 'create'])->name('admin.products.create');
@@ -133,10 +170,10 @@ Route::middleware(['auth', 'admin.superadmin'])->group(function () {
     Route::get('admin/products/{product}', [ProductController::class, 'show'])->name('admin.products.show');
     Route::get('admin/products-moderasi', [ProductController::class, 'moderasi'])->name('admin.products.moderasi');
     Route::patch('admin/products/{product}/status', [ProductController::class, 'updateStatus'])->name('admin.products.updateStatus');
-    
+
     // Desa Management
     Route::resource('admin/desa', DesaController::class, ['as' => 'admin']);
-    
+
     // Reports
     Route::get('admin/laporan', [LaporanController::class, 'index'])->name('admin.laporan.index');
 
@@ -145,20 +182,10 @@ Route::middleware(['auth', 'admin.superadmin'])->group(function () {
     Route::resource('admin/master/units', UnitController::class, ['as' => 'admin.master']);
     Route::get('admin/laporan/export/pdf', [LaporanController::class, 'exportPdf'])->name('admin.laporan.export.pdf');
     Route::get('admin/laporan/export/excel', [LaporanController::class, 'exportExcel'])->name('admin.laporan.export.excel');
-    
+
     // Transaction Management
     Route::resource('admin/transactions', TransactionController::class, ['as' => 'admin']);
-    
-    // Settings
-    Route::get('admin/settings/company', [SettingController::class, 'company'])->name('admin.settings.company');
-    Route::post('admin/settings/company', [SettingController::class, 'updateCompany'])->name('admin.settings.company.update');
-    Route::get('admin/settings/payment', [SettingController::class, 'payment'])->name('admin.settings.payment');
-    Route::post('admin/settings/payment', [SettingController::class, 'updatePayment'])->name('admin.settings.payment.update');
-    Route::post('admin/settings/payment/bank', [SettingController::class, 'addAdminBank'])->name('admin.settings.payment.bank.add');
-    Route::delete('admin/settings/payment/bank/{bank}', [SettingController::class, 'deleteAdminBank'])->name('admin.settings.payment.bank.delete');
-    Route::get('admin/settings/delivery', [SettingController::class, 'delivery'])->name('admin.settings.delivery');
-    Route::post('admin/settings/delivery', [SettingController::class, 'updateDelivery'])->name('admin.settings.delivery.update');
-    
+
     // User Management
     Route::resource('admin/users', UserController::class, ['as' => 'admin']);
 
@@ -189,7 +216,7 @@ Route::post('/contact', [\App\Http\Controllers\ContactController::class, 'store'
 // SuperAdmin only routes
 Route::middleware(['auth', 'role:superadmin'])->group(function () {
     Route::get('/superadmin/dashboard', [SuperAdminController::class, 'index'])->name('superadmin.dashboard');
-    
+
     // Admin Management
     Route::get('/superadmin/admins', [SuperAdminController::class, 'manageAdmins'])->name('superadmin.admins.index');
     Route::get('/superadmin/admins/create', [SuperAdminController::class, 'createAdmin'])->name('superadmin.admins.create');
@@ -197,7 +224,7 @@ Route::middleware(['auth', 'role:superadmin'])->group(function () {
     Route::get('/superadmin/admins/{admin}/edit', [SuperAdminController::class, 'editAdmin'])->name('superadmin.admins.edit');
     Route::put('/superadmin/admins/{admin}', [SuperAdminController::class, 'updateAdmin'])->name('superadmin.admins.update');
     Route::delete('/superadmin/admins/{admin}', [SuperAdminController::class, 'destroyAdmin'])->name('superadmin.admins.destroy');
-    
+
     // Settings
     Route::get('/superadmin/settings', [SuperAdminController::class, 'settings'])->name('superadmin.settings');
     Route::post('/superadmin/settings', [SuperAdminController::class, 'updateSettings'])->name('superadmin.settings.update');
@@ -221,7 +248,7 @@ Route::middleware('auth:umkm')->prefix('umkm')->name('umkm.')->group(function ()
     Route::get('/products/{product}/edit', [UmkmProductController::class, 'edit'])->name('products.edit');
     Route::put('/products/{product}', [UmkmProductController::class, 'update'])->name('products.update');
     Route::delete('/products/{product}', [UmkmProductController::class, 'destroy'])->name('products.destroy');
-    
+
     // Transactions
     Route::get('/transactions', [UmkmTransactionController::class, 'index'])->name('transactions.index');
     Route::get('/pendapatan', [UmkmTransactionController::class, 'income'])->name('transactions.income');

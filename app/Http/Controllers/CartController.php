@@ -61,6 +61,10 @@ class CartController extends Controller
             return redirect()->route('cart.index');
         }
 
+        if ($request->input('redirect') === 'checkout') {
+            return redirect()->route('cart.checkout');
+        }
+
         return redirect()->back()->with('success', 'Produk berhasil ditambahkan ke keranjang!');
     }
 
