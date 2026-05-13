@@ -149,11 +149,11 @@
                                     <label class="form-label">Jenis Usaha <span class="text-danger">*</span></label>
                                     <select name="kategori" class="form-select @error('kategori') is-invalid @enderror" required>
                                         <option value="">Pilih jenis usaha</option>
-                                        <option value="Makanan Olahan" {{ old('kategori') == 'Makanan Olahan' ? 'selected' : '' }}>Makanan Olahan</option>
-                                        <option value="Hasil Laut" {{ old('kategori') == 'Hasil Laut' ? 'selected' : '' }}>Hasil Laut</option>
-                                        <option value="Bumbu Dapur" {{ old('kategori') == 'Bumbu Dapur' ? 'selected' : '' }}>Bumbu Dapur</option>
-                                        <option value="Kerajinan" {{ old('kategori') == 'Kerajinan' ? 'selected' : '' }}>Kerajinan</option>
-                                        <option value="Kuliner" {{ old('kategori') == 'Kuliner' ? 'selected' : '' }}>Kuliner</option>
+                                        @foreach($categories as $category)
+                                            <option value="{{ $category->nama_kategori }}" {{ old('kategori') == $category->nama_kategori ? 'selected' : '' }}>
+                                                {{ $category->nama_kategori }}
+                                            </option>
+                                        @endforeach
                                         <option value="Lainnya" {{ old('kategori') == 'Lainnya' ? 'selected' : '' }}>Lainnya</option>
                                     </select>
                                     @error('kategori')

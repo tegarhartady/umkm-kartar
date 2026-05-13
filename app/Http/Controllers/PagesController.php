@@ -11,7 +11,7 @@ class PagesController extends Controller
     {
         $desas = Desa::all();
         $banks = \App\Models\Bank::where('is_active', true)->orderBy('nama_bank')->get();
-        $categories = ['Hasil Laut', 'Makanan Olahan', 'Bumbu Dapur', 'Kerajinan', 'Kuliner'];
+        $categories = \App\Models\Category::all();
         return view('pages.daftar-umkm', compact('desas', 'categories', 'banks'));
     }
 

@@ -1,0 +1,69 @@
+==========================================================
+      PANDUAN DEPLOYMENT SERVER - SMART UMKM
+==========================================================
+
+BERKAS INI BERISI LANGKAH-LANGKAH YANG WAJIB DIJALANKAN
+SAAT PINDAH KE SERVER PRODUKSI (HOSTINGER).
+
+1. PENGATURAN DATABASE (MIGRATION)
+----------------------------------
+Jalankan perintah ini untuk memastikan semua tabel (termasuk tabel UMKM,
+Kategori, dan Transaksi) sudah terpasang di database server:
+
+    php artisan migrate
+
+*Catatan: Jika ada penambahan kolom di tabel yang sudah ada, pastikan
+menjalankan php artisan migrate.
+
+2. PENGATURAN EMAIL (.ENV)
+--------------------------
+Edit file .env di server, cari bagian MAIL CONFIGURATION:
+- Matikan (tanda #) bagian 1. DEVELOPMENT (MAILTRAP).
+- Aktifkan (hapus #) bagian 2. PRODUCTION (HOSTINGER).
+
+Pastikan kredensial Hostinger sudah benar:
+MAIL_HOST=smtp.hostinger.com
+MAIL_PORT=465
+MAIL_ENCRYPTION=ssl
+
+3. OPTIMALISASI CACHE
+---------------------
+Jalankan perintah ini di terminal SSH Hostinger agar performa maksimal
+dan konfigurasi terbaca dengan benar:
+
+    php artisan config:cache
+    php artisan route:cache
+    php artisan view:cache
+
+4. SETUP QUEUE (PENGIRIMAN EMAIL OTOMATIS)
+------------------------------------------
+Karena pengiriman email menggunakan sistem antrian (Queue) agar website
+tidak lambat, Anda WAJIB mengatur Cron Job di hPanel Hostinger:
+
+- Pilih menu "Cron Jobs".
+- Pilih "Custom" untuk Common Settings.
+- Atur waktu ke "Every Minute" (* * * * *).
+- Masukkan perintah berikut (sesuaikan path dengan folder anda):
+
+  /usr/local/bin/php /home/uXXXXX/public_html/artisan queue:work --stop-when-empty
+
+5. IZIN AKSES FOLDER (PERMISSIONS)
+----------------------------------
+Pastikan folder berikut dapat ditulisi oleh server (Writable):
+- storage/
+- bootstrap/cache/
+
+Gunakan perintah:
+    chmod -R 775 storage bootstrap/cache
+
+6. TROUBLESHOOTING EMAIL
+------------------------
+Jika email tidak masuk:
+- Jalankan "php artisan queue:restart" untuk mereset worker.
+- Cek log error di "storage/logs/laravel.log".
+- Pastikan QUEUE_CONNECTION=database sudah diatur di .env.
+
+==========================================================
+Dibuat pada: 2026-05-13
+Status: Final Development Ready
+==========================================================

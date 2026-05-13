@@ -8,6 +8,10 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\UmkmRegistrationPending;
+use App\Mail\UmkmApproved;
+use App\Mail\UmkmPasswordReset;
 
 class UmkmController extends Controller
 {
@@ -21,7 +25,8 @@ class UmkmController extends Controller
     {
         $desas = Desa::all();
         $banks = \App\Models\Bank::where('is_active', true)->orderBy('nama_bank')->get();
-        return view('admin.umkm.create', compact('desas', 'banks'));
+        $categories = \App\Models\Category::all();
+        return view('admin.umkm.create', compact('desas', 'banks', 'categories'));
     }
 
     public function store(Request $request)
@@ -80,7 +85,8 @@ class UmkmController extends Controller
     {
         $desas = Desa::all();
         $banks = \App\Models\Bank::where('is_active', true)->orderBy('nama_bank')->get();
-        return view('admin.umkm.edit', compact('umkm', 'desas', 'banks'));
+        $categories = \App\Models\Category::all();
+        return view('admin.umkm.edit', compact('umkm', 'desas', 'banks', 'categories'));
     }
 
     public function update(Request $request, $id)
@@ -174,11 +180,17 @@ class UmkmController extends Controller
         $randomNumber = str_pad(rand(0, 9999), 4, '0', STR_PAD_LEFT);
         $defaultPassword = 'umkm' . $randomNumber;
 
-        // Update UMKM: set password dan ubah status ke disetujui
         $umkm->update([
             'password' => \Illuminate\Support\Facades\Hash::make($defaultPassword),
             'status' => 'disetujui',
         ]);
+
+        // Kirim email notifikasi persetujuan
+        try {
+            Mail::to($umkm->email)->send(new UmkmApproved($umkm, $defaultPassword));
+        } catch (\Exception $e) {
+            \Log::error('Gagal mengirim email persetujuan UMKM: ' . $e->getMessage());
+        }
 
         // Success message dengan password untuk admin copy
         $successMessage = "✅ UMKM '{$umkm->nama_toko}' telah disetujui!\n\n" .
@@ -308,6 +320,13 @@ class UmkmController extends Controller
             'nama_pemilik_rekening' => $validated['nama_pemilik_rekening'] ?? null,
         ]);
 
+        // Kirim email notifikasi
+        try {
+            Mail::to($umkm->email)->send(new UmkmRegistrationPending($umkm));
+        } catch (\Exception $e) {
+            \Log::error('Gagal mengirim email pendaftaran UMKM: ' . $e->getMessage());
+        }
+
         if ($request->expectsJson()) {
             return response()->json([
                 'success' => true,
@@ -326,13 +345,23 @@ class UmkmController extends Controller
     public function resetPassword($id)
     {
         $umkm = Umkm::findOrFail($id);
-        $defaultPassword = 'password123';
+        
+        // Generate password baru: reset + 4 angka random
+        $randomNumber = str_pad(rand(0, 9999), 4, '0', STR_PAD_LEFT);
+        $newPassword = 'reset' . $randomNumber;
         
         $umkm->update([
-            'password' => bcrypt($defaultPassword)
+            'password' => bcrypt($newPassword)
         ]);
+
+        // Kirim email notifikasi reset password
+        try {
+            Mail::to($umkm->email)->send(new UmkmPasswordReset($umkm, $newPassword));
+        } catch (\Exception $e) {
+            \Log::error('Gagal mengirim email reset password UMKM: ' . $e->getMessage());
+        }
         
         return redirect()->route('admin.umkm.show', $umkm->id)
-            ->with('success', 'Password berhasil direset ke: password123');
+            ->with('success', "Password berhasil direset ke: {$newPassword} dan telah dikirim ke email UMKM.");
     }
 }

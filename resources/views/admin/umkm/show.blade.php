@@ -179,6 +179,7 @@
                         </form>
                         <form action="{{ route('admin.umkm.reject', $umkm->id) }}" method="POST">
                             @csrf
+                            @method('PATCH')
                             <button type="submit" class="btn btn-danger w-100" onclick="return confirm('Tolak UMKM {{ $umkm->nama_toko }}?')">
                                 <i class="bi bi-x-circle me-2"></i>Tolak UMKM
                             </button>
