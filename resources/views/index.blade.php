@@ -1110,4 +1110,30 @@ $promo = $activePromotion ?? (object)[
 </div>
 @endif
 
+<!-- Mobile Bottom Event Banner -->
+@if(isset($activePromotion) || true)
+<div class="d-block d-xl-none fixed-bottom shadow-lg" style="z-index: 1040; background: linear-gradient(135deg, #001f5c 0%, #000f3d 100%);">
+    <div class="container py-2 px-3">
+        <div class="d-flex align-items-center justify-content-between">
+            <div class="d-flex align-items-center flex-grow-1" style="overflow: hidden;">
+                <div class="me-3">
+                    <span class="badge bg-warning text-dark px-2 py-1 rounded-pill shadow-sm" style="font-size: 0.6rem;">
+                        <i class="bi bi-stars"></i> Event
+                    </span>
+                </div>
+                <div class="text-white text-truncate">
+                    <div class="fw-bold text-truncate" style="font-size: 0.9rem; letter-spacing: -0.3px;">{{ $promo->title }}</div>
+                    <div class="text-white-50 text-truncate" style="font-size: 0.75rem;">{{ $promo->subtitle }}</div>
+                </div>
+            </div>
+            <div class="ms-2 flex-shrink-0">
+                <a href="{{ isset($activePromotion) ? route('event', $activePromotion->id) : $promo->button_link }}" class="btn btn-light btn-sm rounded-pill fw-bold shadow-sm" style="font-size: 0.75rem; padding: 0.4rem 0.8rem;">
+                    Buka <i class="bi bi-chevron-right ms-1" style="font-size: 0.65rem;"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+@endif
+
 @endsection
