@@ -190,37 +190,7 @@
         <!-- Pagination -->
         @if($products && $products->hasPages())
         <div class="d-flex justify-content-center mt-5" data-aos="fade-up">
-            <nav aria-label="Page navigation">
-                <ul class="pagination">
-                    @if($products->onFirstPage())
-                    <li class="page-item disabled">
-                        <a class="page-link" href="#"><i class="bi bi-chevron-left"></i></a>
-                    </li>
-                    @else
-                    <li class="page-item">
-                        <a class="page-link" href="{{ $products->previousPageUrl() }}"><i class="bi bi-chevron-left"></i></a>
-                    </li>
-                    @endif
-                    
-                    @foreach ($products->getUrlRange(1, $products->lastPage()) as $page => $url)
-                        @if ($page == $products->currentPage())
-                        <li class="page-item active"><a class="page-link" href="#">{{ $page }}</a></li>
-                        @else
-                        <li class="page-item"><a class="page-link" href="{{ $url }}">{{ $page }}</a></li>
-                        @endif
-                    @endforeach
-                    
-                    @if($products->hasMorePages())
-                    <li class="page-item">
-                        <a class="page-link" href="{{ $products->nextPageUrl() }}"><i class="bi bi-chevron-right"></i></a>
-                    </li>
-                    @else
-                    <li class="page-item disabled">
-                        <a class="page-link" href="#"><i class="bi bi-chevron-right"></i></a>
-                    </li>
-                    @endif
-                </ul>
-            </nav>
+            {{ $products->appends(request()->query())->links('pagination::bootstrap-5') }}
         </div>
         @endif
             </div>
