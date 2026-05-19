@@ -29,4 +29,13 @@ class PagesController extends Controller
     {
         return view('pages.tentang');
     }
+
+    public function event($id)
+    {
+        $promotion = \App\Models\Promotion::with(['umkms.products' => function($q) {
+            $q->where('status', 'aktif');
+        }])->where('is_active', true)->findOrFail($id);
+
+        return view('pages.event', compact('promotion'));
+    }
 }

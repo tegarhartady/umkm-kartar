@@ -89,6 +89,7 @@ Route::get('/run-migration', function () {
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/katalog', [CatalogController::class, 'indexProducts'])->name('katalog');
+Route::get('/event/{id}', [PagesController::class, 'event'])->name('event');
 
 // Cart Routes (Protected by Auth)
 Route::middleware(['auth'])->group(function () {
@@ -240,6 +241,8 @@ Route::middleware('auth:umkm')->prefix('umkm')->name('umkm.')->group(function ()
 
     // Dashboard
     Route::get('/dashboard', [UmkmDashboardController::class, 'index'])->name('dashboard');
+    Route::get('/profile', [UmkmDashboardController::class, 'profile'])->name('profile');
+    Route::put('/profile', [UmkmDashboardController::class, 'updateProfile'])->name('profile.update');
 
     // Products
     Route::get('/products', [UmkmProductController::class, 'index'])->name('products.index');

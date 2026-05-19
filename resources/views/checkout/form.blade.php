@@ -177,7 +177,8 @@
                                     <select class="form-select form-select-lg rounded-3" id="payment_method_manual" name="payment_method" onchange="togglePaymentDetails()">
                                         <option value="" disabled selected>Pilih Metode Manual</option>
                                         <option value="transfer">Transfer Bank Manual</option>
-                                        <option value="qris">QRIS (Manual)</option>
+                                        <option value="qris">QRIS (Manual Admin)</option>
+                                        <option value="qris_event">QRIS UMKM (Khusus Event)</option>
                                         <option value="cod">COD (Bayar di Tempat)</option>
                                     </select>
                                 </div>
@@ -445,9 +446,17 @@
         const detailsTransfer = document.getElementById('details-transfer');
         const detailsQris = document.getElementById('details-qris');
         
-        if(box) box.style.display = (method === 'transfer' || method === 'qris') ? 'block' : 'none';
+        if(box) box.style.display = (method === 'transfer' || method === 'qris' || method === 'qris_event') ? 'block' : 'none';
         if(detailsTransfer) detailsTransfer.style.display = (method === 'transfer') ? 'block' : 'none';
-        if(detailsQris) detailsQris.style.display = (method === 'qris') ? 'block' : 'none';
+        if(detailsQris) {
+            detailsQris.style.display = (method === 'qris' || method === 'qris_event') ? 'block' : 'none';
+            if (method === 'qris_event') {
+                detailsQris.innerHTML = '<h6 class="fw-bold mb-3 text-primary"><i class="bi bi-qr-code-scan me-2"></i>Pembayaran QRIS UMKM (Event)</h6><div class="alert alert-info py-2 mb-0 small"><i class="bi bi-info-circle me-1"></i> QRIS masing-masing UMKM akan ditampilkan pada halaman selanjutnya (setelah konfirmasi pesanan).</div>';
+            } else if (method === 'qris') {
+                // Restore original details-qris content (we could just use a separate div but let's keep it simple)
+                detailsQris.innerHTML = '<h6 class="fw-bold mb-3">Scan QRIS Berikut</h6>@php $qris = App\Models\Setting::get("payment_qris_image"); @endphp @if($qris) <img src="{{ asset($qris) }}" class="img-fluid rounded shadow-sm" style="max-width: 250px;"> @else <p class="text-muted">Gambar QRIS belum tersedia.</p> @endif';
+            }
+        }
     }
 
     function togglePoDate() {

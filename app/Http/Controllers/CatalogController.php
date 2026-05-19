@@ -16,12 +16,15 @@ class CatalogController extends Controller
             ->withCount('reviews')
             ->whereIn('status', ['published', 'aktif']);
 
-        // Search by product name
+        // Search by product name or UMKM name
         if ($request->filled('search')) {
             $search = $request->input('search');
             $query->where(function ($q) use ($search) {
                 $q->where('nama_produk', 'like', "%{$search}%")
-                  ->orWhere('deskripsi', 'like', "%{$search}%");
+                  ->orWhere('deskripsi', 'like', "%{$search}%")
+                  ->orWhereHas('umkm', function ($qUmkm) use ($search) {
+                      $qUmkm->where('nama_toko', 'like', "%{$search}%");
+                  });
             });
         }
 

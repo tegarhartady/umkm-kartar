@@ -146,6 +146,12 @@
                             </a>
                         </li>
                         <li class="nav-item">
+                            <a href="{{ route('umkm.profile') }}" class="nav-link {{ request()->routeIs('umkm.profile') ? 'active' : '' }}">
+                                <i class="nav-icon bi bi-person"></i>
+                                <span class="nav-text">Profil Toko</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
                             <a href="{{ route('umkm.products.index') }}" class="nav-link {{ request()->routeIs('umkm.products.*') ? 'active' : '' }}">
                                 <i class="nav-icon bi bi-box-seam"></i>
                                 <span class="nav-text">Kelola Produk</span>

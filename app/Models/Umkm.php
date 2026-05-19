@@ -30,6 +30,7 @@ class Umkm extends Model implements AuthenticatableContract
         'foto_ktp',
         'foto_tempat',
         'produk_utama',
+        'foto_qris',
         'latitude',
         'longitude',
         'no_rekening',
@@ -56,5 +57,11 @@ class Umkm extends Model implements AuthenticatableContract
     public function reimbursements()
     {
         return $this->hasMany(\App\Models\Reimbursement::class);
+    }
+
+    // Relationship dengan promotions
+    public function promotions()
+    {
+        return $this->belongsToMany(\App\Models\Promotion::class, 'promotion_umkm');
     }
 }

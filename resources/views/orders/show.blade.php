@@ -10,7 +10,7 @@
                     <a href="{{ route('orders.index') }}" class="btn btn-link text-decoration-none p-0 mb-2 text-muted">
                         <i class="bi bi-arrow-left me-1"></i> Kembali ke Daftar Pesanan
                     </a>
-                    <h3 class="fw-bold mb-0">Detail Pesanan <span class="text-primary">#{{ $transaction->transaction_code }}</span></h3>
+                    <h3 class="fw-bold mb-0">Detail Pesanan <span class="text-primary">#{{ $transaction->checkout_code ?? $transaction->transaction_code }}</span></h3>
                 </div>
                 <div class="text-end">
                     @php

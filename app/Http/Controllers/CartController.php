@@ -153,7 +153,8 @@ class CartController extends Controller
             $deliveryFeeFlat = $deliveryFeePerKm;
         }
         
-        $checkoutCode = 'CHK-' . strtoupper(\Illuminate\Support\Str::random(10));
+        $checkoutPrefix = $validated['payment_method'] === 'qris_event' ? 'EVT-' : 'CHK-';
+        $checkoutCode = $checkoutPrefix . strtoupper(\Illuminate\Support\Str::random(10));
         $transactions = [];
         $totalGrossAmount = 0;
 
@@ -176,10 +177,12 @@ class CartController extends Controller
                 $umkmTotal = $umkmSubtotal + $shippingFee;
                 $totalGrossAmount += $umkmTotal;
 
+                $trxPrefix = $validated['payment_method'] === 'qris_event' ? 'EVT-' : 'TRX-';
+
                 // Create Transaction per UMKM
                 $transaction = \App\Models\Transaction::create([
                     'checkout_code' => $checkoutCode,
-                    'transaction_code' => 'TRX-' . strtoupper(\Illuminate\Support\Str::random(12)),
+                    'transaction_code' => $trxPrefix . strtoupper(\Illuminate\Support\Str::random(12)),
                     'user_id' => auth()->id(),
                     'umkm_id' => $umkmId,
                     'product_id' => $items[0]['id'], // Store first product for compatibility

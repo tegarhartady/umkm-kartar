@@ -37,15 +37,22 @@ dan konfigurasi terbaca dengan benar:
 
 4. SETUP QUEUE (PENGIRIMAN EMAIL OTOMATIS)
 ------------------------------------------
-Karena pengiriman email menggunakan sistem antrian (Queue) agar website
-tidak lambat, Anda WAJIB mengatur Cron Job di hPanel Hostinger:
+Karena pengiriman email menggunakan sistem antrian (Queue), Anda WAJIB mengatur Cron Job agar email terkirim otomatis di latar belakang.
 
-- Pilih menu "Cron Jobs".
+UNTUK AAPANEL:
+- Buka menu "Cron" di sidebar.
+- Type of Task: Pilih "Shell Script".
+- Name: "Laravel Queue Worker".
+- Period: Pilih "N Minutes" dan isi "1" (Tiap 1 menit).
+- Script Content:
+  php /www/wwwroot/path-project-anda/artisan queue:work --stop-when-empty
+
+UNTUK HOSTINGER (hPanel):
+- Buka menu "Cron Jobs".
 - Pilih "Custom" untuk Common Settings.
 - Atur waktu ke "Every Minute" (* * * * *).
-- Masukkan perintah berikut (sesuaikan path dengan folder anda):
-
-  /usr/local/bin/php /home/uXXXXX/public_html/artisan queue:work --stop-when-empty
+- Perintah:
+  /usr/local/bin/php /home/u576371094/public_html/artisan queue:work --stop-when-empty
 
 5. IZIN AKSES FOLDER (PERMISSIONS)
 ----------------------------------

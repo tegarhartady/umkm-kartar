@@ -11,6 +11,7 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\UmkmRegistrationPending;
 use App\Mail\UmkmApproved;
+use App\Mail\UmkmRejected;
 use App\Mail\UmkmPasswordReset;
 
 class UmkmController extends Controller
@@ -205,11 +206,23 @@ class UmkmController extends Controller
     /**
      * Reject UMKM
      */
-    public function reject(Umkm $umkm)
+    public function reject(Request $request, Umkm $umkm)
     {
+        $request->validate([
+            'reason' => 'required|string|max:1000'
+        ]);
+
         $umkm->update([
             'status' => 'ditolak',
+            'rejection_reason' => $request->reason
         ]);
+
+        // Kirim email notifikasi penolakan
+        try {
+            Mail::to($umkm->email)->send(new UmkmRejected($umkm, $request->reason));
+        } catch (\Exception $e) {
+            \Log::error('Gagal mengirim email penolakan UMKM: ' . $e->getMessage());
+        }
 
         return back()->with('success', "UMKM '{$umkm->nama_toko}' ditolak.");
     }

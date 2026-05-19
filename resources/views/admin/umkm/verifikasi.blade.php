@@ -75,10 +75,10 @@
                     <i class="bi bi-shop"></i>
                 </div>
                 <span class="badge-status 
-                    @if($umkm->status == 'approved') bg-success 
+                    @if($umkm->status == 'approved' || $umkm->status == 'disetujui') bg-success 
                     @elseif($umkm->status == 'pending') bg-warning 
                     @else bg-danger @endif">
-                    {{ ucfirst($umkm->status) }}
+                    {{ $umkm->status == 'approved' || $umkm->status == 'disetujui' ? 'Disetujui' : ($umkm->status == 'pending' ? 'Menunggu' : 'Ditolak') }}
                 </span>
             </div>
         </div>
@@ -137,13 +137,13 @@
                     <i class="bi bi-check-circle"></i> Setujui
                 </button>
             </form>
-            <form action="{{ route('admin.umkm.reject', $umkm) }}" method="POST" style="display:inline;">
-                @csrf
-                @method('PATCH')
-                <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Tolak UMKM {{ $umkm->nama_toko }}?')">
-                    <i class="bi bi-x-circle"></i> Tolak
-                </button>
-            </form>
+            <button type="button" class="btn btn-sm btn-danger" 
+                    data-bs-toggle="modal" 
+                    data-bs-target="#rejectModal" 
+                    data-name="{{ $umkm->nama_toko }}"
+                    data-url="{{ route('admin.umkm.reject', $umkm) }}">
+                <i class="bi bi-x-circle"></i> Tolak
+            </button>
         </div>
         @endif
     </div>
@@ -172,6 +172,36 @@
     </nav>
 </div>
 @endif
+
+<!-- Reject Modal -->
+<div class="modal fade" id="rejectModal" tabindex="-1" aria-labelledby="rejectModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content border-0 shadow">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title" id="rejectModalLabel"><i class="bi bi-exclamation-triangle me-2"></i>Alasan Penolakan UMKM</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="rejectForm" method="POST">
+                @csrf
+                @method('PATCH')
+                <div class="modal-body">
+                    <p>Berikan alasan kenapa UMKM <strong id="rejectUmkmName"></strong> ditolak. Alasan ini akan dikirimkan ke email pendaftar.</p>
+                    <div class="mb-3">
+                        <label for="reason" class="form-label font-weight-bold">Alasan Penolakan</label>
+                        <textarea class="form-control" id="reason" name="reason" rows="4" required 
+                                  placeholder="Contoh: Foto KTP tidak jelas atau berkas pendaftaran kurang lengkap."></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer bg-light">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                    <button type="submit" class="btn btn-danger">
+                        <i class="bi bi-send me-1"></i>Tolak & Kirim Email
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 
 @endsection
 
@@ -468,6 +498,25 @@ document.addEventListener('DOMContentLoaded', function() {
         statusFilter.addEventListener('change', function() {
             // In production, this should use proper filtering via API or form submit
             console.log('Status:', this.value);
+        });
+    }
+
+    // Reject Modal Logic
+    const rejectModal = document.getElementById('rejectModal');
+    if (rejectModal) {
+        rejectModal.addEventListener('show.bs.modal', function (event) {
+            const button = event.relatedTarget;
+            const umkmName = button.getAttribute('data-name');
+            const actionUrl = button.getAttribute('data-url');
+            
+            const modalTitle = rejectModal.querySelector('#rejectUmkmName');
+            const form = rejectModal.querySelector('#rejectForm');
+            
+            modalTitle.textContent = umkmName;
+            form.setAttribute('action', actionUrl);
+            
+            // Clear previous reason
+            rejectModal.querySelector('#reason').value = '';
         });
     }
 });

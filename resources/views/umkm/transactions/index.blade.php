@@ -51,9 +51,13 @@
                                     @foreach($transactions as $t)
                                         <tr>
                                             <td>
-                                                <span class="badge bg-light text-dark fw-bold border">{{ $t->transaction_code }}</span>
-                                                @if($t->checkout_code)
-                                                    <div class="x-small text-muted mt-1" style="font-size: 0.65rem;">Grup: {{ $t->checkout_code }}</div>
+                                                @php $displayCode = $t->checkout_code ?? $t->transaction_code; @endphp
+                                                <span class="badge bg-light text-dark fw-bold border">{{ $displayCode }}</span>
+                                                @if(str_starts_with($displayCode, 'EVT-'))
+                                                    <div class="mt-1"><span class="badge bg-danger x-small" style="font-size: 0.65rem;"><i class="bi bi-star-fill me-1"></i>Pesanan Event</span></div>
+                                                @endif
+                                                @if($t->checkout_code && $t->transaction_code)
+                                                    <div class="x-small text-muted mt-1" style="font-size: 0.65rem;">Ref: {{ $t->transaction_code }}</div>
                                                 @endif
                                             </td>
                                             <td>{{ $t->created_at->format('d M Y, H:i') }}</td>
@@ -91,7 +95,11 @@
                                                 @elseif($t->status == 'paid' || $t->status == 'proses' || $t->status == 'ready' || $t->status == 'shipping')
                                                     <span class="badge bg-success bg-opacity-10 text-success border-success border-opacity-25 px-2 py-1">Berhasil</span>
                                                 @elseif($t->status == 'pending')
-                                                    <span class="badge bg-warning bg-opacity-10 text-warning border-warning border-opacity-25 px-2 py-1">Belum Bayar</span>
+                                                    @if($t->payment_method == 'qris_event')
+                                                        <span class="badge bg-primary bg-opacity-10 text-primary border-primary border-opacity-25 px-2 py-1">Aksi Diperlukan (Event)</span>
+                                                    @else
+                                                        <span class="badge bg-warning bg-opacity-10 text-warning border-warning border-opacity-25 px-2 py-1">Belum Bayar</span>
+                                                    @endif
                                                 @else
                                                     <span class="badge bg-danger bg-opacity-10 text-danger border-danger border-opacity-25 px-2 py-1">{{ ucfirst($t->status) }}</span>
                                                 @endif
@@ -125,7 +133,7 @@
                                             </td>
                                             <td>
                                                 <div class="d-flex gap-1">
-                                                    @if($t->status == 'paid')
+                                                    @if($t->status == 'paid' || ($t->status == 'pending' && $t->payment_method == 'qris_event'))
                                                         <form action="{{ route('umkm.transactions.update_status', $t->id) }}" method="POST">
                                                             @csrf
                                                             <input type="hidden" name="status" value="proses">
@@ -178,7 +186,12 @@
                                 <div class="modal-dialog modal-lg modal-dialog-centered">
                                     <div class="modal-content border-0 shadow-lg rounded-4">
                                         <div class="modal-header bg-light border-0">
-                                            <h5 class="modal-title fw-bold">Detail Pesanan #{{ $t->transaction_code }}</h5>
+                                            @php $displayCode = $t->checkout_code ?? $t->transaction_code; @endphp
+                                            <h5 class="modal-title fw-bold">Detail Pesanan #{{ $displayCode }} 
+                                                @if(str_starts_with($displayCode, 'EVT-'))
+                                                    <span class="badge bg-danger ms-2"><i class="bi bi-star-fill me-1"></i>Pesanan Event Spesial</span>
+                                                @endif
+                                            </h5>
                                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                         </div>
                                         <div class="modal-body p-4">

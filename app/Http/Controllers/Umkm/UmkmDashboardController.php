@@ -38,4 +38,35 @@ class UmkmDashboardController extends Controller
             'totalRevenue'
         ));
     }
+
+    public function profile()
+    {
+        $umkm = Auth::guard('umkm')->user();
+        return view('umkm.profile', compact('umkm'));
+    }
+
+    public function updateProfile(\Illuminate\Http\Request $request)
+    {
+        $umkm = Auth::guard('umkm')->user();
+
+        $validated = $request->validate([
+            'nama_toko' => 'required|string|max:255',
+            'pemilik' => 'required|string|max:255',
+            'phone' => 'required|string|max:20',
+            'alamat' => 'required|string',
+            'deskripsi' => 'nullable|string',
+            'foto_qris' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+        ]);
+
+        if ($request->hasFile('foto_qris')) {
+            if ($umkm->foto_qris) {
+                \Illuminate\Support\Facades\Storage::disk('public')->delete($umkm->foto_qris);
+            }
+            $validated['foto_qris'] = $request->file('foto_qris')->store('umkm/qris', 'public');
+        }
+
+        $umkm->update($validated);
+
+        return back()->with('success', 'Profil berhasil diperbarui!');
+    }
 }

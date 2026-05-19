@@ -31,6 +31,7 @@
                             <th>Judul (Main)</th>
                             <th>Subtitle (Lokasi)</th>
                             <th>Tombol</th>
+                            <th>UMKM Terkait</th>
                             <th>Aksi</th>
                         </tr>
                     </thead>
@@ -50,6 +51,9 @@
                             <td>
                                 <span class="badge bg-info">{{ $promo->button_text }}</span><br>
                                 <small class="text-muted">{{ $promo->button_link }}</small>
+                            </td>
+                            <td>
+                                <span class="badge bg-secondary">{{ $promo->umkms->count() }} UMKM</span>
                             </td>
                             <td>
                                 <div class="d-flex gap-2">
@@ -121,6 +125,15 @@
                         </div>
                     </div>
                     <div class="mb-3">
+                        <label class="form-label">Pilih UMKM yang Tergabung di Event Ini</label>
+                        <select name="umkm_ids[]" class="form-select" multiple style="height: 120px;">
+                            @foreach($umkms as $u)
+                                <option value="{{ $u->id }}">{{ $u->nama_toko }} ({{ $u->pemilik }})</option>
+                            @endforeach
+                        </select>
+                        <small class="text-muted">Tahan tombol Ctrl (Windows) atau Command (Mac) untuk memilih lebih dari satu UMKM.</small>
+                    </div>
+                    <div class="mb-3">
                         <div class="form-check form-switch">
                             <input class="form-check-input" type="checkbox" name="is_active" value="1" id="isActiveCheck" checked>
                             <label class="form-check-label" for="isActiveCheck">Aktifkan Sekarang (Otomatis menonaktifkan promo lain)</label>
@@ -175,6 +188,15 @@
                         </div>
                     </div>
                     <div class="mb-3">
+                        <label class="form-label">Pilih UMKM yang Tergabung di Event Ini</label>
+                        <select name="umkm_ids[]" id="edit_umkm_ids" class="form-select" multiple style="height: 120px;">
+                            @foreach($umkms as $u)
+                                <option value="{{ $u->id }}">{{ $u->nama_toko }} ({{ $u->pemilik }})</option>
+                            @endforeach
+                        </select>
+                        <small class="text-muted">Tahan tombol Ctrl (Windows) atau Command (Mac) untuk memilih lebih dari satu UMKM.</small>
+                    </div>
+                    <div class="mb-3">
                         <div class="form-check form-switch">
                             <input class="form-check-input" type="checkbox" name="is_active" value="1" id="edit_is_active">
                             <label class="form-check-label" for="edit_is_active">Aktif</label>
@@ -206,6 +228,13 @@
                 document.getElementById('edit_button_text').value = promo.button_text;
                 document.getElementById('edit_button_link').value = promo.button_link;
                 document.getElementById('edit_is_active').checked = (promo.is_active == 1);
+                
+                // Select UMKM options
+                const umkmSelect = document.getElementById('edit_umkm_ids');
+                const selectedUmkms = promo.umkms ? promo.umkms.map(u => u.id.toString()) : [];
+                Array.from(umkmSelect.options).forEach(option => {
+                    option.selected = selectedUmkms.includes(option.value);
+                });
             });
         });
     });

@@ -39,12 +39,12 @@
                                     <td>
                                         @if($umkm->status == 'pending')
                                             <span class="badge bg-warning">Menunggu Persetujuan</span>
-                                        @elseif($umkm->status == 'disetujui')
+                                        @elseif($umkm->status == 'disetujui' || $umkm->status == 'approved')
                                             <span class="badge bg-success">Disetujui</span>
-                                        @elseif($umkm->status == 'ditolak')
+                                        @elseif($umkm->status == 'ditolak' || $umkm->status == 'rejected')
                                             <span class="badge bg-danger">Ditolak</span>
                                         @else
-                                            <span class="badge bg-secondary">{{ $umkm->status }}</span>
+                                            <span class="badge bg-secondary">{{ ucfirst($umkm->status) }}</span>
                                         @endif
                                     </td>
                                 </tr>

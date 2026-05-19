@@ -57,9 +57,9 @@
         <div class="col-md-6">
             <select class="form-select form-select-lg" id="statusFilter">
                 <option value="">Semua Status</option>
-                <option value="approved">Disetujui</option>
+                <option value="disetujui">Disetujui</option>
                 <option value="pending">Menunggu</option>
-                <option value="rejected">Ditolak</option>
+                <option value="ditolak">Ditolak</option>
             </select>
         </div>
     </div>
@@ -75,10 +75,10 @@
                     <i class="bi bi-shop"></i>
                 </div>
                 <span class="badge-status 
-                    @if($umkm->status == 'approved') bg-success 
+                    @if($umkm->status == 'approved' || $umkm->status == 'disetujui') bg-success 
                     @elseif($umkm->status == 'pending') bg-warning 
                     @else bg-danger @endif">
-                    {{ ucfirst($umkm->status) }}
+                    {{ $umkm->status == 'approved' || $umkm->status == 'disetujui' ? 'Disetujui' : ($umkm->status == 'pending' ? 'Menunggu' : 'Ditolak') }}
                 </span>
             </div>
         </div>

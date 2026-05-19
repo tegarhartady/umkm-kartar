@@ -1102,7 +1102,7 @@ $promo = $activePromotion ?? (object)[
                 {{ $promo->description }}
             </p>
 
-            <a href="{{ $promo->button_link }}" class="btn btn-light w-100 rounded-pill fw-bold shadow-sm py-2" style="font-size: 0.9rem;">
+            <a href="{{ isset($activePromotion) ? route('event', $activePromotion->id) : $promo->button_link }}" class="btn btn-light w-100 rounded-pill fw-bold shadow-sm py-2" style="font-size: 0.9rem;">
                 {{ $promo->button_text }}
             </a>
         </div>

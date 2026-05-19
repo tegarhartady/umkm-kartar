@@ -36,7 +36,7 @@ class CheckoutController extends Controller
                 'buyer_address' => 'required|string',
                 'buyer_city' => 'required|string|max:255',
                 'buyer_postal_code' => 'nullable|string|max:10',
-                'payment_method' => 'required|in:midtrans,transfer,qris,cod',
+                'payment_method' => 'required|in:midtrans,transfer,qris,qris_event,cod',
                 'order_type' => 'required|in:po,langsung',
                 'delivery_type' => 'required|in:take_away,delivery',
                 'quantity' => 'required|integer|min:1',
@@ -48,11 +48,13 @@ class CheckoutController extends Controller
             $product = Product::findOrFail($validated['product_id']);
             $totalHarga = ($product->harga * $validated['quantity']) + ($validated['delivery_fee'] ?? 0);
 
+            $trxPrefix = $validated['payment_method'] === 'qris_event' ? 'EVT-' : 'TRX-';
+
             $transaction = Transaction::create([
                 'user_id' => auth()->id(),
                 'product_id' => $product->id,
                 'umkm_id' => $product->umkm_id,
-                'transaction_code' => 'TRX-' . strtoupper(Str::random(10)),
+                'transaction_code' => $trxPrefix . strtoupper(Str::random(10)),
                 'buyer_name' => $validated['buyer_name'],
                 'buyer_phone' => $validated['buyer_phone'],
                 'buyer_address' => $validated['buyer_address'],

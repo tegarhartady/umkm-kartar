@@ -17,4 +17,9 @@ class Promotion extends Model
         'button_link',
         'is_active',
     ];
+
+    public function umkms()
+    {
+        return $this->belongsToMany(Umkm::class, 'promotion_umkm');
+    }
 }

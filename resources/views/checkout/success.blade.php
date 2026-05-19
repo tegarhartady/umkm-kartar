@@ -176,20 +176,42 @@
                         @endif
 
                         <!-- QRIS Payment Display -->
-                        @if($transaction->payment_method === 'qris')
+                        @if($transaction->payment_method === 'qris' || $transaction->payment_method === 'qris_event')
                         <div class="card border-primary mb-4 shadow-sm">
                             <div class="card-body text-center">
                                 <h6 class="fw-bold mb-3 text-primary"><i class="bi bi-qr-code-scan me-2"></i>Scan QRIS untuk Pembayaran</h6>
-                                @php
-                                    $qrisImage = App\Models\Setting::get('payment_qris_image');
-                                @endphp
-                                @if($qrisImage)
-                                    <img src="{{ asset($qrisImage) }}" class="img-fluid rounded mb-3 shadow-sm" style="max-width: 300px; border: 1px solid #eee;">
-                                    <div class="alert alert-info py-2 mb-0 small">
-                                        <i class="bi bi-info-circle me-1"></i> Setelah scan dan bayar, mohon simpan bukti pembayaran Anda.
+                                
+                                @if($transaction->payment_method === 'qris_event')
+                                    <div class="row justify-content-center g-3">
+                                        @foreach($transactions as $t)
+                                            <div class="col-md-6 mb-3">
+                                                <div class="p-3 bg-light rounded border h-100">
+                                                    <h6 class="fw-bold mb-2">QRIS UMKM: {{ $t->umkm->nama_toko ?? 'UMKM' }}</h6>
+                                                    @if($t->umkm && $t->umkm->foto_qris)
+                                                        <img src="{{ asset('storage/' . $t->umkm->foto_qris) }}" class="img-fluid rounded mb-2 shadow-sm" style="max-height: 250px; border: 1px solid #eee;">
+                                                        <p class="small text-muted mb-0">Bayar: <strong>Rp{{ number_format($t->total_price, 0, ',', '.') }}</strong></p>
+                                                    @else
+                                                        <div class="alert alert-warning py-2 mb-0 small">QRIS UMKM ini belum tersedia. Silakan hubungi UMKM langsung atau gunakan metode lain.</div>
+                                                    @endif
+                                                </div>
+                                            </div>
+                                        @endforeach
+                                    </div>
+                                    <div class="alert alert-info py-2 mt-3 mb-0 small">
+                                        <i class="bi bi-info-circle me-1"></i> Jika Anda memesan dari beberapa UMKM, pastikan untuk men-scan masing-masing QRIS dan unggah seluruh bukti pembayarannya di bawah (bisa dijadikan 1 foto kolase jika lebih dari 1).
                                     </div>
                                 @else
-                                    <div class="alert alert-warning">Gambar QRIS belum tersedia. Silakan hubungi admin.</div>
+                                    @php
+                                        $qrisImage = App\Models\Setting::get('payment_qris_image');
+                                    @endphp
+                                    @if($qrisImage)
+                                        <img src="{{ asset($qrisImage) }}" class="img-fluid rounded mb-3 shadow-sm" style="max-width: 300px; border: 1px solid #eee;">
+                                        <div class="alert alert-info py-2 mb-0 small">
+                                            <i class="bi bi-info-circle me-1"></i> Setelah scan dan bayar, mohon simpan bukti pembayaran Anda.
+                                        </div>
+                                    @else
+                                        <div class="alert alert-warning">Gambar QRIS belum tersedia. Silakan hubungi admin.</div>
+                                    @endif
                                 @endif
                             </div>
                         </div>
@@ -283,7 +305,7 @@
                         @endif
 
                         <!-- Upload Payment Proof -->
-                        @if(in_array($transaction->payment_method, ['transfer', 'qris']) && $transaction->status === 'pending')
+                        @if(in_array($transaction->payment_method, ['transfer', 'qris', 'qris_event']) && $transaction->status === 'pending')
                         <div class="card border-warning mb-4 shadow-sm overflow-hidden">
                             <div class="card-header bg-warning text-dark text-center py-3">
                                 <h6 class="fw-bold mb-0"><i class="bi bi-cloud-upload me-2"></i>Upload Bukti Pembayaran</h6>
@@ -329,9 +351,9 @@
                         <div class="alert alert-warning mb-4 border-0 shadow-sm text-start">
                             <h6 class="fw-bold mb-2"><i class="bi bi-exclamation-triangle-fill me-2"></i>Instruksi Pembayaran:</h6>
                             <ol class="small mb-0 ps-3">
-                                @if ($transaction->payment_method === 'qris')
+                                @if ($transaction->payment_method === 'qris' || $transaction->payment_method === 'qris_event')
                                     <li>Buka aplikasi e-wallet atau mobile banking Anda (Gopay, OVO, Dana, dll)</li>
-                                    <li>Gunakan fitur <strong>Scan/Bayar</strong> dan arahkan ke kode QR di atas</li>
+                                    <li>Gunakan fitur <strong>Scan/Bayar</strong> dan arahkan ke kode QR di atas @if($transaction->payment_method === 'qris_event') (Scan masing-masing QRIS UMKM) @endif</li>
                                     <li>Masukkan nominal sesuai total tagihan: <strong>Rp{{ number_format($transaction->total_price, 0, ',', '.') }}</strong></li>
                                     <li>Kirim bukti pembayaran ke nomor WhatsApp admin untuk konfirmasi cepat</li>
                                 @elseif ($transaction->payment_method === 'transfer')
