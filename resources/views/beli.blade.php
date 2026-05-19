@@ -94,23 +94,23 @@
             </div>
 
             <!-- CTA Buttons -->
-            <div class="d-flex gap-3">
-                <form action="{{ route('cart.add', $product->id) }}" method="POST" class="d-inline">
+            <div class="d-flex flex-column flex-lg-row gap-3">
+                <form action="{{ route('cart.add', $product->id) }}" method="POST" class="d-block w-100" style="flex: 1;">
                     @csrf
                     <input type="hidden" name="quantity" id="cart-qty" value="1">
-                    <button type="submit" class="btn btn-outline-success btn-lg grow px-4 {{ $product->stok <= 0 ? 'disabled' : '' }}">
+                    <button type="submit" class="btn btn-outline-success btn-lg grow px-4 w-100 {{ $product->stok <= 0 ? 'disabled' : '' }}">
                         <i class="bi bi-cart-plus me-2"></i>Tambah ke Keranjang
                     </button>
                 </form>
-                <form action="{{ route('cart.add', $product->id) }}" method="POST" class="d-inline">
+                <form action="{{ route('cart.add', $product->id) }}" method="POST" class="d-block w-100" style="flex: 1;">
                     @csrf
                     <input type="hidden" name="quantity" id="buy-qty" value="1">
                     <input type="hidden" name="redirect" value="checkout">
-                    <button type="submit" class="btn btn-success btn-lg grow px-4 {{ $product->stok <= 0 ? 'disabled' : '' }}">
+                    <button type="submit" class="btn btn-success btn-lg grow px-4 w-100 {{ $product->stok <= 0 ? 'disabled' : '' }}">
                         <i class="bi bi-cart-check me-2"></i>Beli Sekarang
                     </button>
                 </form>
-                <a href="/katalog" class="btn btn-outline-secondary btn-lg">
+                <a href="/katalog" class="btn btn-outline-secondary btn-lg w-100 d-lg-inline-block" style="flex: 0 0 auto;">
                     <i class="bi bi-arrow-left me-2"></i>Kembali
                 </a>
             </div>
