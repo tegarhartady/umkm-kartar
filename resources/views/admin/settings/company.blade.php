@@ -241,6 +241,12 @@
                             <input type="email" name="company_email" class="form-control-custom" 
                                    value="{{ $settings['company_email']->value ?? '' }}" required>
                         </div>
+                        <div class="form-group">
+                            <label class="form-label">Nomor WhatsApp (Contoh: 62812...)</label>
+                            <input type="tel" name="company_whatsapp" class="form-control-custom" 
+                                   value="{{ $settings['company_whatsapp']->value ?? '' }}" placeholder="628..." required>
+                        </div>
+                    </div>
 
                     <div class="form-row">
                         <div class="form-group">

@@ -1134,6 +1134,70 @@ $promo = $activePromotion ?? (object)[
         </div>
     </div>
 </div>
+</div>
 @endif
+
+<!-- Floating WhatsApp Button -->
+@php 
+    $waNumber = \App\Models\Setting::where('key', 'company_whatsapp')->value('value') ?? '6281234567890';
+    // Ensure it starts with 62 or +62
+    $waNumber = preg_replace('/[^0-9]/', '', $waNumber);
+    if (str_starts_with($waNumber, '0')) {
+        $waNumber = '62' . substr($waNumber, 1);
+    }
+@endphp
+<a href="https://wa.me/{{ $waNumber }}" target="_blank" class="floating-wa shadow-lg d-flex align-items-center justify-content-center" title="Hubungi Kami via WhatsApp">
+    <i class="bi bi-whatsapp"></i>
+</a>
+
+<style>
+    .floating-wa {
+        position: fixed;
+        width: 60px;
+        height: 60px;
+        bottom: 40px;
+        right: 40px;
+        background-color: #25d366;
+        color: #FFF;
+        border-radius: 50px;
+        text-align: center;
+        font-size: 30px;
+        z-index: 1050;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        animation: pulse-wa 2s infinite;
+    }
+
+    .floating-wa:hover {
+        background-color: #128C7E;
+        color: #fff;
+        transform: scale(1.1);
+        box-shadow: 0 10px 25px rgba(37, 211, 102, 0.5) !important;
+        animation: none;
+    }
+
+    @keyframes pulse-wa {
+        0% {
+            box-shadow: 0 0 0 0 rgba(37, 211, 102, 0.7);
+        }
+        70% {
+            box-shadow: 0 0 0 15px rgba(37, 211, 102, 0);
+        }
+        100% {
+            box-shadow: 0 0 0 0 rgba(37, 211, 102, 0);
+        }
+    }
+
+    /* Adjust position on mobile to avoid overlapping with bottom event banner */
+    @media (max-width: 1199px) {
+        .floating-wa {
+            bottom: 85px; /* Above the mobile bottom banner if active */
+            right: 20px;
+            width: 55px;
+            height: 55px;
+            font-size: 28px;
+        }
+    }
+</style>
 
 @endsection

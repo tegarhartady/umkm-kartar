@@ -40,6 +40,7 @@ class SettingController extends Controller
             'about_heading' => 'nullable|string|max:255',
             'about_text' => 'nullable|string',
             'company_footer_text' => 'nullable|string',
+            'company_whatsapp' => 'nullable|string|max:20',
             'seo_title' => 'nullable|string|max:255',
             'seo_description' => 'nullable|string|max:500',
             'social_facebook' => 'nullable|url',
