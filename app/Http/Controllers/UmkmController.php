@@ -359,9 +359,8 @@ class UmkmController extends Controller
     {
         $umkm = Umkm::findOrFail($id);
         
-        // Generate password baru: reset + 4 angka random
-        $randomNumber = str_pad(rand(0, 9999), 4, '0', STR_PAD_LEFT);
-        $newPassword = 'reset' . $randomNumber;
+        // Generate password baru: password123
+        $newPassword = 'password123';
         
         $umkm->update([
             'password' => bcrypt($newPassword)
