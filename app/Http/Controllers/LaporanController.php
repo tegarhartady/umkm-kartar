@@ -129,4 +129,52 @@ class LaporanController extends Controller
 
         return view('admin.laporan.transaksi_desa', compact('desaList', 'selectedDesa', 'transactions'));
     }
+
+    public function exportTransaksiDesaExcel(Request $request)
+    {
+        $selectedDesa = $request->get('desa');
+        $fileName = 'data_transaksi_desa_' . ($selectedDesa ? str_replace(' ', '_', strtolower($selectedDesa)) . '_' : '') . date('Y-m-d') . '.xls';
+        
+        $query = \App\Models\Transaction::with(['umkm', 'product', 'user'])
+            ->select('transactions.*')
+            ->join('umkms', 'transactions.umkm_id', '=', 'umkms.id');
+
+        if ($selectedDesa) {
+            $query->where('umkms.desa', $selectedDesa);
+        }
+
+        $query->orderBy('umkms.desa', 'asc')->orderBy('transactions.created_at', 'desc');
+        $transactions = $query->get();
+
+        $headers = array(
+            "Content-type"        => "application/vnd.ms-excel; charset=utf-8",
+            "Content-Disposition" => "attachment; filename=$fileName",
+            "Pragma"              => "no-cache",
+            "Cache-Control"       => "must-revalidate, post-check=0, pre-check=0",
+            "Expires"             => "0"
+        );
+
+        $html = '<html xmlns:x="urn:schemas-microsoft-com:office:excel">';
+        $html .= '<head><meta charset="utf-8"></head><body>';
+        $html .= '<table border="1">';
+        $html .= '<tr><th>ID</th><th>Tgl Transaksi</th><th>Desa</th><th>UMKM</th><th>Nama Pembeli</th><th>No HP</th><th>Produk</th><th>Total Harga (Rp)</th><th>Status</th></tr>';
+        
+        foreach ($transactions as $txn) {
+            $html .= '<tr>';
+            $html .= '<td>' . $txn->id . '</td>';
+            $html .= '<td>' . ($txn->created_at ? $txn->created_at->format('Y-m-d H:i') : '') . '</td>';
+            $html .= '<td>' . htmlspecialchars($txn->umkm->desa ?? '') . '</td>';
+            $html .= '<td>' . htmlspecialchars($txn->umkm->nama_toko ?? '') . '</td>';
+            $html .= '<td>' . htmlspecialchars($txn->buyer_name ?? '') . '</td>';
+            $html .= '<td style="mso-number-format:\'\@\';">' . htmlspecialchars($txn->buyer_phone ?? '') . '</td>';
+            $html .= '<td>' . htmlspecialchars($txn->product->nama_produk ?? '') . ' (' . $txn->quantity . 'x)</td>';
+            $html .= '<td>' . ($txn->total_price ?? 0) . '</td>';
+            $html .= '<td>' . htmlspecialchars($txn->status ?? '') . '</td>';
+            $html .= '</tr>';
+        }
+        
+        $html .= '</table></body></html>';
+
+        return response($html, 200, $headers);
+    }
 }

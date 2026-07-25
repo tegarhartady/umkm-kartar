@@ -118,6 +118,91 @@
         </div>
     </div>
 
+    <!-- Customer Reviews Section -->
+    <div class="row mt-5 pt-4">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm rounded-4 p-4 p-md-5">
+                <div class="d-flex align-items-center justify-content-between mb-4 flex-wrap gap-2">
+                    <div>
+                        <h4 class="fw-bold mb-1">Ulasan Pembeli</h4>
+                        <p class="text-muted mb-0 small">Pengalaman nyata dari customer yang sudah membeli produk ini</p>
+                    </div>
+                    <div class="text-end">
+                        <div class="d-flex align-items-center gap-1 justify-content-end">
+                            <i class="bi bi-star-fill text-warning fs-5"></i>
+                            <span class="fs-4 fw-bold text-dark">{{ number_format($product->reviews_avg_rating ?? 0, 1) }}</span>
+                            <span class="text-muted">/ 5.0</span>
+                        </div>
+                        <div class="small text-muted">Dari {{ $product->reviews_count }} ulasan</div>
+                    </div>
+                </div>
+
+                @if($product->reviews->count() > 0)
+                    <style>
+                        #reviewsSlider::-webkit-scrollbar {
+                            height: 6px;
+                        }
+                        #reviewsSlider::-webkit-scrollbar-track {
+                            background: #f1f1f1;
+                            border-radius: 10px;
+                        }
+                        #reviewsSlider::-webkit-scrollbar-thumb {
+                            background: #198754;
+                            border-radius: 10px;
+                        }
+                        #reviewsSlider::-webkit-scrollbar-thumb:hover {
+                            background: #157347;
+                        }
+                    </style>
+                    <div class="position-relative">
+                        <div id="reviewsSlider" class="d-flex gap-4 overflow-x-auto pb-3 pt-1 px-1" style="scroll-snap-type: x mandatory; scroll-behavior: smooth; -webkit-overflow-scrolling: touch;">
+                            @foreach($product->reviews as $review)
+                            <div class="flex-shrink-0" style="width: calc(50% - 0.75rem); min-width: 290px; scroll-snap-align: start;">
+                                <div class="p-3 bg-light rounded-3 h-100 border-start border-4 border-success d-flex flex-column justify-content-between shadow-sm" style="background-color: #f8f9fa;">
+                                    <div>
+                                        <div class="d-flex justify-content-between align-items-center mb-2">
+                                            <div class="d-flex align-items-center gap-2">
+                                                <div class="bg-success text-white rounded-circle d-flex align-items-center justify-content-center fw-bold shadow-sm" style="width: 38px; height: 38px; font-size: 14px;">
+                                                    {{ strtoupper(substr($review->user->name ?? 'Customer', 0, 1)) }}
+                                                </div>
+                                                <div>
+                                                    <h6 class="mb-0 fw-bold text-dark">{{ $review->user->name ?? 'Customer' }}</h6>
+                                                    <small class="text-muted" style="font-size: 11px;">{{ $review->created_at ? $review->created_at->diffForHumans() : '-' }}</small>
+                                                </div>
+                                            </div>
+                                            <div class="text-warning text-nowrap">
+                                                @for($i = 1; $i <= 5; $i++)
+                                                    <i class="bi bi-star{{ $i <= $review->rating ? '-fill' : '' }}" style="font-size: 14px;"></i>
+                                                @endfor
+                                            </div>
+                                        </div>
+                                        <p class="mb-0 text-secondary small mt-2 fst-italic">"{{ $review->comment ?? 'Pesanan telah diselesaikan dengan baik.' }}"</p>
+                                    </div>
+                                </div>
+                            </div>
+                            @endforeach
+                        </div>
+                        @if($product->reviews->count() > 2)
+                        <div class="d-flex justify-content-between align-items-center mt-3 pt-1">
+                            <small class="text-muted"><i class="bi bi-arrows-collapse-horizontal me-1"></i>Geser untuk melihat ulasan lainnya</small>
+                            <div class="d-flex gap-2">
+                                <button type="button" class="btn btn-sm btn-outline-success rounded-circle d-flex align-items-center justify-content-center" style="width: 36px; height: 36px;" onclick="document.getElementById('reviewsSlider').scrollBy({left: -320, behavior: 'smooth'})" title="Sebelumnya"><i class="bi bi-chevron-left"></i></button>
+                                <button type="button" class="btn btn-sm btn-outline-success rounded-circle d-flex align-items-center justify-content-center" style="width: 36px; height: 36px;" onclick="document.getElementById('reviewsSlider').scrollBy({left: 320, behavior: 'smooth'})" title="Selanjutnya"><i class="bi bi-chevron-right"></i></button>
+                            </div>
+                        </div>
+                        @endif
+                    </div>
+                @else
+                    <div class="text-center py-5 bg-light rounded-3">
+                        <i class="bi bi-chat-square-text text-muted" style="font-size: 2.5rem;"></i>
+                        <p class="mt-2 text-muted fw-semibold mb-0">Belum ada ulasan untuk produk ini.</p>
+                        <small class="text-muted">Jadilah yang pertama memberikan ulasan setelah membeli produk ini!</small>
+                    </div>
+                @endif
+            </div>
+        </div>
+    </div>
+
     <!-- Related Products -->
     @if($relatedProducts->count() > 0)
     <div class="row mt-5 pt-5">

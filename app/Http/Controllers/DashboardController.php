@@ -12,6 +12,8 @@ class DashboardController extends Controller
 {
     public function admin()
     {
+        \App\Models\Review::autoGenerateForCompletedTransactions();
+
         // Fetch real data from database
         $umkmCount = Umkm::count();
         $umkmBaru = Umkm::where('created_at', '>=', now()->subDays(7))->count();
@@ -98,6 +100,8 @@ class DashboardController extends Controller
 
     public function umkm()
     {
+        \App\Models\Review::autoGenerateForCompletedTransactions();
+
         $user = auth()->user();
         
         // Get UMKM data for this user

@@ -45,24 +45,28 @@
 
 <!-- Filter & Search -->
 <div class="filter-section mb-4">
-    <div class="row g-3">
-        <div class="col-md-6">
+    <form action="{{ route('admin.umkm.index') }}" method="GET" class="row g-3 align-items-center">
+        <div class="col-md-5">
             <div class="input-group input-group-lg search-box">
                 <span class="input-group-text">
                     <i class="bi bi-search"></i>
                 </span>
-                <input type="text" class="form-control" id="searchBox" placeholder="Cari nama toko atau pemilik...">
+                <input type="text" name="search" class="form-control" placeholder="Cari nama toko, pemilik, atau desa..." value="{{ request('search') }}">
             </div>
         </div>
-        <div class="col-md-6">
-            <select class="form-select form-select-lg" id="statusFilter">
+        <div class="col-md-4">
+            <select name="status" class="form-select form-select-lg">
                 <option value="">Semua Status</option>
-                <option value="disetujui">Disetujui</option>
-                <option value="pending">Menunggu</option>
-                <option value="ditolak">Ditolak</option>
+                <option value="disetujui" {{ in_array(request('status'), ['disetujui', 'approved']) ? 'selected' : '' }}>Disetujui</option>
+                <option value="pending" {{ request('status') == 'pending' ? 'selected' : '' }}>Menunggu</option>
+                <option value="ditolak" {{ in_array(request('status'), ['ditolak', 'rejected']) ? 'selected' : '' }}>Ditolak</option>
             </select>
         </div>
-    </div>
+        <div class="col-md-3 d-flex gap-2">
+            <button type="submit" class="btn btn-primary btn-lg flex-grow-1"><i class="bi bi-filter me-1"></i>Filter</button>
+            <a href="{{ route('admin.umkm.index') }}" class="btn btn-light btn-lg"><i class="bi bi-arrow-counterclockwise me-1"></i>Reset</a>
+        </div>
+    </form>
 </div>
 
 <!-- UMKM Grid View -->
@@ -440,26 +444,4 @@
 </style>
 @endpush
 
-@push('scripts')
-<script>
-// Simple search filter
-document.addEventListener('DOMContentLoaded', function() {
-    const searchBox = document.getElementById('searchBox');
-    const statusFilter = document.getElementById('statusFilter');
-    
-    if(searchBox) {
-        searchBox.addEventListener('input', function() {
-            // In production, this should use proper filtering via API or form submit
-            console.log('Search:', this.value);
-        });
-    }
-    
-    if(statusFilter) {
-        statusFilter.addEventListener('change', function() {
-            // In production, this should use proper filtering via API or form submit
-            console.log('Status:', this.value);
-        });
-    }
-});
-</script>
-@endpush
+

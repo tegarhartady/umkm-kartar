@@ -67,4 +67,65 @@ class Transaction extends Model
     {
         return $this->hasMany(TransactionItem::class);
     }
+
+    protected static function booted()
+    {
+        static::created(function ($transaction) {
+            $activeStatuses = ['paid', 'proses', 'ready', 'shipping', 'completed'];
+            if (in_array($transaction->status, $activeStatuses)) {
+                $transaction->decrementProductStock();
+            }
+        });
+
+        static::updating(function ($transaction) {
+            if ($transaction->isDirty('status')) {
+                $oldStatus = $transaction->getOriginal('status');
+                $newStatus = $transaction->status;
+
+                $activeStatuses = ['paid', 'proses', 'ready', 'shipping', 'completed'];
+                $inactiveStatuses = ['pending', 'cancelled', 'failed'];
+
+                // Jika berubah dari inactive (misal pending) ke active (misal paid/proses/completed)
+                if (in_array($oldStatus, $inactiveStatuses) && in_array($newStatus, $activeStatuses)) {
+                    $transaction->decrementProductStock();
+                }
+
+                // Jika berubah dari active ke inactive (misal dibatalkan setelah bayar/proses)
+                if (in_array($oldStatus, $activeStatuses) && in_array($newStatus, $inactiveStatuses)) {
+                    $transaction->incrementProductStock();
+                }
+            }
+        });
+    }
+
+    public function decrementProductStock()
+    {
+        if ($this->items()->count() > 0) {
+            foreach ($this->items as $item) {
+                $product = $item->product;
+                if ($product && $product->stok !== null) {
+                    $newStock = max(0, $product->stok - $item->quantity);
+                    $product->update(['stok' => $newStock]);
+                }
+            }
+        } elseif ($this->product && $this->product->stok !== null) {
+            $product = $this->product;
+            $newStock = max(0, $product->stok - $this->quantity);
+            $product->update(['stok' => $newStock]);
+        }
+    }
+
+    public function incrementProductStock()
+    {
+        if ($this->items()->count() > 0) {
+            foreach ($this->items as $item) {
+                $product = $item->product;
+                if ($product && $product->stok !== null) {
+                    $product->increment('stok', $item->quantity);
+                }
+            }
+        } elseif ($this->product && $this->product->stok !== null) {
+            $this->product->increment('stok', $this->quantity);
+        }
+    }
 }

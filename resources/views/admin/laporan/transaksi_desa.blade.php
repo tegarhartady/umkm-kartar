@@ -18,7 +18,12 @@
         <div class="col-12">
             <div class="card border-0 shadow-sm rounded-4">
                 <div class="card-body p-4">
-                    <h5 class="fw-bold mb-4">Filter Transaksi Berdasarkan Desa</h5>
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h5 class="fw-bold mb-0">Filter Transaksi Berdasarkan Desa</h5>
+                        <a href="{{ route('admin.laporan.transaksi_desa.export', request()->all()) }}" class="btn btn-success shadow-sm text-white">
+                            <i class="bi bi-file-earmark-excel me-2"></i>Export Excel
+                        </a>
+                    </div>
                     
                     <form action="{{ route('admin.laporan.transaksi_desa') }}" method="GET" class="row g-3 align-items-end">
                         <div class="col-md-6 col-lg-4">

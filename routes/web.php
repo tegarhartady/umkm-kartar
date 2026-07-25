@@ -177,6 +177,7 @@ Route::middleware(['auth', 'admin.superadmin'])->group(function () {
 
     // Reports
     Route::get('admin/laporan', [LaporanController::class, 'index'])->name('admin.laporan.index');
+    Route::get('admin/laporan/transaksi-desa/export', [LaporanController::class, 'exportTransaksiDesaExcel'])->name('admin.laporan.transaksi_desa.export');
     Route::get('admin/laporan/transaksi-desa', [LaporanController::class, 'transaksiDesa'])->name('admin.laporan.transaksi_desa');
 
     // Master Data

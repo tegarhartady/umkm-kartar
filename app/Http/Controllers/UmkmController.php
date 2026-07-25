@@ -16,9 +16,32 @@ use App\Mail\UmkmPasswordReset;
 
 class UmkmController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $umkms = Umkm::withCount('products')->paginate(10);
+        $query = Umkm::withCount('products');
+
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('nama_toko', 'like', "%{$search}%")
+                  ->orWhere('pemilik', 'like', "%{$search}%")
+                  ->orWhere('email', 'like', "%{$search}%")
+                  ->orWhere('desa', 'like', "%{$search}%");
+            });
+        }
+
+        if ($request->filled('status')) {
+            $status = $request->status;
+            if ($status === 'disetujui' || $status === 'approved') {
+                $query->whereIn('status', ['disetujui', 'approved']);
+            } elseif ($status === 'ditolak' || $status === 'rejected') {
+                $query->whereIn('status', ['ditolak', 'rejected']);
+            } else {
+                $query->where('status', $status);
+            }
+        }
+
+        $umkms = $query->latest()->paginate(10)->appends($request->all());
         return view('admin.umkm.index', compact('umkms'));
     }
 

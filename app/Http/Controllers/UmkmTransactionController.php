@@ -97,26 +97,8 @@ class UmkmTransactionController extends Controller
             'delivery_status' => 'nullable|string',
         ]);
 
-        // Logic: Jika status berubah menjadi 'proses' (diterima oleh UMKM)
-        // Maka kurangi stok produk sesuai quantity pesanan
-        // Logic: Jika status berubah menjadi 'proses' (diterima oleh UMKM)
-        // Maka kurangi stok produk sesuai quantity pesanan
-        if ($validated['status'] === 'proses' && $transaction->status !== 'proses') {
-            // Check items first, then fallback to single product
-            if ($transaction->items->count() > 0) {
-                foreach ($transaction->items as $item) {
-                    $product = $item->product;
-                    if ($product) {
-                        $newStock = max(0, $product->stok - $item->quantity);
-                        $product->update(['stok' => $newStock]);
-                    }
-                }
-            } elseif ($transaction->product) {
-                $product = $transaction->product;
-                $newStock = max(0, $product->stok - $transaction->quantity);
-                $product->update(['stok' => $newStock]);
-            }
-        }
+        // Logic pemotongan stok sekarang sudah ditangani secara otomatis
+        // oleh model event di App\Models\Transaction (updating/created)
 
         $updateData = ['status' => $validated['status']];
         if (isset($validated['delivery_status'])) {

@@ -10,6 +10,8 @@ class HomeController extends Controller
 {
     public function index()
     {
+        \App\Models\Review::autoGenerateForCompletedTransactions();
+
         $recommendedProducts = Product::where('status', 'aktif')
             ->withAvg('reviews', 'rating')
             ->orderByDesc('is_best_seller')
@@ -33,6 +35,9 @@ class HomeController extends Controller
     {
         $product = Product::withAvg('reviews', 'rating')
             ->withCount('reviews')
+            ->with(['reviews' => function($q) {
+                $q->with('user')->latest();
+            }])
             ->withSum(['transactions' => function ($query) {
                 $query->whereIn('status', ['completed']);
             }], 'quantity')

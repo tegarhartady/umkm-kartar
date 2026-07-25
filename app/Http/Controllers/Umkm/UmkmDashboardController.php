@@ -10,6 +10,8 @@ class UmkmDashboardController extends Controller
 {
     public function index()
     {
+        \App\Models\Review::autoGenerateForCompletedTransactions();
+
         $umkm = Auth::guard('umkm')->user();
         $products = $umkm->products()->latest()->paginate(10);
         $totalProducts = $umkm->products()->count();
