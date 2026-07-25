@@ -7,9 +7,41 @@
             <h1 class="page-title mb-1">Riwayat Transaksi</h1>
             <p class="text-muted small mb-0">Manajemen data transaksi UMKM Karang Taruna Teluknaga</p>
         </div>
-        <a href="{{ route('admin.transactions.create') }}" class="btn btn-primary shadow-sm">
-            <i class="bi bi-plus-lg me-2"></i>Tambah Transaksi
-        </a>
+        <div class="d-flex gap-2">
+            <a href="{{ route('admin.transactions.export', request()->all()) }}" class="btn btn-success shadow-sm text-white">
+                <i class="bi bi-file-earmark-excel me-2"></i>Export Excel
+            </a>
+            <a href="{{ route('admin.transactions.create') }}" class="btn btn-primary shadow-sm">
+                <i class="bi bi-plus-lg me-2"></i>Tambah Transaksi
+            </a>
+        </div>
+    </div>
+
+    <!-- Filter Form -->
+    <div class="card border-0 shadow-sm mb-4">
+        <div class="card-body p-3">
+            <form action="{{ route('admin.transactions.index') }}" method="GET" class="row g-2 align-items-center">
+                <div class="col-md-4">
+                    <input type="text" name="search" class="form-control" placeholder="Cari kode transaksi, checkout, atau pembeli..." value="{{ request('search') }}">
+                </div>
+                <div class="col-md-3">
+                    <select name="status" class="form-select">
+                        <option value="">Semua Status</option>
+                        <option value="pending" {{ request('status') == 'pending' ? 'selected' : '' }}>Pending</option>
+                        <option value="paid" {{ request('status') == 'paid' ? 'selected' : '' }}>Paid</option>
+                        <option value="proses" {{ request('status') == 'proses' ? 'selected' : '' }}>Diproses</option>
+                        <option value="ready" {{ request('status') == 'ready' ? 'selected' : '' }}>Siap Diambil/Dikirim</option>
+                        <option value="shipping" {{ request('status') == 'shipping' ? 'selected' : '' }}>Dikirim</option>
+                        <option value="completed" {{ request('status') == 'completed' ? 'selected' : '' }}>Selesai</option>
+                        <option value="failed" {{ request('status') == 'failed' ? 'selected' : '' }}>Gagal/Batal</option>
+                    </select>
+                </div>
+                <div class="col-md-5 d-flex gap-2">
+                    <button type="submit" class="btn btn-primary"><i class="bi bi-search me-1"></i>Filter</button>
+                    <a href="{{ route('admin.transactions.index') }}" class="btn btn-light"><i class="bi bi-arrow-counterclockwise me-1"></i>Reset</a>
+                </div>
+            </form>
+        </div>
     </div>
 
     @if ($message = Session::get('success'))

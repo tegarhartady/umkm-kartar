@@ -186,6 +186,7 @@ Route::middleware(['auth', 'admin.superadmin'])->group(function () {
     Route::get('admin/laporan/export/excel', [LaporanController::class, 'exportExcel'])->name('admin.laporan.export.excel');
 
     // Transaction Management
+    Route::get('admin/transactions/export', [TransactionController::class, 'exportExcel'])->name('admin.transactions.export');
     Route::resource('admin/transactions', TransactionController::class, ['as' => 'admin']);
 
     // User Management

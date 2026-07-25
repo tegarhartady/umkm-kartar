@@ -17,6 +17,19 @@ class TransactionController extends Controller
     {
         $query = Transaction::with(['user', 'product', 'items', 'umkm']);
         
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('transaction_code', 'like', "%{$search}%")
+                  ->orWhere('checkout_code', 'like', "%{$search}%")
+                  ->orWhere('buyer_name', 'like', "%{$search}%");
+            });
+        }
+        
         // Fetch all and group by checkout_code or transaction_code
         $allTransactions = $query->latest()->get();
         $groupedTransactions = $allTransactions->groupBy(function($item) {
@@ -151,5 +164,60 @@ class TransactionController extends Controller
 
         return redirect()->route('admin.transactions.index')
             ->with('success', 'Transaksi berhasil dihapus');
+    }
+
+    public function exportExcel(Request $request)
+    {
+        $fileName = 'data_transaksi_' . date('Y-m-d') . '.xls';
+        
+        $query = Transaction::with(['umkm', 'product', 'user']);
+        
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('transaction_code', 'like', "%{$search}%")
+                  ->orWhere('checkout_code', 'like', "%{$search}%")
+                  ->orWhere('buyer_name', 'like', "%{$search}%");
+            });
+        }
+
+        $transactions = $query->latest()->get();
+
+        $headers = array(
+            "Content-type"        => "application/vnd.ms-excel; charset=utf-8",
+            "Content-Disposition" => "attachment; filename=$fileName",
+            "Pragma"              => "no-cache",
+            "Cache-Control"       => "must-revalidate, post-check=0, pre-check=0",
+            "Expires"             => "0"
+        );
+
+        $html = '<html xmlns:x="urn:schemas-microsoft-com:office:excel">';
+        $html .= '<head><meta charset="utf-8"></head><body>';
+        $html .= '<table border="1">';
+        $html .= '<tr><th>ID</th><th>Tgl Transaksi</th><th>Kode Transaksi</th><th>Kode Checkout</th><th>Nama Pembeli</th><th>No HP</th><th>Desa/UMKM</th><th>Produk</th><th>Total Harga (Rp)</th><th>Metode Pembayaran</th><th>Status</th></tr>';
+        
+        foreach ($transactions as $txn) {
+            $html .= '<tr>';
+            $html .= '<td>' . $txn->id . '</td>';
+            $html .= '<td>' . ($txn->created_at ? $txn->created_at->format('Y-m-d H:i') : '') . '</td>';
+            $html .= '<td style="mso-number-format:\'\@\';">' . htmlspecialchars($txn->transaction_code ?? '') . '</td>';
+            $html .= '<td style="mso-number-format:\'\@\';">' . htmlspecialchars($txn->checkout_code ?? '') . '</td>';
+            $html .= '<td>' . htmlspecialchars($txn->buyer_name ?? '') . '</td>';
+            $html .= '<td style="mso-number-format:\'\@\';">' . htmlspecialchars($txn->buyer_phone ?? '') . '</td>';
+            $html .= '<td>' . htmlspecialchars(($txn->umkm->desa ?? '') . ' / ' . ($txn->umkm->nama_toko ?? '')) . '</td>';
+            $html .= '<td>' . htmlspecialchars($txn->product->nama_produk ?? '') . ' (' . $txn->quantity . 'x)</td>';
+            $html .= '<td>' . ($txn->total_price ?? 0) . '</td>';
+            $html .= '<td>' . htmlspecialchars(strtoupper($txn->payment_method ?? '')) . '</td>';
+            $html .= '<td>' . htmlspecialchars($txn->status ?? '') . '</td>';
+            $html .= '</tr>';
+        }
+        
+        $html .= '</table></body></html>';
+
+        return response($html, 200, $headers);
     }
 }

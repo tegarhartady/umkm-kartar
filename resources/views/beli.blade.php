@@ -46,6 +46,7 @@
                     </div>
                     <span class="fw-bold me-1">{{ number_format($rating, 1) }}</span>
                     <span class="text-muted">({{ $product->reviews_count }} Ulasan)</span>
+                    <span class="text-muted ms-2 px-2 border-start">&bull; {{ $product->transactions_sum_quantity ?? 0 }} Terjual</span>
                 </div>
 
                 <!-- UMKM Info -->

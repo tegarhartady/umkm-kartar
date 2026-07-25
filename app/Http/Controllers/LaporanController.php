@@ -67,44 +67,41 @@ class LaporanController extends Controller
 
     public function exportExcel()
     {
-        $fileName = 'data_umkm_' . date('Y-m-d') . '.csv';
+        $fileName = 'data_umkm_' . date('Y-m-d') . '.xls';
         $umkms = Umkm::all();
 
         $headers = array(
-            "Content-type"        => "text/csv",
+            "Content-type"        => "application/vnd.ms-excel; charset=utf-8",
             "Content-Disposition" => "attachment; filename=$fileName",
             "Pragma"              => "no-cache",
             "Cache-Control"       => "must-revalidate, post-check=0, pre-check=0",
             "Expires"             => "0"
         );
 
-        $columns = array('ID', 'Nama Toko', 'Pemilik', 'Desa', 'Kecamatan', 'Kategori', 'No Telp', 'Omzet Bulanan (Rp)', 'Status', 'Tanggal Daftar');
+        $html = '<html xmlns:x="urn:schemas-microsoft-com:office:excel">';
+        $html .= '<head><meta charset="utf-8"></head><body>';
+        $html .= '<table border="1">';
+        $html .= '<tr><th>ID</th><th>Nama Toko</th><th>Pemilik</th><th>Desa</th><th>Kecamatan</th><th>Kategori</th><th>No Telp</th><th>Omzet Bulanan (Rp)</th><th>Status</th><th>Tanggal Daftar</th></tr>';
+        
+        foreach ($umkms as $umkm) {
+            $html .= '<tr>';
+            $html .= '<td>' . $umkm->id . '</td>';
+            $html .= '<td>' . htmlspecialchars($umkm->nama_toko ?? '') . '</td>';
+            $html .= '<td>' . htmlspecialchars($umkm->pemilik ?? '') . '</td>';
+            $html .= '<td>' . htmlspecialchars($umkm->desa ?? '') . '</td>';
+            $html .= '<td>' . htmlspecialchars($umkm->kecamatan ?? '') . '</td>';
+            $html .= '<td>' . htmlspecialchars($umkm->kategori ?? '') . '</td>';
+            // mso-number-format:'\@' is an Excel CSS hack to treat the cell as text (preserves leading zeros)
+            $html .= '<td style="mso-number-format:\'\@\';">' . htmlspecialchars($umkm->no_telp ?? '') . '</td>';
+            $html .= '<td>' . ($umkm->omzet_bulanan ?? 0) . '</td>';
+            $html .= '<td>' . htmlspecialchars($umkm->status ?? '') . '</td>';
+            $html .= '<td>' . ($umkm->created_at ? $umkm->created_at->format('Y-m-d H:i') : '') . '</td>';
+            $html .= '</tr>';
+        }
+        
+        $html .= '</table></body></html>';
 
-        $callback = function() use($umkms, $columns) {
-            $file = fopen('php://output', 'w');
-            // Add BOM for Excel UTF-8 compatibility
-            fputs($file, "\xEF\xBB\xBF");
-            fputcsv($file, $columns);
-
-            foreach ($umkms as $umkm) {
-                fputcsv($file, array(
-                    $umkm->id,
-                    $umkm->nama_toko,
-                    $umkm->pemilik,
-                    $umkm->desa,
-                    $umkm->kecamatan,
-                    $umkm->kategori,
-                    $umkm->no_telp,
-                    $umkm->omzet_bulanan,
-                    $umkm->status,
-                    $umkm->created_at ? $umkm->created_at->format('Y-m-d H:i') : ''
-                ));
-            }
-
-            fclose($file);
-        };
-
-        return response()->stream($callback, 200, $headers);
+        return response($html, 200, $headers);
     }
 
     public function transaksiDesa(Request $request)

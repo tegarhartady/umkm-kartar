@@ -33,6 +33,9 @@ class HomeController extends Controller
     {
         $product = Product::withAvg('reviews', 'rating')
             ->withCount('reviews')
+            ->withSum(['transactions' => function ($query) {
+                $query->whereIn('status', ['completed']);
+            }], 'quantity')
             ->findOrFail($id);
             
         $umkm = $product->umkm;
