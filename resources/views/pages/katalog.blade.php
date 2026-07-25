@@ -171,7 +171,10 @@
                                         </div>
                                     </div>
                                     <h5 class="product-title">{{ $product->nama_produk }}</h5>
-                                    <p class="product-seller"><i class="bi bi-shop me-1"></i> {{ $product->umkm->nama_toko ?? 'UMKM' }} &middot; <small class="text-muted">{{ $product->umkm->desa ?? '' }}</small></p>
+                                    <div class="d-flex justify-content-between align-items-center mb-1">
+                                        <p class="product-seller m-0"><i class="bi bi-shop me-1"></i> {{ $product->umkm->nama_toko ?? 'UMKM' }} &middot; <small class="text-muted">{{ $product->umkm->desa ?? '' }}</small></p>
+                                        <small class="text-muted" style="font-size: 0.75rem;">Terjual {{ $product->transactions_sum_quantity ?? 0 }}</small>
+                                    </div>
                                     <div class="product-footer d-flex justify-content-between align-items-center">
                                         <span class="product-price">Rp {{ number_format($product->harga, 0, ',', '.') }}</span>
                                         <a href="/beli/{{ $product->id }}" class="btn btn-sm btn-primary rounded-pill">Detail</a>

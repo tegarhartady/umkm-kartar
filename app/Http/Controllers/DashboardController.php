@@ -26,12 +26,15 @@ class DashboardController extends Controller
         // Hitung total omzet dari UMKM
         $totalOmzet = Umkm::sum('omzet_bulanan') / 1000000; // konversi ke juta
         
-        // Ambil data peningkatan per desa menggunakan groupBy
-        $peningkatanDesa = Umkm::select('desa')
-            ->selectRaw('COUNT(*) as transaksi')
-            ->selectRaw('COALESCE(SUM(omzet_bulanan), 0) as total_omzet')
-            ->groupBy('desa')
-            ->orderByRaw('COUNT(*) DESC')
+        // Ambil data peningkatan per desa dari transaksi aktual 30 hari terakhir
+        $peningkatanDesa = \App\Models\Transaction::join('umkms', 'transactions.umkm_id', '=', 'umkms.id')
+            ->where('transactions.status', 'completed')
+            ->where('transactions.created_at', '>=', now()->subDays(30))
+            ->select('umkms.desa')
+            ->selectRaw('COUNT(transactions.id) as transaksi')
+            ->selectRaw('COALESCE(SUM(transactions.total_price), 0) as total_omzet')
+            ->groupBy('umkms.desa')
+            ->orderByRaw('total_omzet DESC')
             ->limit(10)
             ->get()
             ->map(function($item) {

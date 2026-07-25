@@ -25,8 +25,8 @@
         </div>
         <div class="col-auto">
             <div class="page-actions">
-                <a href="#" class="btn btn-outline-primary">
-                    <i class="bi bi-download me-2"></i>Export Data
+                <a href="{{ route('admin.laporan.export.excel') }}" class="btn btn-outline-primary">
+                    <i class="bi bi-download me-2"></i>Export Data UMKM
                 </a>
                 <a href="{{ route('admin.umkm.create') }}" class="btn btn-primary">
                     <i class="bi bi-plus-lg me-2"></i>Tambah UMKM
@@ -41,13 +41,13 @@
     <div class="row g-4 mb-4">
         <!-- Total Omzet -->
         <div class="col-lg-3 col-md-6" data-aos="fade-up">
-            <div class="stats-card">
+            <div class="stats-card" title="Dihitung dari total estimasi omzet yang diisi manual oleh UMKM saat pendaftaran, bukan dari transaksi website." style="cursor: help;" onclick="alert('Dihitung dari total estimasi omzet yang diisi manual oleh UMKM saat pendaftaran, bukan dari transaksi website.')">
                 <div class="stats-icon bg-primary">
                     <i class="bi bi-currency-dollar"></i>
                 </div>
                 <div class="stats-content">
-                    <h3 class="stats-number">{{ $data['total_omzet'] }}M</h3>
-                    <p class="stats-label">Total Omzet Global</p>
+                    <h3 class="stats-number">{{ $data['total_omzet'] }} Jt</h3>
+                    <p class="stats-label">Total Omzet Global <i class="bi bi-info-circle text-muted ms-1"></i></p>
                     <span class="stats-growth positive">+12.5%</span>
                 </div>
             </div>
@@ -83,13 +83,13 @@
 
         <!-- Total Revenue -->
         <div class="col-lg-3 col-md-6" data-aos="fade-up" data-aos-delay="300">
-            <div class="stats-card">
+            <div class="stats-card" title="Dihitung murni dari total uang hasil transaksi pelanggan di website yang sudah Selesai." style="cursor: help;" onclick="alert('Dihitung murni dari total uang hasil transaksi pelanggan di website yang sudah Selesai.')">
                 <div class="stats-icon bg-warning">
                     <i class="bi bi-graph-up"></i>
                 </div>
                 <div class="stats-content">
-                    <h3 class="stats-number">Rp{{ number_format($data['total_revenue'] / 1000000, 1) }}M</h3>
-                    <p class="stats-label">Total Revenue (Transaksi)</p>
+                    <h3 class="stats-number">Rp{{ number_format($data['total_revenue'] / 1000000, 1) }} Jt</h3>
+                    <p class="stats-label" title="Dihitung murni dari total uang hasil transaksi pelanggan di website yang sudah Selesai." style="cursor: help;">Total Revenue (Transaksi) <i class="bi bi-info-circle text-muted ms-1"></i></p>
                     <span class="stats-growth positive">Dari checkout online</span>
                 </div>
             </div>
@@ -153,9 +153,13 @@
                     <div class="desa-item-compact">
                         <div class="desa-rank">#{{ $index + 1 }}</div>
                         <div class="desa-info">
-                            <h6 class="desa-name">{{ $desa['nama'] }}</h6>
+                            <h6 class="desa-name">
+                                <a href="{{ route('admin.laporan.transaksi_desa', ['desa' => $desa['nama']]) }}" style="color: inherit; text-decoration: none;">
+                                    {{ $desa['nama'] }}
+                                </a>
+                            </h6>
                             <p class="desa-transactions">{{ $desa['transaksi'] }} transaksi</p>
-                            <span class="omzet-amount">Rp{{ number_format($desa['omzet'], 1) }}M</span>
+                            <span class="omzet-amount">Rp{{ number_format($desa['omzet'], 1) }} Jt</span>
                         </div>
                     </div>
                     @endif
@@ -178,11 +182,15 @@
                     <div class="desa-item">
                         <div class="desa-rank">#{{ $index + 1 }}</div>
                         <div class="desa-info">
-                            <h6 class="desa-name">{{ $desa['nama'] }}</h6>
+                            <h6 class="desa-name">
+                                <a href="{{ route('admin.laporan.transaksi_desa', ['desa' => $desa['nama']]) }}" style="color: inherit; text-decoration: none;">
+                                    {{ $desa['nama'] }}
+                                </a>
+                            </h6>
                             <p class="desa-transactions">{{ $desa['transaksi'] }} transaksi</p>
                         </div>
                         <div class="desa-omzet">
-                            <span class="omzet-amount">Rp {{ number_format($desa['omzet'], 1) }}M</span>
+                            <span class="omzet-amount">Rp {{ number_format($desa['omzet'], 1) }} Jt</span>
                             <div class="progress">
                                 <div class="progress-bar" style="width: {{ ($desa['omzet'] / 50) * 100 }}%"></div>
                             </div>

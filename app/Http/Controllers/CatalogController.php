@@ -14,6 +14,9 @@ class CatalogController extends Controller
         $query = Product::with('umkm')
             ->withAvg('reviews', 'rating')
             ->withCount('reviews')
+            ->withSum(['transactions' => function ($query) {
+                $query->whereIn('status', ['completed']);
+            }], 'quantity')
             ->whereIn('status', ['published', 'aktif']);
 
         // Search by product name or UMKM name

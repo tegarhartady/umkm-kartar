@@ -172,7 +172,12 @@
                             <a href="{{ route('admin.laporan.index') }}" class="nav-link {{ request()->routeIs('admin.laporan.*') ? 'active' : '' }}">
                                 <i class="nav-icon bi bi-graph-up"></i>
                                 <span class="nav-text">Laporan</span>
+                                <i class="bi bi-chevron-down ms-auto nav-arrow"></i>
                             </a>
+                            <ul class="nav-submenu {{ request()->routeIs('admin.laporan.*') ? 'show' : '' }}">
+                                <li><a href="{{ route('admin.laporan.index') }}" class="{{ request()->routeIs('admin.laporan.index') ? 'active' : '' }}">Laporan Umum</a></li>
+                                <li><a href="{{ route('admin.laporan.transaksi_desa') }}" class="{{ request()->routeIs('admin.laporan.transaksi_desa') ? 'active' : '' }}">Transaksi per Desa</a></li>
+                            </ul>
                         </li>
                         <li class="nav-item">
                             <a href="{{ route('admin.transactions.index') }}" class="nav-link {{ request()->routeIs('admin.transactions.*') ? 'active' : '' }}">

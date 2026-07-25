@@ -473,7 +473,7 @@
 
 @endsection --}}
 
-@section('scripts')
+@push('scripts')
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const searchInput = document.getElementById('searchDesa');
@@ -506,4 +506,4 @@ function confirmDelete(desaId) {
     modal.show();
 }
 </script>
-@endsection
+@endpush

@@ -45,4 +45,9 @@ class Product extends Model
     {
         return $this->reviews()->avg('rating') ?: 0;
     }
+
+    public function transactions()
+    {
+        return $this->hasMany(Transaction::class, 'product_id');
+    }
 }

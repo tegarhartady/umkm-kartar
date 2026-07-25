@@ -18,7 +18,12 @@ return new class extends Migration
                 }
                 // We will use string for status to allow more flexible statuses
                 $table->string('status')->default('pending')->change();
-                $table->string('delivery_status')->default('pending')->change();
+                
+                if (!Schema::hasColumn('transactions', 'delivery_status')) {
+                    $table->string('delivery_status')->default('pending')->after('status');
+                } else {
+                    $table->string('delivery_status')->default('pending')->change();
+                }
             });
         }
     }
